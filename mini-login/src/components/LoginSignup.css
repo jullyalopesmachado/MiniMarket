@@ -30,7 +30,7 @@
 
     width: 61px;
     height: 6px;
-    background: rgb(101, 191, 240);
+    background: linear-gradient(135deg, rgba(199, 200, 216, 0.9), rgba(51, 94, 194, 0.9), rgba(148, 149, 205, 0.9));
     border-radius: 4px;
 }
 
@@ -79,7 +79,7 @@
   }
 
   .forgot-password span{
-    color:rgb(64, 168, 224);
+    color: rgb(6, 8, 151);
     cursor: pointer;
   }
 
@@ -96,7 +96,7 @@
     width: 50px;
     height: 13px;
     color: #fff;
-    background-color: rgb(56, 153, 222);
+    background-color: rgb(23, 93, 223);
     border-radius: 50px;
     font-size: 7px;
     font-weight: 700;
