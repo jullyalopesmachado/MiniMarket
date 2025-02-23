@@ -1,0 +1,107 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    margin-top: 30px;
+    padding: 30px;
+    max-width: 500px; /* Increased max-width for better layout */
+    width: 95%; /* Responsive width */
+    height: auto; /* Adjust height dynamically */
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Enhanced shadow */
+}
+
+.header{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.text{
+    color: rgb(23, 66, 141);
+    font-size: 28px; /* Increased font size for better readability */
+    font-weight: 700;
+}
+
+.underline{
+    width: 100px;
+    height: 8px;
+    background: linear-gradient(135deg, rgba(199, 200, 216, 0.9), rgba(51, 94, 194, 0.9), rgba(148, 149, 205, 0.9));
+    border-radius: 4px;
+}
+
+.inputs {
+    margin-top: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Increased spacing */
+    align-items: center;
+}
+
+.input {
+    display: flex;
+    align-items: center;
+    width: 95%;
+    max-width: 350px; /* Increased width for better usability */
+    height: 50px; /* Increased height */
+    background: #eaeaea;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.input input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: 10px;
+    font-size: 1.2rem; /* Increased font size */
+}
+
+.input img {
+    width: 22px; /* Increased icon size */
+    height: 22px;
+    margin: 0 12px;
+}
+
+.forgot-password{
+    padding: 15px 60px;
+    margin-top: 15px;
+    color: #797979;
+    font-size: 1rem; /* Increased size */
+    text-align: center;
+}
+
+.forgot-password span{
+    color: rgb(6, 8, 151);
+    cursor: pointer;
+}
+
+.submit-container{
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 30px auto;
+}
+
+.submit{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 150px; /* Increased button size */
+    height: 45px;
+    color: #fff;
+    background-color: rgb(23, 93, 223);
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.gray{
+    background: #eaeaea;
+    color: #676767;
+}
