@@ -1,5 +1,6 @@
 import "./App.css";
 import React, { useState } from "react";
+import { Helmet } from "react-helmet";
 
 import { SearchBar } from "./Components/SearchBar";
 import { SearchResultList } from "./Components/SearchResultList";
@@ -16,6 +17,9 @@ function App() {
 
   return (
     <div className="App">
+      <Helmet>
+        <title>MiniMarket</title>
+      </Helmet>
       {/* Search Bar Component */}
       <div className="search-bar-container">
         <SearchBar setResults={setResults} />
