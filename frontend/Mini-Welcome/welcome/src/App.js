@@ -14,14 +14,34 @@ import Footer from "./Components/Footer";
 function App() {
   const [results, setResults] = useState([]); // State for search results
   const [searchActive, setSearchActive] = useState(false); // Track if search is active
+  const [query, setQuery] = useState(""); // State for search query
+
+  // Callback for when a search result is selected
+  const handleSelect = (businessName) => {
+    setQuery(businessName);
+    setSearchActive(false);
+    setResults([]);
+  };
 
   return (
     <div className="App">
-      {/* Search Bar Component */}
-      <div className="search-bar-container">
-        <SearchBar setResults={setResults} setSearchActive={setSearchActive} />
-        {searchActive && results.length > 0 && <SearchResultList results={results} />}
-        {searchActive && results.length === 0 && <p className="no-results">No users found.</p>}
+      {/* Search Bar and Dropdown */}
+      <div
+        className="search-bar-container"
+        style={{ position: "relative", width: "210px" }}
+      >
+        <SearchBar
+          query={query}
+          setQuery={setQuery}
+          setResults={setResults}
+          setSearchActive={setSearchActive}
+        />
+        {searchActive && results.length > 0 && (
+          <SearchResultList results={results} onSelect={handleSelect} />
+        )}
+        {searchActive && results.length === 0 && (
+          <p className="no-results">No users found.</p>
+        )}
       </div>
 
       {/* Show main content only if search is NOT active */}
