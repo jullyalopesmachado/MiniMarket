@@ -1,13 +1,10 @@
-.search-result{
+.search-result {
     padding: 4px 10px;
-    font-size: 9px;
+    font-size: 12px;
     margin-top: 2px;
-
- 
+    cursor: pointer;
 }
 
-.search-result:hover{
-
+.search-result:hover {
     background-color: rgb(231, 179, 179);
-
 }
