@@ -1,6 +1,6 @@
 .results-list {
     width: 100%;
-    background-color: rgb(255, 0, 0);
+    background-color: rgb(255, 255, 255);
     display: flex;
     flex-direction: column;
     box-shadow: 0px 0px 8px #ddd;
@@ -9,6 +9,9 @@
     max-height: 300px;
     max-width: 210px;
     overflow-y: scroll;
+    position: absolute; /* Ensures it stays on top */
+    z-index: 9999; /* Ensures it appears above other elements */
+    left: 0; /* Aligns with input field */
 }
 
 .results-list .search-result {

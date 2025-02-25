@@ -22,7 +22,7 @@ export const SearchBar = ({ setResults, setSearchActive }) => {
             const json = await response.json();
             console.log("API Response:", json);
 
-            // ✅ Filter by both name and businessName
+            // Filter by both name and businessName
             const results = Array.isArray(json)
                 ? json.filter(user =>
                     user?.name?.toLowerCase().includes(value.toLowerCase()) ||
@@ -40,7 +40,13 @@ export const SearchBar = ({ setResults, setSearchActive }) => {
 
     const handleChange = (value) => {
         setInput(value);
-        fetchData(value);
+        if (value.trim()) {
+            setSearchActive(true);
+            fetchData(value);
+        } else {
+            setSearchActive(false);
+            setResults([]);
+        }
     };
 
     return (
