@@ -12,11 +12,11 @@ import Contact from "./Components/Contact";
 import Footer from "./Components/Footer";
 
 function App() {
-  const [results, setResults] = useState([]); // State for search results
-  const [searchActive, setSearchActive] = useState(false); // Track if search is active
-  const [query, setQuery] = useState(""); // State for search query
+  const [results, setResults] = useState([]);           // State for search results
+  const [searchActive, setSearchActive] = useState(false); // Whether dropdown is active
+  const [query, setQuery] = useState("");                 // Controlled input for search bar
 
-  // Callback for when a search result is selected
+  // When a result is clicked, update the search input and hide the dropdown.
   const handleSelect = (businessName) => {
     setQuery(businessName);
     setSearchActive(false);
@@ -25,10 +25,10 @@ function App() {
 
   return (
     <div className="App">
-      {/* Search Bar and Dropdown */}
+      {/* Search Bar & Dropdown Container */}
       <div
         className="search-bar-container"
-        style={{ position: "relative", width: "210px" }}
+        style={{ position: "relative", zIndex: 1000 }}
       >
         <SearchBar
           query={query}
@@ -44,17 +44,13 @@ function App() {
         )}
       </div>
 
-      {/* Show main content only if search is NOT active */}
-      {!searchActive && (
-        <>
-          <Home />
-          <About />
-          <Work />
-          <Testimonial />
-          <Contact />
-          <Footer />
-        </>
-      )}
+      {/* Main Content Always Visible */}
+      <Home />
+      <About />
+      <Work />
+      <Testimonial />
+      <Contact />
+      <Footer />
     </div>
   );
 }

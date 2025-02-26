@@ -19,15 +19,15 @@ export const SearchBar = ({ query, setQuery, setResults, setSearchActive }) => {
       console.log("API Response:", json);
 
       // Filter by both name and businessName
-      const results = Array.isArray(json)
+      const filteredResults = Array.isArray(json)
         ? json.filter(
             (user) =>
               user?.name?.toLowerCase().includes(value.toLowerCase()) ||
               user?.businessName?.toLowerCase().includes(value.toLowerCase())
           )
         : [];
-      console.log("Filtered Results:", results);
-      setResults(results);
+      console.log("Filtered Results:", filteredResults);
+      setResults(filteredResults);
     } catch (error) {
       console.error("❌ Error fetching users:", error);
       setResults([]);
@@ -51,7 +51,7 @@ export const SearchBar = ({ query, setQuery, setResults, setSearchActive }) => {
       <FaSearch id="search-icon" />
       <input
         className="text-lg"
-        placeholder="Search users by name, email, or business name"
+        placeholder="Search participating companies"
         value={query}
         onChange={handleChange}
       />
