@@ -427,8 +427,6 @@ nav {
   }
 }
 
-
-
 .search-bar-container {
   width: 40%;
   margin: auto;
@@ -437,5 +435,9 @@ nav {
   align-items: center;
   position: relative;
   top: -30px;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
