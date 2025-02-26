@@ -1,9 +1,9 @@
 .results-list {
   position: absolute;
   top: calc(150% + 100px); /* Positions dropdown 50px below the search bar */
-  left: -30%;
+  left: -50%;
 
-  width: 60%;
+  width: 55%;
   background-color: #fff;
   border: 1px solid #ddd;
   box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.1);

@@ -6,11 +6,11 @@ import { FiArrowRight } from "react-icons/fi";
 
 const Home = () => {
   return (
-    <div className="home-container">
+    <div id="home" className="home-container">
       <Navbar />
       <div className="home-banner-container">
         <div className="home-bannerImage-container">
-          <img src={BannerBackground} alt="" />
+          <img src={BannerBackground} alt="Banner Background" />
         </div>
         <div className="home-text-section">
           <h1 className="primary-heading">
@@ -20,12 +20,11 @@ const Home = () => {
             Connect to your community and help it grow.
           </p>
           <button className="secondary-button">
-            Sign Up Now <FiArrowRight />{" "}
+            Sign Up Now <FiArrowRight />
           </button>
         </div>
         <div className="home-image-section">
-        <img src={BannerImage} alt="" style={{ borderRadius: "70%" }} />
-
+          <img src={BannerImage} alt="Banner" style={{ borderRadius: "70%" }} />
         </div>
       </div>
     </div>

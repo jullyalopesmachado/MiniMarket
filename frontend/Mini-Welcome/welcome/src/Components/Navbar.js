@@ -23,34 +23,40 @@ const Navbar = () => {
     {
       text: "Home",
       icon: <HomeIcon />,
+      href: "#home",
     },
     {
       text: "About",
       icon: <InfoIcon />,
+      href: "#about",
     },
     {
       text: "Feedback",
       icon: <CommentRoundedIcon />,
+      href: "#feedback",
     },
     {
       text: "Contact",
       icon: <PhoneRoundedIcon />,
+      href: "#contact",
     },
     {
       text: "Cart",
       icon: <ShoppingCartRoundedIcon />,
+      href: "", // leave as is if not linking to a section
     },
   ];
   return (
     <nav>
       <div className="nav-logo-container">
-        <img src={Logo} alt="" style={{ width: "100px", height: "auto" }} />
+        <img src={Logo} alt="Logo" style={{ width: "100px", height: "auto" }} />
       </div>
       <div className="navbar-links-container">
-        <a href="">Home</a>
-        <a href="">About</a>
-        <a href="">Feedback</a>
-        <a href="">Contact</a>
+        {menuOptions.map((item) => (
+          <a key={item.text} href={item.href}>
+            {item.text}
+          </a>
+        ))}
         <a href="">
           <BsCart2 className="navbar-cart-icon" />
         </a>
@@ -69,7 +75,7 @@ const Navbar = () => {
           <List>
             {menuOptions.map((item) => (
               <ListItem key={item.text} disablePadding>
-                <ListItemButton>
+                <ListItemButton component="a" href={item.href}>
                   <ListItemIcon>{item.icon}</ListItemIcon>
                   <ListItemText primary={item.text} />
                 </ListItemButton>
