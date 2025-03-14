@@ -16,9 +16,12 @@ import InfoIcon from "@mui/icons-material/Info";
 import CommentRoundedIcon from "@mui/icons-material/CommentRounded";
 import PhoneRoundedIcon from "@mui/icons-material/PhoneRounded";
 import ShoppingCartRoundedIcon from "@mui/icons-material/ShoppingCartRounded";
+import LoginSignup from "./LoginSignup";  // Ensure this path is correct
 
 const Navbar = () => {
   const [openMenu, setOpenMenu] = useState(false);
+  const [showLoginSignup, setShowLoginSignup] = useState(false); // New state
+
   const menuOptions = [
     {
       text: "Home",
@@ -33,7 +36,7 @@ const Navbar = () => {
     {
       text: "Feedback",
       icon: <CommentRoundedIcon />,
-      href: "#feedback",
+      action: () => setShowLoginSignup(true), // Open LoginSignup modal
     },
     {
       text: "Contact",
@@ -43,9 +46,10 @@ const Navbar = () => {
     {
       text: "Cart",
       icon: <ShoppingCartRoundedIcon />,
-      href: "", // leave as is if not linking to a section
+      href: "", 
     },
   ];
+
   return (
     <nav>
       <div className="nav-logo-container">
@@ -53,11 +57,15 @@ const Navbar = () => {
       </div>
       <div className="navbar-links-container">
         {menuOptions.map((item) => (
-          <a key={item.text} href={item.href}>
+          <a 
+            key={item.text} 
+            href={item.href || "#"} 
+            onClick={item.action || null} // Handle action instead of href
+          >
             {item.text}
           </a>
         ))}
-        <a href="">
+        <a href="#">
           <BsCart2 className="navbar-cart-icon" />
         </a>
         <button className="primary-button">Join Our Community</button>
@@ -75,7 +83,11 @@ const Navbar = () => {
           <List>
             {menuOptions.map((item) => (
               <ListItem key={item.text} disablePadding>
-                <ListItemButton component="a" href={item.href}>
+                <ListItemButton 
+                  component="a" 
+                  href={item.href || "#"} 
+                  onClick={item.action || null} 
+                >
                   <ListItemIcon>{item.icon}</ListItemIcon>
                   <ListItemText primary={item.text} />
                 </ListItemButton>
@@ -85,6 +97,14 @@ const Navbar = () => {
           <Divider />
         </Box>
       </Drawer>
+
+      {/* Show LoginSignup when Feedback is clicked */}
+      {showLoginSignup && (
+        <div className="login-modal">
+          <LoginSignup />
+          <button onClick={() => setShowLoginSignup(false)}>Close</button>
+        </div>
+      )}
     </nav>
   );
 };

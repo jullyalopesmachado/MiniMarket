@@ -1,5 +1,6 @@
-import "./App.css";
+import "./App.css"; 
 import React, { useState } from "react";
+import { Route, Routes, useLocation } from "react-router-dom";
 
 import { SearchBar } from "./Components/SearchBar";
 import { SearchResultList } from "./Components/SearchResultList";
@@ -10,13 +11,16 @@ import Work from "./Components/Work";
 import Testimonial from "./Components/Testimonial";
 import Contact from "./Components/Contact";
 import Footer from "./Components/Footer";
+import LoginSignup from "./Components/LoginSignup";
+import UserProfile from "./Components/UserProfile"; // ✅ Import UserProfile
 
 function App() {
-  const [results, setResults] = useState([]);           // State for search results
-  const [searchActive, setSearchActive] = useState(false); // Whether dropdown is active
-  const [query, setQuery] = useState("");                 // Controlled input for search bar
+  const [results, setResults] = useState([]);
+  const [searchActive, setSearchActive] = useState(false);
+  const [query, setQuery] = useState("");
 
-  // When a result is clicked, update the search input and hide the dropdown.
+  const location = useLocation();
+
   const handleSelect = (businessName) => {
     setQuery(businessName);
     setSearchActive(false);
@@ -25,32 +29,40 @@ function App() {
 
   return (
     <div className="App">
-      {/* Search Bar & Dropdown Container */}
-      <div
-        className="search-bar-container"
-        style={{ position: "relative", zIndex: 1000 }}
-      >
-        <SearchBar
-          query={query}
-          setQuery={setQuery}
-          setResults={setResults}
-          setSearchActive={setSearchActive}
-        />
-        {searchActive && results.length > 0 && (
-          <SearchResultList results={results} onSelect={handleSelect} />
-        )}
-        {searchActive && results.length === 0 && (
-          <p className="no-results">No users found.</p>
-        )}
-      </div>
+      {location.pathname !== "/login-signup" && location.pathname !== "/user-profile" && (
+        <div className="search-bar-container" style={{ position: "relative", zIndex: 1000 }}>
+          <SearchBar
+            query={query}
+            setQuery={setQuery}
+            setResults={setResults}
+            setSearchActive={setSearchActive}
+          />
+          {searchActive && results.length > 0 && (
+            <SearchResultList results={results} onSelect={handleSelect} />
+          )}
+          {searchActive && results.length === 0 && (
+            <p className="no-results">No users found.</p>
+          )}
+        </div>
+      )}
 
-      {/* Main Content Always Visible */}
-      <Home />
-      <About />
-      <Work />
-      <Testimonial />
-      <Contact />
-      <Footer />
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <>
+              <Home />
+              <About />
+              <Work />
+              <Testimonial />
+              <Contact />
+              <Footer />
+            </>
+          }
+        />
+        <Route path="/login-signup" element={<LoginSignup />} />
+        <Route path="/user-profile" element={<UserProfile />} /> {/* ✅ Add route */}
+      </Routes>
     </div>
   );
 }

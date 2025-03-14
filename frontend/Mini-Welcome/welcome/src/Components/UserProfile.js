@@ -1,19 +1,25 @@
 import React from "react";
-import avatarImage from "./assets/layne-staley.png";  // Correct path to the image
+import avatarImage from "../Assets/layne-staley.png"; // Correct path to the image
+import "./UserProfile.css";
 
 const UserProfile = () => {
   const user = {
     name: "Layne Staley",
     email: "layne@example.com",
     bio: "A passionate musician and grunge enthusiast.",
-    avatar: avatarImage  // Use the imported image
+    avatar: avatarImage,
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="user-profile-container">
       <div className="bg-white shadow-lg rounded-lg p-6 w-96 text-center">
         <img
-          style={{ width: "100px", height: "100px", borderRadius: "50%" }}  // Inline styles for resizing and making it round
+          style={{
+            width: "100px",
+            height: "100px",
+            borderRadius: "50%",
+            objectFit: "cover",
+          }}
           src={user.avatar}
           alt="User Avatar"
         />

@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./LoginSignup.css";
-import user_icon from "./assets/person.png";
-import email_icon from "./assets/email.png";
-import password_icon from "./assets/password.png";
+import user_icon from "../Assets/person.png";
+import email_icon from "../Assets/email.png";
+import password_icon from "../Assets/password.png";
 
 const LoginSignup = () => {
   const [action, setAction] = useState("Sign Up");
@@ -11,7 +11,7 @@ const LoginSignup = () => {
 
   const handleAuth = () => {
     console.log(`Attempting to ${action}...`);
-    navigate("/user-profile");  // Navigate when user confirms login/signup
+    navigate("/user-profile");  // ✅ Navigate to user profile after login/signup
   };
 
   return (
@@ -57,7 +57,7 @@ const LoginSignup = () => {
         </div>
       </div>
 
-      {/* ✅ Change the login/signup confirmation button to say "Enter" */}
+      {/* ✅ Updated to navigate to user profile */}
       <div className="submit-container">
         <div className="submit" onClick={handleAuth}>
           Enter

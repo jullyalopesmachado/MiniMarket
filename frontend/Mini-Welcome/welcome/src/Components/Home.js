@@ -3,8 +3,15 @@ import BannerBackground from "../Assets/home-banner-background.png";
 import BannerImage from "../Assets/home-banner-image.png";
 import Navbar from "./Navbar";
 import { FiArrowRight } from "react-icons/fi";
+import { useNavigate } from "react-router-dom"; 
 
 const Home = () => {
+  const navigate = useNavigate();
+
+  const handleSignupClick = () => {
+    navigate("/login-signup");
+  };
+
   return (
     <div id="home" className="home-container">
       <Navbar />
@@ -19,7 +26,7 @@ const Home = () => {
           <p className="primary-text">
             Connect to your community and help it grow.
           </p>
-          <button className="secondary-button">
+          <button className="secondary-button" onClick={handleSignupClick}>
             Sign Up Now <FiArrowRight />
           </button>
         </div>
