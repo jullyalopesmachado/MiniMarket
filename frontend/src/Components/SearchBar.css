@@ -1,0 +1,81 @@
+/* Apply box-sizing globally to avoid layout shifts */
+* {
+  box-sizing: border-box;
+}
+
+/* Wrapper for the search bar */
+.input-wrapper {
+  background-color: rgb(68, 139, 225);
+  margin-top: 3.2rem;
+  margin-right: 39rem;
+  width: 350%;
+  border-radius: 20px;
+  height: 2.5rem; /* Fixed height for wrapper */
+  padding: 5px;
+  padding-left: 6%;
+  padding-right: 5%;
+  box-shadow: 0px 0px 8px #ddd;
+  display: flex;
+  align-items: center;
+  max-width: 250px;
+  position: absolute;
+  left: -23%;
+  transform: translateX(-50%);
+  overflow: hidden; /* Prevent overflow */
+  display: flex;
+  justify-content: space-between; /* Keep the search icon aligned */
+}
+
+/* Input field styles */
+.input-wrapper input {
+  background-color: #ddd;
+  font-weight: bold;
+  width: 100%;
+  border-radius: 10px;
+  height: 100%; /* Ensure input takes up full height of wrapper */
+  font-size: 14px;
+  padding: 0 5px; /* Adjust padding to fit */
+  border: none;
+  box-sizing: border-box; /* Ensure padding doesn't affect the layout */
+}
+
+/* Ensure no border or layout change on focus */
+.input-wrapper input:focus {
+  outline: none;
+  border: none; /* Remove any default browser outline */
+  box-shadow: none; /* Remove box shadow if any */
+}
+
+/* Additional styles for .input and #search-icon */
+.input {
+  color: black;
+  background-color: black;
+}
+
+.input:focus {
+  outline: none;
+}
+
+#search-icon {
+  font-size: 14px;
+  color: rgb(7, 22, 136);
+  margin-right: -1px;
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+#search-icon {
+  margin-right: 5px;
+}
+
+.text-lg {
+  border: none;
+  outline: none;
+  width: 100%;
+}
