@@ -98,13 +98,6 @@ const Navbar = () => {
         </Box>
       </Drawer>
 
-      {/* Show LoginSignup when Feedback is clicked */}
-      {showLoginSignup && (
-        <div className="login-modal">
-          <LoginSignup />
-          <button onClick={() => setShowLoginSignup(false)}>Close</button>
-        </div>
-      )}
     </nav>
   );
 };

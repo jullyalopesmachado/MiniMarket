@@ -14,6 +14,7 @@ import Footer from "./Components/Footer";
 import LoginSignup from "./Components/LoginSignup";
 import UserProfile from "./Components/UserProfile"; // Import UserProfile
 
+
 function App() {
   const [results, setResults] = useState([]);
   const [searchActive, setSearchActive] = useState(false);
@@ -61,7 +62,10 @@ function App() {
           }
         />
         <Route path="/login-signup" element={<LoginSignup />} />
-        <Route path="/user-profile" element={<UserProfile />} /> {/* Add route */}
+        <Route path="/user-profile" element={<UserProfile />} /> 
+        <Route path="/home-page" element={<Home />} />
+
+
       </Routes>
     </div>
   );
