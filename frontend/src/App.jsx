@@ -13,7 +13,7 @@ import Contact from "./Components/Contact";
 import Footer from "./Components/Footer";
 import LoginSignup from "./Components/LoginSignup";
 import UserProfile from "./Components/UserProfile"; // Import UserProfile
-
+import CompanyList from "./Components/CompanyList"; // Import CompanyList
 
 function App() {
   const [results, setResults] = useState([]);
@@ -21,6 +21,8 @@ function App() {
   const [query, setQuery] = useState("");
 
   const location = useLocation();
+
+  const isAdmin = true; {/* Replace this with actual authentication logic. This allows for editing mode (admin) in company page list. */} 
 
   const handleSelect = (businessName) => {
     setQuery(businessName);
@@ -30,7 +32,7 @@ function App() {
 
   return (
     <div className="App">
-      {location.pathname !== "/login-signup" && location.pathname !== "/user-profile" && (
+      {location.pathname !== "/login-signup" && location.pathname !== "/user-profile" && location.pathname !== "/companies-page" &&(
         <div className="search-bar-container" style={{ position: "relative", zIndex: 1000 }}>
           <SearchBar
             query={query}
@@ -64,7 +66,13 @@ function App() {
         <Route path="/login-signup" element={<LoginSignup />} />
         <Route path="/user-profile" element={<UserProfile />} /> 
         <Route path="/home-page" element={<Home />} />
+        {/* <Route path="/companies-page" element={<CompanyList  />} /> */}  {/* This route is without admin priviledges */}
+        <Route path="/companies-page" element={<CompanyList isAdmin={isAdmin} />} />  {/* The 'isAdmin' prop is 
+        passed to the component to determine if the user has admin privileges
+        This allows the component to conditionally render admin-specific features 
+        (e.g., an "Edit" button) */}
 
+      
 
       </Routes>
     </div>

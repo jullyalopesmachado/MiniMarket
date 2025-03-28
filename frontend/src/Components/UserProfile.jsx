@@ -77,14 +77,6 @@ export function UserProfile() {
         <Navbar.Toggle aria-controls="basic-navbar" className="me-auto" />
         <Navbar.Collapse id="basic-navbar-nav" className="me-auto img-fluid">
           <Nav className="ms-auto">
-          <Nav.Link as={Link} to="/home-page">
-              <Button variant="outline-primary" className="me-2" size="sm">
-                Home
-              </Button>
-            </Nav.Link>
-            <Nav.Link href="#help">
-              <Button variant= "outline-primary" className="me-2" size="sm">Help</Button>
-            </Nav.Link>
             <NavDropdown title="Dropdown" id="basic-nav-dropdown">
               <NavDropdown.Item href="#action/3.1">Action
               </NavDropdown.Item>

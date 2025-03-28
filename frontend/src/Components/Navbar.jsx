@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import Logo from "../Assets/Logo3.png";
 import { BsCart2 } from "react-icons/bs";
 import { HiOutlineBars3 } from "react-icons/hi2";
@@ -21,6 +22,7 @@ import LoginSignup from "./LoginSignup";  // Ensure this path is correct
 const Navbar = () => {
   const [openMenu, setOpenMenu] = useState(false);
   const [showLoginSignup, setShowLoginSignup] = useState(false); // New state
+  const navigate = useNavigate(); // Initialize navigate function
 
   const menuOptions = [
     {
@@ -29,25 +31,21 @@ const Navbar = () => {
       href: "#home",
     },
     {
-      text: "About",
+      text: "About us",
       icon: <InfoIcon />,
       href: "#about",
     },
     {
       text: "Feedback",
       icon: <CommentRoundedIcon />,
-      action: () => setShowLoginSignup(true), // Open LoginSignup modal
+      href: "#feedback",
     },
     {
-      text: "Contact",
+      text: "Contact us",
       icon: <PhoneRoundedIcon />,
       href: "#contact",
     },
-    {
-      text: "Cart",
-      icon: <ShoppingCartRoundedIcon />,
-      href: "", 
-    },
+
   ];
 
   return (
@@ -65,10 +63,8 @@ const Navbar = () => {
             {item.text}
           </a>
         ))}
-        <a href="#">
-          <BsCart2 className="navbar-cart-icon" />
-        </a>
-        <button className="primary-button">Join Our Community</button>
+
+        <button className="primary-button" onClick={() => navigate("/companies-page")}>Partner Businesses</button>
       </div>
       <div className="navbar-menu-container">
         <HiOutlineBars3 onClick={() => setOpenMenu(true)} />
