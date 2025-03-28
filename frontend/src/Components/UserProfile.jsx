@@ -9,11 +9,14 @@ import { Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./UserProfile.css";
 import Axios from "axios";
+import { useEffect } from "react";
+import { updateData } from "../App";
 
 // Importing Bootstrap components (Note: Fixed typo in 'bootstrap' and 'Breadcrumb')
-import { Container, Row, Col, Button, Alert, Breadcrumb, Card, Form, Nav, Navbar, NavDropdown, NavbarCollapse } from 'react-bootstrap';
+import { Container, Row, Col, Button, Alert, Breadcrumb, Card, Form, Nav, Navbar, NavDropdown, NavbarCollapse, Spinner } from 'react-bootstrap';
 
 import { useNavigate } from "react-router-dom"; 
+
 
 export function UserProfile() {
 
@@ -27,47 +30,99 @@ export function UserProfile() {
   const [isEditing, setIsEditing] = useState(false);
   const [firstName, setFirstName] = useState("Layne");
   const [lastName, setLastName] = useState("Staley");
-  const [userBio, setUserBio] = useState("I'm a musician and songwriter, best known as the lead vocalist and co-songwriter of the grunge rock band Alice in Chains.");
-  const [userLocation, setUserLocation] = useState("Seattle, WA");
-  const [userWebsite, setUserWebsite] = useState("https://www.aliceinchains.com/");
+  const [userBio, setUserBio] = useState(null);
+  const [userLocation, setUserLocation] = useState(null);
+  const [userWebsite, setUserWebsite] = useState(null);
+  
 
   const [isLoading, setIsLoading] = useState(false); // tracks loading
   const [error, setError] = useState(null); // tracks error
 
+  
+  //const [userlogo, setUserLogo] = useState(avatarImage);
+  const [userId, setUserId] = useState(null);
+
+  const fetchProfile = async () => {
+    const token = localStorage.getItem("token"); // Retrieve token from local storage
+    try {
+      const response = await fetch("http://localhost:3000/api/profile", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const profile = await response.json();
+
+        console.log("User Profile:", profile);
+
+        // Split user.name into firstName and lastName
+        const [firstName, lastName] = (profile.name || "").split(" ");
+        setFirstName(firstName || "");
+        setLastName(lastName || "");
+
+        // Set other profile data
+        setUserId(profile._id);
+        setUserBio(profile.bio || "");
+        setUserLocation(profile.location || "");
+        setUserWebsite(profile.website || "");
+      } else {
+        console.error("Error fetching user profile:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error fetching user profile:", error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+
   // Function to handle the form submission
   const handleSave = async () => {
+if (!firstName || !lastName ) {
+  setError("Required information missing");
+  return;
+}
+
     setIsLoading(true); // Set loading state to true
     setError(null); // Reset error state
 
     //prepare data to be saved 
 
     const updatedProfile = {
+      _id: userId,
       firstName,
       lastName,
-      userBio,
-      userLocation,
-      userWebsite,
+      //email,
+      //businessName,
+      bio: userBio,
+      location: userLocation,
+      website: userWebsite,
+      //logo: userlogo,
     };
 
     try{
-      // makes the api call to save the data (need real api here!!!)
-      const response = await Axios.put ("/api/user/update", updatedProfile);
-    
-    // Handle any errors that occur during the request
-      if (response.status === 200) {
-        console.log("Profile updated successfully", response.data);
-      }
+      // Updates data on the server
+      const updatedUser = await updateData(updatedProfile);
+      console.log("User Profile Updated:", updatedUser);
       setIsEditing(false); // Set editing state to false
-  
     } catch (err) {
     
       console.error("error updating profile", err);
       setError("Failed to update profile");
+
     } finally {
       setIsLoading(false); // Set loading state to false
     }
 
   };
+
+  if (isLoading) {
+    return <Spinner animation="border" />;
+  }
 
   return (
 <div className="min-vh-100 w-100" >
@@ -77,6 +132,14 @@ export function UserProfile() {
         <Navbar.Toggle aria-controls="basic-navbar" className="me-auto" />
         <Navbar.Collapse id="basic-navbar-nav" className="me-auto img-fluid">
           <Nav className="ms-auto">
+          <Nav.Link as={Link} to="/home">
+              <Button variant="outline-primary" className="me-2" size="sm">
+                Home
+              </Button>
+            </Nav.Link>
+            <Nav.Link href="#help">
+              <Button variant= "outline-primary" className="me-2" size="sm">Help</Button>
+            </Nav.Link>
             <NavDropdown title="Dropdown" id="basic-nav-dropdown">
               <NavDropdown.Item href="#action/3.1">Action
               </NavDropdown.Item>
@@ -100,26 +163,26 @@ export function UserProfile() {
 
       <Card style={{ width: '28rem', paddingTop: '5rem' ,  background: 'linear-gradient(rgba(199, 200, 216, 0.9), rgba(255, 255, 255, 0.93), rgba(255, 255, 255, 0.9)' }}>
         <div  className="d-flex justify-content-center align-items-center">
-        <Card.Img variant="top" src={avatarImage}  className="rounded-circle img-fluid h-50 w-50" />
+        <Card.Img variant="top" src={avatarImage}/* will be pulled from database*/  className="rounded-circle img-fluid h-50 w-50" />
         </div>
           <Card.Body>
             {/* Display user's first and last name */}
             <Card.Title>{firstName} {lastName}</Card.Title>
               {/* Display user's bio */}
               <Card.Text>
-                {userBio}
+                {userBio || "No bio provided"}
               </Card.Text>
 
               {/* Display user's location */} 
 
             <Card.Text>
-              <strong>Located in:</strong> {userLocation}
+              <strong>Located in:</strong> {userLocation || "No location provided"}
             </Card.Text>
 
             {/* Display user's website */}
             <Card.Text>
               <strong>Find {firstName} at: </strong>
-              {userWebsite}
+              {userWebsite || "No website provided"}
             </Card.Text>
             {/* User Profile Edit Button */}
             <div className="d-flex justify-content-center align-items-center"> 
@@ -207,6 +270,6 @@ export function UserProfile() {
 
 export default UserProfile;
 
-  
+
 
 

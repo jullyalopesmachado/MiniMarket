@@ -4,15 +4,60 @@ import "./LoginSignup.css";
 import user_icon from "../Assets/person.png";
 import email_icon from "../Assets/email.png";
 import password_icon from "../Assets/password.png";
+import { sendData } from "../App";
+import { fetchData } from "../App";
 
 const LoginSignup = () => {
   const [action, setAction] = useState("Sign Up");
+  const [userName, setUserName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [businessName, setBusiness] = useState("");
   const navigate = useNavigate();  
 
-  const handleAuth = () => {
-    console.log(`Attempting to ${action}...`);
-    navigate("/user-profile");  // ✅ Navigate to user profile after login/signup
+  
+
+
+const handleAuth = async () => {
+  const userData = {
+    name: userName,
+    email,
+    password,
+    businessName,
+    action,
   };
+
+  try {
+    const response = await sendData(userData, action);
+    console.log("Response from server:", response);
+
+
+  
+    if (response.ok) {
+      console.log("continue");
+      alert(`${action} successful!`);
+      const data = await response.json();
+
+      if (action === "Sign Up") {
+        setAction("Login");
+        alert("Sign-up successful! Please log in.");
+      } else if (action === "Login") {
+      
+         localStorage.setItem("token", data.token);
+         console.log("token:", data.token);
+         alert("Login successful!");
+         console.log("Navigating to user profile...");
+         navigate("/user-profile"); 
+      }
+     } else {
+        alert(response.message || `${action} failed. Please try again.`);
+      }
+      
+    } catch (error) {
+    console.error("Error during authentication:", error);
+    alert("An error occurred. Please try again.");
+  }
+};
 
   return (
     <div className="container">
@@ -25,19 +70,40 @@ const LoginSignup = () => {
         {action === "Login" ? null : (
           <><div className="input">
             <img src={user_icon} alt="" />
-            <input type="text" placeholder="Name" />
+            <input 
+              type="text" 
+              placeholder="Name"
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)} 
+              />
+            
           </div><div className="input">
               <img src={user_icon} alt="" />
-              <input type="text" placeholder="Business Name" />
+              <input 
+              type="text" 
+              placeholder="Business Name"
+              value={businessName}
+              onChange={(e) => setBusiness(e.target.value)} 
+               />
             </div></>
         )}
         <div className="input">
           <img src={email_icon} alt=""/>
-          <input type="email" placeholder="Email" />
+          <input 
+          type="email" 
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)} 
+          />
         </div>
         <div className="input">
           <img src={password_icon} alt=""/>
-          <input type="password" placeholder="Password" />
+          <input 
+          type="password" 
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)} 
+          />
         </div>
       </div>
 

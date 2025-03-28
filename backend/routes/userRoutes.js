@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const router = express.Router();
 
 // ✅ Register a New User
-router.post("/", async (req, res) => {
+router.post("/register", async (req, res) => {
     try {
         const { name, email, businessName, password } = req.body;
 
@@ -16,9 +16,9 @@ router.post("/", async (req, res) => {
         }
 
         // 🔹 Hash password before saving
-        const salt = await bcrypt.genSalt(10);
+        const salt = await bcrypt.genSalt(15);
         const hashedPassword = await bcrypt.hash(password, salt);
-
+        console.log("Hashed password:", hashedPassword);
         // 🔹 Create new user
         const newUser = new User({
             name,
@@ -78,11 +78,25 @@ router.get("/:id", async (req, res) => {
 // ✅ Update User Details
 router.put("/:id", async (req, res) => {
     try {
-        const { name, email, businessName } = req.body;
+        const { firstName, lastName, bio, location, website, logo } = req.body;
+
+        // Checks if req.body is empty
+        if (!Object.keys(req.body).length) {
+            return res.status(400).json({ message: "No fields updated" });
+        }
+
+        // Filter out undefined fields
+        const updates = {};
+        Object.keys(req.body).forEach((key) => {
+            if (req.body[key] !== undefined) {
+                updates[key] = req.body[key];
+            }
+        }
+        );
 
         const updatedUser = await User.findByIdAndUpdate(
             req.params.id,
-            { name, email, businessName },
+            updates,
             { new: true, runValidators: true }
         ).select("-password");
 

@@ -1,45 +1,34 @@
 import React from "react";
 import { FaSearch } from "react-icons/fa";
 import "./SearchBar.css";
+import { fetchData } from "../App";
+
 
 export const SearchBar = ({ query, setQuery, setResults, setSearchActive }) => {
-  const fetchData = async (value) => {
-    if (!value.trim()) return; // Prevent empty search requests
 
-    const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
-    const apiUrl = `${baseUrl}/api/users?search=${encodeURIComponent(value)}`;
-    console.log("Fetching from:", apiUrl);
 
-    try {
-      const response = await fetch(apiUrl);
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      const json = await response.json();
-      console.log("API Response:", json);
+  
 
-      // Filter by both name and businessName
-      const filteredResults = Array.isArray(json)
-        ? json.filter(
-            (user) =>
-              user?.name?.toLowerCase().includes(value.toLowerCase()) ||
-              user?.businessName?.toLowerCase().includes(value.toLowerCase())
-          )
-        : [];
-      console.log("Filtered Results:", filteredResults);
-      setResults(filteredResults);
-    } catch (error) {
-      console.error("Error fetching users:", error);
-      setResults([]);
-    }
-  };
+  
 
-  const handleChange = (e) => {
+  const handleChange = async (e) => {
     const value = e.target.value;
     setQuery(value);
+
     if (value.trim()) {
       setSearchActive(true);
-      fetchData(value);
+
+      try {
+      const json = await fetchData({value, action: "search"});
+
+      const Results = Array.isArray(json) ? json : []; 
+      console.log("Results:", Results);
+      setResults(Results);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+        setResults([]);
+      }
+      
     } else {
       setSearchActive(false);
       setResults([]);

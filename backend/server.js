@@ -4,11 +4,16 @@ const cors = require('cors'); // ✅ Added for frontend connection
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const User = require('./models/User');
+const Upload = require('./models/Upload');
 const bcrypt = require('bcrypt');
 const userRoutes = require('./routes/userRoutes');
 const businessRoutes = require('./routes/businessRoutes');
 const apiRoutes = require('./models/api'); // ✅ Ensure correct API route import
 const authMiddleware = require('./middleware/auth');
+
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 dotenv.config();
 
@@ -48,12 +53,16 @@ mongoose.connect(process.env.MONGODB_URI, {
 app.post('/api/login', async (req, res) => {
     try {
         const { email, password } = req.body;
+
+        console.log("Login request body:", req.body)
+
         const user = await User.findOne({ email }).select("+password");
 
         if (!user) {
             return res.status(400).json({ message: 'User not found' });
         }
 
+        console.log("hashed password:", user.password);
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(400).json({ message: 'Invalid credentials' });
