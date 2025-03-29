@@ -1,17 +1,24 @@
 // Importing React and useState hook for managing component state
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Container, Row, Col, Button, Alert, Breadcrumb, Card, Form, Nav, Navbar, NavDropdown, NavbarCollapse } from 'react-bootstrap';
+import { Container, Row, Col, Button, Alert, Breadcrumb, Card, Form, Nav, Navbar, NavDropdown, NavbarCollapse, Modal } from 'react-bootstrap';
 import logoImage from "../Assets/Logo3.png"; 
 import crochetImage from "../Assets/crochetPic.jpg"; 
+import honeyImage from "../Assets/honeyShopPhoto2.jpg"; 
+import breadImage from "../Assets/breadShopPhoto3.jpg"; 
+import produceImage from "../Assets/shopphoto.jpg"; 
+import veggiesImage from "../Assets/shopPhoto1.jpg"; 
+import peachesImage from "../Assets/peachesPhoto.jpg"; 
+import background from "../Assets/home-banner-background.png"; 
 
-export function CompanyList({isAdmin}) { // Passing isAdmin as a prop here.
+import { useNavigate } from "react-router-dom";
+export function CompanyList({user}) { // Passing isAdmin as a prop here.
 
     const [companies, setCompanies] = useState([ 
         // sample data until backend is connected here
         {
             id: 1,
-            companyPhoto: logoImage,
+            companyPhoto: veggiesImage,
             companyName: "Mom&Pop Shop",
             companyBio: "Small local business specializing in handmade crafts and artisanal goods.",
             companyLocation: "Seattle, WA",
@@ -20,7 +27,7 @@ export function CompanyList({isAdmin}) { // Passing isAdmin as a prop here.
         },
         {
             id: 2,
-            companyPhoto: logoImage,
+            companyPhoto: crochetImage,
             companyName: "CrochetGoods",
             companyBio: "Small shop for crochet patterns and supplies.",
             companyLocation: "Seattle, WA",
@@ -30,7 +37,7 @@ export function CompanyList({isAdmin}) { // Passing isAdmin as a prop here.
         },
         {
             id: 3,
-            companyPhoto: logoImage,
+            companyPhoto: peachesImage,
             companyName: "Peaches & Apples",
             companyBio: "Fruits from a grandma's garden.",
             companyLocation: "DeLand, FL",
@@ -40,8 +47,8 @@ export function CompanyList({isAdmin}) { // Passing isAdmin as a prop here.
 
         {
             id: 4,
-            companyPhoto: logoImage,
-            companyName: "Strawberries & Grapes",
+            companyPhoto: breadImage,
+            companyName: "Bread, Strawberries & Grapes",
             companyBio: "Fruits from a mom's garden.",
             companyLocation: "Orlando, FL",
             companyWebsite: "momsfruits.com",  
@@ -50,7 +57,7 @@ export function CompanyList({isAdmin}) { // Passing isAdmin as a prop here.
 
         {
             id: 5,
-            companyPhoto: logoImage,
+            companyPhoto: honeyImage,
             companyName: "Honey & Jam",
             companyBio: "Family honey and jam.",
             companyLocation: "Winter Garden, FL",
@@ -60,14 +67,80 @@ export function CompanyList({isAdmin}) { // Passing isAdmin as a prop here.
 
         {
             id: 6,
-            companyPhoto: logoImage,
+            companyPhoto: produceImage,
             companyName: "Lettuce & Veggies",
             companyBio: "Fruits from a grandma's garden.",
             companyLocation: "DeLand, FL",
             companyWebsite: "grandmaveggies.com",  
             isEditing: false,
         },
+
+
     ]); // State to hold the initial list of companies
+
+    const  [showMessageModal, setShowMessageModal] = useState(false); // State to control the visibility of the message modal
+    const [selectedCompany, setSelectedCompany] = useState(null); // State to hold the selected company for messaging
+    const [messagem, setMessage] = useState(""); // State to hold the message content
+    const navigate = useNavigate();
+    
+    const handleMessageClick = (company) => {
+        if (!user){ // Check if the user is logged in
+            alert ("Please log in to send a message.");
+            navigate ("/login-signup"); // Redirect to login page
+        } else {
+            setSelectedCompany(company); // Set the selected company for messaging
+            setShowMessageModal(true); // Show the message modal
+        }
+    };
+
+    const handleCloseModal  = () => {   
+        setShowMessageModal(false); // Close the message modal
+        setMessage(""); // Reset the message content
+    };
+
+    const handleSendMessage = async () => {  
+        if (!messagem.trim()){
+            alert ("Please enter a message."); // Alert if the message is empty
+            return; 
+
+        }
+
+        try {
+
+            // This is assuming there's an API endpoint to send a message to
+            const response = await fetch( `/api/companies/${selectedCompany.id}/message`, {
+                method: "POST",
+                headers:{
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`, // Include the token for authentication
+                },
+                body: JSON.stringify({message}),
+            });
+
+            if (response.ok) {
+                alert("Message sent successfully!"); // Alert on successful message sending 
+                handleCloseModal(); // Close the modal
+            } else {    
+                alert("Failed to send message.");
+
+            }
+        } catch (error) {
+            console.error("Error sending message:", error); // Log any errors that occur during the fetch
+        }
+    };
+
+
+
+    const handleEditToggle = (id) => {
+        if (user?.isAdmin) { // Check if the user is an admin
+            setCompanies(companies.map(company =>
+                company.id === id ? { ...company, isEditing: !company.isEditing } : company 
+            ));
+        } else {
+            alert("Only admnis can edit company details.");
+        }
+};
+
 
     // The handleEditToggle function below does the following:
     // map() function iterates over all companies in the companies array. 
@@ -76,12 +149,7 @@ export function CompanyList({isAdmin}) { // Passing isAdmin as a prop here.
     // using the spread operator (...company), and we toggle its isEditing property.
     // If the company.id doesn't match, we return the company without changes.
     // The updated array is then passed to setCompanies() to update the state.
-
-    const handleEditToggle = (id) => {
-        setCompanies(companies.map(company =>
-            company.id === id ? { ...company, isEditing: !company.isEditing } : company
-        ));
-    };
+    
 
     // Function to save the edited data
     //  (this would eventually send the data to the backend)
@@ -111,21 +179,36 @@ export function CompanyList({isAdmin}) { // Passing isAdmin as a prop here.
         // After map() finishes, setCompanies() updates the state with the new companies array
     }
 
+    // log out handler
+    const handleLogout = () => {
+        //remove token from local storage
+        localStorage.removeItem("token");
+        // now redirect user to the login page
+        navigate("/login-signup");  
+    }
+
+
+
     return (
         <div className="min-vh-100 w-100">
             {/* Navbar Section */}
             <Navbar expand="lg" className="img-fluid">
-                <Container className="mt-4">
-                <Card.Img variant="top" src={logoImage} className="me-auto img-fluid" style={{width: '10%'}} />
-                    <Navbar.Toggle aria-controls="basic-navbar" className="me-auto" />
+                <Container className="mt-4"              style={{ 
+                backgroundImage: `url(${background})`, 
+                backgroundSize: '130px',  // Adjust to your preferred smaller size
+                backgroundPosition: 'right', // Keep the image aligned to the left
+                backgroundRepeat: 'no-repeat' // Ensure the image doesn't repeat
+            }}>
+                <Card.Img variant="top" src={logoImage} className="me-auto img-fluid" style={{width: '10%'}}  />
+                    <Navbar.Toggle aria-controls="basic-navbar" className="me-auto"  />
                     <Navbar.Collapse id="basic-navbar-nav" className="me-auto img-fluid">
-                        <Nav className="ms-auto">
+                        <Nav className="ms-auto" >
                             <NavDropdown title="Dropdown" id="basic-nav-dropdown">
                                 <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
                                 <NavDropdown.Item href="#action/3.2">Another action</NavDropdown.Item>
                                 <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
                                 <NavDropdown.Divider />
-                                <NavDropdown.Item href="#action/3.4">LogOut</NavDropdown.Item>
+                                <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>
                             </NavDropdown>
                         </Nav>
                     </Navbar.Collapse>
@@ -134,7 +217,7 @@ export function CompanyList({isAdmin}) { // Passing isAdmin as a prop here.
 
             {/* Company List Section */}
             <Container className="mt-4">
-                <Row>
+                <Row >
                     {/* Loop through each company and render a card for each */}
                     {companies.map(company => (
                         <Col md={4} key={company.id}>
@@ -219,12 +302,12 @@ export function CompanyList({isAdmin}) { // Passing isAdmin as a prop here.
                                             <Card.Text><strong>Location:</strong>{company.companyLocation}</Card.Text> 
                                             {/* Display the company's location with a label "Location:" */}
                                         
-                                            <Card.Text><strong>Website:</strong><a href={company.companyWebsite} target="_blank" rel="noopener noreferrer"></a> {company.companyWebsite}</Card.Text>
+                                            <Card.Text><strong>Website:</strong><a href={company.companyWebsite} target="_blank" rel="noopener noreferrer">{company.companyWebsite}</a></Card.Text>
                                             {/* Display the company's website as a clickable link. It opens in a new tab. 
                                                 `rel="noopener noreferrer"` ensures security when opening links in a new tab */}
                                             
-                                            <Button variant="primary">Message</Button> 
                                             {/* A button that says "Message", presumably for contacting the company */}
+                                            {user && <Button variant="primary" onClick={() => handleMessageClick(company)}>Message</Button>}
                                             {/*}
                                             // This line BELOW conditionally renders the "Edit" button only if the user is an admin.
                                             // The 'isAdmin' prop is a boolean. If it is true, the button is displayed.
@@ -232,8 +315,12 @@ export function CompanyList({isAdmin}) { // Passing isAdmin as a prop here.
                                             // and when clicked, it triggers the 'handleEditToggle' function with the company id.
                                             // This function toggles the 'isEditing' state for the specific company, allowing the user to enter edit mode.
                                             */}
-                                            {isAdmin && <Button variant="warning" className="ms-2" onClick={() => handleEditToggle(company.id)}>Edit</Button>}
-                                            {/* If the user is an admin (i.e., isAdmin is true), show an "Edit" button.
+                                            {user?.isAdmin && (
+                                                <Button variant="warning" className="ms-2" onClick={() => handleEditToggle(company.id)}>
+                                                    Edit
+                                                </Button>
+                                            )}
+                                                                                    {/* If the user is an admin (i.e., isAdmin is true), show an "Edit" button.
                                                 Clicking it sets isEditing to true, which would switch to editing mode */}
                                         </>
                                     )}
@@ -243,6 +330,37 @@ export function CompanyList({isAdmin}) { // Passing isAdmin as a prop here.
                     ))}
                 </Row>
             </Container>
+
+            {/* Message Modal Section */}
+
+            <Modal show={showMessageModal} onHide={handleCloseModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Send Message to {selectedCompany?.companyName}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Message</Form.Label>
+                            <Form.Control
+                                as="textarea"
+                                rows={3}
+                                value={messagem}
+                                onChange={(e) => setMessage(e.target.value)}
+                                placeholder="Type your message here..."
+                            />
+                        </Form.Group>
+                    </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseModal}>
+                        Close
+                    </Button>
+                    <Button variant="primary" onClick={handleSendMessage}>
+                        Send Message
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
         </div>
     );
 };

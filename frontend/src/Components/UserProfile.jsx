@@ -24,7 +24,7 @@ export function UserProfile() {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate("/home-page");
+    navigate("/");
   };
 
   const [isEditing, setIsEditing] = useState(false);
@@ -123,6 +123,13 @@ if (!firstName || !lastName ) {
   if (isLoading) {
     return <Spinner animation="border" />;
   }
+    // log out handler
+    const handleLogout = () => {
+      //remove token from local storage
+      localStorage.removeItem("token");
+      // now redirect user to the login page
+      navigate("/login-signup");  
+  }
 
   return (
 <div className="min-vh-100 w-100" >
@@ -132,25 +139,15 @@ if (!firstName || !lastName ) {
         <Navbar.Toggle aria-controls="basic-navbar" className="me-auto" />
         <Navbar.Collapse id="basic-navbar-nav" className="me-auto img-fluid">
           <Nav className="ms-auto">
-          <Nav.Link as={Link} to="/home">
-              <Button variant="outline-primary" className="me-2" size="sm">
-                Home
-              </Button>
-            </Nav.Link>
-            <Nav.Link href="#help">
-              <Button variant= "outline-primary" className="me-2" size="sm">Help</Button>
-            </Nav.Link>
+
             <NavDropdown title="Dropdown" id="basic-nav-dropdown">
-              <NavDropdown.Item href="#action/3.1">Action
-              </NavDropdown.Item>
+            <NavDropdown.Item onClick={handleClick}>Home Page</NavDropdown.Item>
               <NavDropdown.Item href="#action/3.2">
-                Another action
+                Companies
               </NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
+              <NavDropdown.Item href="#action/3.3">Feed</NavDropdown.Item>
               <NavDropdown.Divider />
-              <NavDropdown.Item href="#action/3.4">
-                LogOut
-              </NavDropdown.Item>
+              <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>
             </NavDropdown>
           </Nav>
         </Navbar.Collapse>

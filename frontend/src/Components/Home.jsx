@@ -6,12 +6,18 @@ import { FiArrowRight } from "react-icons/fi";
 import { useNavigate } from "react-router-dom"; 
 
 const Home = () => {
+  
   const navigate = useNavigate();
 
-  const handleSignupClick = () => {
-    navigate("/login-signup");
-  };
+  // Check if a token exists in local storage (i.e., user is logged in)
+  const isLoggedIn = Boolean(localStorage.getItem("token"));
 
+  const handleSignupClick = () => {
+    console.log("Sign up button clicked, isLoggedIn:", isLoggedIn);
+    if (!isLoggedIn) {
+      navigate("/login-signup");
+    }
+  };
   return (
     <div id="home" className="home-container">
       <Navbar />

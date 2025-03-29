@@ -1,5 +1,5 @@
 import "./App.css"; 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Axios from "axios";
 import { Routes, Route, useLocation } from "react-router-dom";
 
@@ -14,6 +14,7 @@ import Contact from "./Components/Contact";
 import Footer from "./Components/Footer";
 import LoginSignup from "./Components/LoginSignup";
 import UserProfile from "./Components/UserProfile"; // Import UserProfile
+import CompanyList from './Components/CompanyList';
 
 
 
@@ -124,9 +125,44 @@ function App() {
     setResults([]);
   };
 
+  // useState hook to manage the logged-in user state, initially set to null
+  const [user, setUser] = useState(null); 
+  useEffect(() => {
+  //retrieve authentication token from local storage
+    const token = localStorage.getItem("token");
+      if (token){
+        fetchUserProfile(); // if a token exists, fetch the user profile
+      }
+  }, []); // Empty dependency array to run only once on mount
+
+  const fetchUserProfile = async () => {
+    try {
+      // Make a request to the profile API endpoint with the authorization header
+      const response = await fetch("http://localhost:3000/api/profile", {
+        headers: {Authorization: `Bearer ${localStorage.getItem("token")}`},
+      });
+      
+      // if reponse is not OK, throw an error
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch user profile");
+      }
+      // Parse the JSON response conataining user profile data
+
+      const userData = await response.json();
+      console.log("User data fetched:", userData); // Log fetched user data
+      // Update the user state with the fetched data
+
+      setUser(userData);
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+    }
+  };
+
+
   return (
     <div className="App">
-      {location.pathname !== "/login-signup" && location.pathname !== "/user-profile" && (
+      {location.pathname !== "/login-signup" && location.pathname !== "/user-profile" && location.pathname !== "/companies-page" && (
         <div className="search-bar-container" style={{ position: "relative", zIndex: 1000 }}>
           <SearchBar
             query={query}
@@ -160,9 +196,11 @@ function App() {
         <Route path="/login-signup" element={<LoginSignup />} />
         <Route path="/user-profile" element={<UserProfile />} /> {/* Add route */}
         <Route path="/home-page" element={<Home />} />
+        <Route path="/companies-page" element={<CompanyList user={user} />} />
+
         {/* <Route path="/companies-page" element={<CompanyList  />} /> */}  {/* This route is without admin priviledges */}
-        <Route path="/companies-page" element={<CompanyList isAdmin={isAdmin} />} />  {/* The 'isAdmin' prop is 
-        passed to the component to determine if the user has admin privileges
+        {/* <Route path="/companies-page" element={<CompanyList isAdmin={isAdmin} />} />  {/* The 'isAdmin' prop is */}
+        {/*passed to the component to determine if the user has admin privileges
         This allows the component to conditionally render admin-specific features 
         (e.g., an "Edit" button) */}
       </Routes>
