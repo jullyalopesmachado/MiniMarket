@@ -1,19 +1,29 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs'); // ✅ Changed bcrypt to bcryptjs for Windows compatibility
 
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true, index: true },
-  password: { type: String, required: true, select: false },
-  businessName: {type: String, required: true },
-  bio: { type: String },
-  location: { type: String },
-  website: { type: String },
+  password: { type: String, required: true },
+  businessName: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
-},
-  {collection: 'Login'});
+}, 
+{ collection: 'Login' });
 
-userSchema.index({ name: 1, email: 1, password: 1, BusinessName:1 });
+// ✅ Index for faster searches
+userSchema.index({ name: 1, email: 1 });
 
+// ✅ Hash password before saving
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+  next();
+});
 
-module.exports = mongoose.model('User', userSchema );
+// ✅ Compare passwords for login
+userSchema.methods.comparePassword = async function (enteredPassword) {
+  return bcrypt.compare(enteredPassword, this.password);
+};
+
+module.exports = mongoose.model('User', userSchema);
