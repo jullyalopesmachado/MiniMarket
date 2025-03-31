@@ -1,45 +1,38 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors'); // ✅ Added for frontend connection
+const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
+const bcrypt = require('bcryptjs'); // ✅ FIXED: Replaced bcrypt with bcryptjs
 const User = require('./models/User');
-const Upload = require('./models/Upload');
-const bcrypt = require('bcrypt');
 const userRoutes = require('./routes/userRoutes');
 const businessRoutes = require('./routes/businessRoutes');
-const apiRoutes = require('./models/api'); // ✅ Ensure correct API route import
+const apiRoutes = require('./models/api');
 const authMiddleware = require('./middleware/auth');
-
-const multer = require('multer');
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// ✅ CORS Middleware to allow frontend requests
+// ✅ CORS
 app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 
-// Middleware
+// ✅ Middleware
 app.use(express.json());
-
-// Enable Mongoose debugging
 mongoose.set('debug', true);
 
-// ✅ Check if required environment variables are set
+// ✅ Env check
 if (!process.env.MONGODB_URI || !process.env.JWT_SECRET) {
     console.error("❌ Missing environment variables. Check your .env file.");
     process.exit(1);
 }
 
-// ✅ Connect to MongoDB
+// ✅ MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI, {
     serverSelectionTimeoutMS: 5000,
     socketTimeoutMS: 45000,
-    family: 4 
+    family: 4
 })
     .then(() => {
         console.log("✅ Connected to MongoDB ->", mongoose.connection.name);
@@ -49,20 +42,16 @@ mongoose.connect(process.env.MONGODB_URI, {
         process.exit(1);
     });
 
-// ✅ Login Route
+// ✅ Login Route (manual token + password comparison)
 app.post('/api/login', async (req, res) => {
     try {
         const { email, password } = req.body;
-
-        console.log("Login request body:", req.body)
-
         const user = await User.findOne({ email }).select("+password");
 
         if (!user) {
             return res.status(400).json({ message: 'User not found' });
         }
 
-        console.log("hashed password:", user.password);
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(400).json({ message: 'Invalid credentials' });
@@ -78,12 +67,11 @@ app.post('/api/login', async (req, res) => {
 });
 
 // ✅ Routes
-
 app.use('/api/users', userRoutes);
-app.use("/api/business", businessRoutes);
-app.use("/api", apiRoutes); // ✅ Connects to `api.js`
+app.use('/api/business', businessRoutes);
+app.use('/api', apiRoutes)
 
-// ✅ Protected Profile Route
+// ✅ Protected route
 app.get('/api/profile', authMiddleware, async (req, res) => {
     try {
         const user = await User.findById(req.user._id).select('-password');
@@ -94,13 +82,13 @@ app.get('/api/profile', authMiddleware, async (req, res) => {
     }
 });
 
-// ✅ Error Handling Middleware
+// ✅ Error handling
 app.use((err, req, res, next) => {
     console.error("❌ Server Error:", err.stack);
     res.status(500).send('Something broke!');
 });
 
-// ✅ Start Server
+// ✅ Start server
 app.listen(port, () => {
     console.log(`🚀 Server is running on http://localhost:${port}`);
 });
