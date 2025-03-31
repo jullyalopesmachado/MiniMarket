@@ -36,4 +36,49 @@ router.post('/add', authMiddleware, async (req, res) => {
   }
 });
 
+// ✅ Get All Users or Search Users
+router.get("/", async (req, res) => {
+    try {
+        const { search } = req.query;
+        let businesses;
+
+        if (search) {
+            // 🔹 Search by name, owner, industry, or location (case insensitive)
+            businesses = await Business.find({
+                $or: [
+                    { name: { $regex: search, $options: "i" } }, 
+                    { owner: { $regex: search, $options: "i" } },
+                    { industry: { $regex: search, $options: "i" } },
+                    { "address.city": { $regex: search, $options: "i" } },
+                    
+                ]
+            });
+
+            
+        } else {
+            // 🔹 Return all users
+            businesses = await Business.find();
+            
+        }
+
+        res.json(businesses);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+router.get("/:id", async (req, res) => {
+    try {
+        const business = await Business.findById(req.params.id);
+
+        if (!business) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.json(business);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 module.exports = router;

@@ -79,7 +79,7 @@ app.post('/api/login', async (req, res) => {
 
 // ✅ Routes
 app.use('/api/users', userRoutes);
-app.use("/api/businesses", businessRoutes);
+app.use("/api/business", businessRoutes);
 app.use("/api", apiRoutes); // ✅ Connects to `api.js`
 
 // ✅ Protected Profile Route

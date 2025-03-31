@@ -1,12 +1,14 @@
 const mongoose = require("mongoose");
 
 const BusinessSchema = new mongoose.Schema({
-  user: {
+  owner: {
     type: mongoose.Schema.Types.ObjectId, // Reference to the user
     required: true,
     ref: "User", // Reference the 'users' collection
   },
- industry: { type: String, required: true,},
+  name: { type: String, required: true, },
+  description: { type: String, required: true, },
+ industry: { type: String, },
   address: { street: { type: String},
              city: { type: String},
              state: {type: String},
