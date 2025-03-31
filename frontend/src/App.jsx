@@ -15,6 +15,7 @@ import Footer from "./Components/Footer";
 import LoginSignup from "./Components/LoginSignup";
 import UserProfile from "./Components/UserProfile"; // Import UserProfile
 import CompanyList from './Components/CompanyList';
+import Opportunities from './Components/Opportunities';
 
 
 
@@ -162,7 +163,7 @@ function App() {
 
   return (
     <div className="App">
-      {location.pathname !== "/login-signup" && location.pathname !== "/user-profile" && location.pathname !== "/companies-page" && (
+      {location.pathname !== "/login-signup" && location.pathname !== "/user-profile" && location.pathname !== "/companies-page" && location.pathname !== "/opportunities-page" && (
         <div className="search-bar-container" style={{ position: "relative", zIndex: 1000 }}>
           <SearchBar
             query={query}
@@ -197,6 +198,8 @@ function App() {
         <Route path="/user-profile" element={<UserProfile />} /> {/* Add route */}
         <Route path="/home-page" element={<Home />} />
         <Route path="/companies-page" element={<CompanyList user={user} />} />
+
+        <Route path="/opportunities-page" element={<Opportunities />} />
 
         {/* <Route path="/companies-page" element={<CompanyList  />} /> */}  {/* This route is without admin priviledges */}
         {/* <Route path="/companies-page" element={<CompanyList isAdmin={isAdmin} />} />  {/* The 'isAdmin' prop is */}

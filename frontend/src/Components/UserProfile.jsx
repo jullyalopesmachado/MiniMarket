@@ -31,7 +31,13 @@ export function UserProfile() {
   const [firstName, setFirstName] = useState("Layne");
   const [lastName, setLastName] = useState("Staley");
   const [userBio, setUserBio] = useState(null);
-  const [userLocation, setUserLocation] = useState(null);
+  const [userLocation, setUserLocation] = useState({
+    country: "",
+    state: "",
+    city: "",
+    street: "",
+  });
+  
   const [userWebsite, setUserWebsite] = useState(null);
   
 
@@ -65,7 +71,13 @@ export function UserProfile() {
         // Set other profile data
         setUserId(profile._id);
         setUserBio(profile.bio || "");
-        setUserLocation(profile.location || "");
+        setUserLocation({
+          country: profile.location?.country || "",
+          state: profile.location?.state || "",
+          city: profile.location?.city || "",
+          street: profile.location?.street || "",
+        });
+        
         setUserWebsite(profile.website || "");
       } else {
         console.error("Error fetching user profile:", response.statusText);
@@ -96,13 +108,11 @@ if (!firstName || !lastName ) {
       _id: userId,
       firstName,
       lastName,
-      //email,
-      //businessName,
       bio: userBio,
-      location: userLocation,
+      location: userLocation, // Now an object
       website: userWebsite,
-      //logo: userlogo,
     };
+    
 
     try{
       // Updates data on the server
@@ -227,16 +237,35 @@ if (!firstName || !lastName ) {
                     value={userBio} // value is set to userBio which I set up there in the beginning of the code
                     onChange={(e) => setUserBio(e.target.value)} // onChange event handler to update userBio. When user types, update `userBio` state
                     />
-                  </Form.Group>
-                  {/* input field for editing location */}
-                  <Form.Group className="mb-3">
-                    <Form.Label>Location</Form.Label>
-                    <Form.Control
-                      type="text" // input is text
-                      value={userLocation}
-                      onChange={(e) => setUserLocation(e.target.value)}
+                  <Form.Group className="mb-4">
+                <Form.Label className="mt-4">Country</Form.Label>
+                      <Form.Control
+                        type="text"
+                        value={userLocation.country}
+                        onChange={(e) => setUserLocation({ ...userLocation, country: e.target.value })}
                       />
+                      <Form.Label className="mt-4">State</Form.Label>
+                      <Form.Control
+                        type="text"
+                        value={userLocation.state}
+                        onChange={(e) => setUserLocation({ ...userLocation, state: e.target.value })}
+                      />
+                      <Form.Label className="mt-4">City</Form.Label>
+                      <Form.Control
+                        type="text"
+                        value={userLocation.city}
+                        onChange={(e) => setUserLocation({ ...userLocation, city: e.target.value })}
+                      />
+                      <Form.Label className="mt-4">Street address</Form.Label>
+                      <Form.Control
+                        type="text"
+                        value={userLocation.street}
+                        onChange={(e) => setUserLocation({ ...userLocation, street: e.target.value })}
+                      />
+
+                    </Form.Group>
                   </Form.Group>
+
                   
                   {/* input field for editing website */} 
                   <Form.Group className="mb-3">

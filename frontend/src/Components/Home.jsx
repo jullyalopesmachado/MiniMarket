@@ -33,7 +33,29 @@ const Home = () => {
 
           {userStatus === "User not logged in" && (
           <button className="secondary-button" onClick={handleSignupClick}>
-            Sign Up Now <FiArrowRight />
+            Sign Up or Log in Today <FiArrowRight />
+          </button>
+          )}
+          {userStatus === "User logged in" && (
+          <button className="secondary-button" onClick={() => navigate("/user-profile")}>
+            User Profile <FiArrowRight />
+          </button>
+          )}
+
+          {userStatus === "User logged in" && (
+          <button className="secondary-button" onClick={() => navigate("/opportunities-page")}   style={{
+            variant: "primary",
+            position: "absolute",
+            top: "100px",
+            right: "150px",
+          }}>
+            Services <FiArrowRight />
+          </button>
+          )}
+
+      {userStatus === "Admin logged in" && (
+          <button className="secondary-button" onClick={() => navigate("/user-profile")}>
+            User Profile <FiArrowRight />
           </button>
           )}
 
@@ -43,12 +65,14 @@ const Home = () => {
         </div>
       </div>
 
+      
+
       {/* User Status Dropdown */}
       <Dropdown
   style={{
     position: "absolute",
-    top: "100px",
-    right: "150px",
+    top: "600px",
+    right: "10px",
   }}
 >
   <Dropdown.Toggle variant="primary">{userStatus}</Dropdown.Toggle>
