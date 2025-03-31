@@ -1,23 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Dropdown } from "react-bootstrap";
+import { FiArrowRight } from "react-icons/fi";
+import Navbar from "./Navbar";
 import BannerBackground from "../Assets/home-banner-background.png";
 import BannerImage from "../Assets/home-banner-image.png";
-import Navbar from "./Navbar";
-import { FiArrowRight } from "react-icons/fi";
-import { useNavigate } from "react-router-dom"; 
 
 const Home = () => {
-  
+  const [userStatus, setUserStatus] = useState("User not logged in");
   const navigate = useNavigate();
 
-  // Check if a token exists in local storage (i.e., user is logged in)
-  const isLoggedIn = Boolean(localStorage.getItem("token"));
-
   const handleSignupClick = () => {
-    console.log("Sign up button clicked, isLoggedIn:", isLoggedIn);
-    if (!isLoggedIn) {
+    if (userStatus === "User not logged in") {
       navigate("/login-signup");
     }
   };
+
   return (
     <div id="home" className="home-container">
       <Navbar />
@@ -32,14 +30,41 @@ const Home = () => {
           <p className="primary-text">
             Connect to your community and help it grow.
           </p>
+
+          {userStatus === "User not logged in" && (
           <button className="secondary-button" onClick={handleSignupClick}>
             Sign Up Now <FiArrowRight />
           </button>
+          )}
+
         </div>
         <div className="home-image-section">
           <img src={BannerImage} alt="Banner" style={{ borderRadius: "70%" }} />
         </div>
       </div>
+
+      {/* User Status Dropdown */}
+      <Dropdown
+  style={{
+    position: "absolute",
+    top: "100px",
+    right: "150px",
+  }}
+>
+  <Dropdown.Toggle variant="primary">{userStatus}</Dropdown.Toggle>
+  <Dropdown.Menu>
+    <Dropdown.Item onClick={() => setUserStatus("User logged in")}>
+      User logged in
+    </Dropdown.Item>
+    <Dropdown.Item onClick={() => setUserStatus("Admin logged in")}>
+      Admin logged in
+    </Dropdown.Item>
+    <Dropdown.Item onClick={() => setUserStatus("User not logged in")}>
+      Logged out
+    </Dropdown.Item>
+  </Dropdown.Menu>
+</Dropdown>
+
     </div>
   );
 };

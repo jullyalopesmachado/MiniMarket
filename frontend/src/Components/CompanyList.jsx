@@ -1,7 +1,7 @@
 // Importing React and useState hook for managing component state
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Container, Row, Col, Button, Alert, Breadcrumb, Card, Form, Nav, Navbar, NavDropdown, NavbarCollapse, Modal } from 'react-bootstrap';
+import { Container, Row, Col, Button, Dropdown, Alert, Breadcrumb, Card, Form, Nav, Navbar, NavDropdown, NavbarCollapse, Modal } from 'react-bootstrap';
 import logoImage from "../Assets/Logo3.png"; 
 import crochetImage from "../Assets/crochetPic.jpg"; 
 import honeyImage from "../Assets/honeyShopPhoto2.jpg"; 
@@ -13,8 +13,18 @@ import background from "../Assets/home-banner-background.png";
 
 import { useNavigate } from "react-router-dom";
 export function CompanyList({user}) { // Passing isAdmin as a prop here.
+      const [userStatus, setUserStatus] = useState("User not logged in");
+
+
+      const handleSignupClick = () => {
+        if (userStatus === "User not logged in") {
+          navigate("/login-signup");
+        }
+      };
+    
 
     const [companies, setCompanies] = useState([ 
+
         // sample data until backend is connected here
         {
             id: 1,
@@ -84,9 +94,9 @@ export function CompanyList({user}) { // Passing isAdmin as a prop here.
     const navigate = useNavigate();
     
     const handleMessageClick = (company) => {
-        if (!user){ // Check if the user is logged in
-            alert ("Please log in to send a message.");
-            navigate ("/login-signup"); // Redirect to login page
+        if (user){ // Check if the user is logged in
+            alert ("You're about to send a message.");
+            // Redirect to login page
         } else {
             setSelectedCompany(company); // Set the selected company for messaging
             setShowMessageModal(true); // Show the message modal
@@ -129,10 +139,10 @@ export function CompanyList({user}) { // Passing isAdmin as a prop here.
         }
     };
 
-
+// /////////////////////////////////////////////
 
     const handleEditToggle = (id) => {
-        if (user?.isAdmin) { // Check if the user is an admin
+        if (user?.isAdmin || userStatus === "Admin logged in") { // Check if the user is an admin
             setCompanies(companies.map(company =>
                 company.id === id ? { ...company, isEditing: !company.isEditing } : company 
             ));
@@ -307,7 +317,12 @@ export function CompanyList({user}) { // Passing isAdmin as a prop here.
                                                 `rel="noopener noreferrer"` ensures security when opening links in a new tab */}
                                             
                                             {/* A button that says "Message", presumably for contacting the company */}
-                                            {user && <Button variant="primary" onClick={() => handleMessageClick(company)}>Message</Button>}
+                                            
+                                            {user || userStatus !== "User not logged in" && (
+                                                <Button variant="primary" onClick={() => handleMessageClick(company)}>Message</Button>
+                                            )}
+
+                                            
                                             {/*}
                                             // This line BELOW conditionally renders the "Edit" button only if the user is an admin.
                                             // The 'isAdmin' prop is a boolean. If it is true, the button is displayed.
@@ -315,8 +330,8 @@ export function CompanyList({user}) { // Passing isAdmin as a prop here.
                                             // and when clicked, it triggers the 'handleEditToggle' function with the company id.
                                             // This function toggles the 'isEditing' state for the specific company, allowing the user to enter edit mode.
                                             */}
-                                            {user?.isAdmin && (
-                                                <Button variant="warning" className="ms-2" onClick={() => handleEditToggle(company.id)}>
+                                            {user?.isAdmin || userStatus === "Admin logged in" && (
+                                                <Button variant="outline-primary" className="ms-2" onClick={() => handleEditToggle(company.id)}>
                                                     Edit
                                                 </Button>
                                             )}
@@ -339,6 +354,7 @@ export function CompanyList({user}) { // Passing isAdmin as a prop here.
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
+                        
                         <Form.Group className="mb-3">
                             <Form.Label>Message</Form.Label>
                             <Form.Control
@@ -355,11 +371,22 @@ export function CompanyList({user}) { // Passing isAdmin as a prop here.
                     <Button variant="secondary" onClick={handleCloseModal}>
                         Close
                     </Button>
+                    
                     <Button variant="primary" onClick={handleSendMessage}>
                         Send Message
                     </Button>
                 </Modal.Footer>
             </Modal>
+
+      {/* User Status Dropdown */}
+      <Dropdown style={{ position: "absolute", top: "100px", right: "150px" }}>
+    <Dropdown.Toggle variant="primary">{userStatus}</Dropdown.Toggle>
+    <Dropdown.Menu>
+        <Dropdown.Item onClick={() => setUserStatus("User logged in")}>User logged in</Dropdown.Item>
+        <Dropdown.Item onClick={() => setUserStatus("Admin logged in")}>Admin logged in</Dropdown.Item>
+        <Dropdown.Item onClick={() => setUserStatus("User not logged in")}>User not logged in</Dropdown.Item>
+    </Dropdown.Menu>
+</Dropdown>
 
         </div>
     );
