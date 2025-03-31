@@ -42,7 +42,8 @@ router.get("/", async (req, res) => {
         const { search } = req.query;
         let businesses;
 
-        if (search) {
+        if (search) { 
+          
             // 🔹 Search by name, owner, industry, or location (case insensitive)
             businesses = await Business.find({
                 $or: [

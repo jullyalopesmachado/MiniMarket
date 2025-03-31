@@ -78,6 +78,7 @@ app.post('/api/login', async (req, res) => {
 });
 
 // ✅ Routes
+
 app.use('/api/users', userRoutes);
 app.use("/api/business", businessRoutes);
 app.use("/api", apiRoutes); // ✅ Connects to `api.js`

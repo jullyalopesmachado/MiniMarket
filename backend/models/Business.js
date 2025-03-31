@@ -6,6 +6,7 @@ const BusinessSchema = new mongoose.Schema({
     required: true,
     ref: "User", // Reference the 'users' collection
   },
+  
   name: { type: String, required: true, },
   description: { type: String, required: true, },
  industry: { type: String, },
