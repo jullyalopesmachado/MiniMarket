@@ -5,9 +5,10 @@ const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const User = require('./models/User');
 const Upload = require('./models/Upload');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const userRoutes = require('./routes/userRoutes');
 const businessRoutes = require('./routes/businessRoutes');
+const messageRoutes = require('./routes/messageRoutes');
 const apiRoutes = require('./models/api'); // ✅ Ensure correct API route import
 const authMiddleware = require('./middleware/auth');
 
@@ -81,6 +82,7 @@ app.post('/api/login', async (req, res) => {
 
 app.use('/api/users', userRoutes);
 app.use("/api/business", businessRoutes);
+app.use("/api/pm", messageRoutes); // ✅ Ensure correct message route import
 app.use("/api", apiRoutes); // ✅ Connects to `api.js`
 
 // ✅ Protected Profile Route
