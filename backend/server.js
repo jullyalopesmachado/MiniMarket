@@ -1,14 +1,20 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
+const cors = require('cors'); // ✅ Added for frontend connection
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
-const bcrypt = require('bcryptjs'); // ✅ FIXED: Replaced bcrypt with bcryptjs
 const User = require('./models/User');
+const Upload = require('./models/Upload');
+const bcrypt = require('bcryptjs');
 const userRoutes = require('./routes/userRoutes');
 const businessRoutes = require('./routes/businessRoutes');
-const apiRoutes = require('./models/api');
+const messageRoutes = require('./routes/messageRoutes');
+const apiRoutes = require('./models/api'); // ✅ Ensure correct API route import
 const authMiddleware = require('./middleware/auth');
+
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 dotenv.config();
 
@@ -69,6 +75,7 @@ app.post('/api/login', async (req, res) => {
 // ✅ Routes
 app.use('/api/users', userRoutes);
 app.use('/api/business', businessRoutes);
+app.use("/api/pm", messageRoutes); // ✅ Ensure correct message route import
 app.use('/api', apiRoutes)
 
 // ✅ Protected route
