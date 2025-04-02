@@ -24,6 +24,7 @@ const Navbar = () => {
   const [showLoginSignup, setShowLoginSignup] = useState(false); // New state
   const navigate = useNavigate(); // Initialize navigate function
 
+  
   const menuOptions = [
     {
       text: "Home",
