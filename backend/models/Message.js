@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bycriptjs');
+const bcrypt = require('bcryptjs');
 
 const messageSchema = new mongoose.Schema({
     senderId: { type: String, required: true },
