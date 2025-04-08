@@ -1,71 +1,42 @@
-// Importing React and useState hook for managing component state
-import React, { useState } from "react";
-
-// Importing an avatar image for the user profile
-import avatarImage from "../Assets/userBlue.png"; 
-import logoImage from "../Assets/Logo3.png"; 
-import { Link } from "react-router-dom";
-import backgroundIv from "../Assets/about-background.png"; 
-import backgroundImage from "../Assets/home-banner-background.png"; 
-// Importing Bootstrap styles for UI components
-import "bootstrap/dist/css/bootstrap.min.css";
-import "./UserProfile.css";
-import Axios from "axios";
-import { useEffect } from "react";
-import { updateData } from "../App";
-// In UserProfile.jsx
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  Container, Row, Col, Button, Alert, Card, Form, Nav, Navbar, NavDropdown, Spinner
+} from 'react-bootstrap';
 
-// Importing Bootstrap components (Note: Fixed typo in 'bootstrap' and 'Breadcrumb')
-import { Container, Row, Col, Button, Alert, Breadcrumb, Card, Form, Nav, Navbar, NavDropdown, NavbarCollapse, Spinner } from 'react-bootstrap';
+import avatarImage from "../Assets/userBlue.png";
+import logoImage from "../Assets/Logo3.png";
+import backgroundIv from "../Assets/about-background.png";
+import backgroundImage from "../Assets/home-banner-background.png";
+import backgroundBottom from "../Assets/delivery-image-Photoroom.png";
 
-
-
+import { updateData } from "../App";
 
 export function UserProfile() {
-
   const navigate = useNavigate();
-
-  const handleClick = () => {
-    navigate("/");
-  };
-
   const [isEditing, setIsEditing] = useState(false);
   const [firstName, setFirstName] = useState("Layne");
   const [lastName, setLastName] = useState("Staley");
   const [userBio, setUserBio] = useState(null);
   const [userLocation, setUserLocation] = useState(null);
   const [userWebsite, setUserWebsite] = useState(null);
-  const [userStatus, setUserStatus] = useState("User logged in"); // State for authentication status
-
-  const [isLoading, setIsLoading] = useState(false); // tracks loading
-  const [error, setError] = useState(null); // tracks error
-
-  
-  //const [userlogo, setUserLogo] = useState(avatarImage);
   const [userId, setUserId] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const fetchProfile = async () => {
-    const token = localStorage.getItem("token"); // Retrieve token from local storage
+    const token = localStorage.getItem("token");
     try {
       const response = await fetch("http://localhost:3000/api/profile", {
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (response.ok) {
         const profile = await response.json();
-
-        console.log("User Profile:", profile);
-
-        // Split user.name into firstName and lastName
-        const [firstName, lastName] = (profile.name || "").split(" ");
-        setFirstName(firstName || "");
-        setLastName(lastName || "");
-
-        // Set other profile data
+        const [first, last] = (profile.name || "").split(" ");
+        setFirstName(first || "");
+        setLastName(last || "");
         setUserId(profile._id);
         setUserBio(profile.bio || "");
         setUserLocation(profile.location || "");
@@ -82,241 +53,135 @@ export function UserProfile() {
     fetchProfile();
   }, []);
 
-
-  // Function to handle the form submission
   const handleSave = async () => {
-if (!firstName || !lastName ) {
-  setError("Required information missing");
-  return;
-}
+    if (!firstName || !lastName) {
+      setError("Required information missing");
+      return;
+    }
 
-    setIsLoading(true); // Set loading state to true
-    setError(null); // Reset error state
-
-    //prepare data to be saved 
+    setIsLoading(true);
+    setError(null);
 
     const updatedProfile = {
       _id: userId,
-      name: firstName, lastName,
-
+      name: firstName + " " + lastName,
       bio: userBio,
       location: userLocation,
       website: userWebsite,
-      //logo: userlogo,
     };
 
-    try{
-      // Updates data on the server
-      const updatedUser = await updateData(updatedProfile);
-      console.log("User Profile Updated:", updatedUser);
-      setIsEditing(false); // Set editing state to false
+    try {
+      await updateData(updatedProfile);
+      setIsEditing(false);
     } catch (err) {
-    
-      console.error("error updating profile", err);
       setError("Failed to update profile");
-
     } finally {
-      setIsLoading(false); // Set loading state to false
+      setIsLoading(false);
     }
-
   };
 
-  if (isLoading) {
-    return <Spinner animation="border" />;
-  }
-    // log out handler
-    const handleLogout = () => {
-      //remove token from local storage
-      localStorage.removeItem("token");
-      // now redirect user to the login page
-      navigate("/login-signup");  
-  }
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login-signup");
+  };
 
   return (
-<div className="min-vh-100 w-100" >
-    <Navbar expand="lg" className="img-fluid">
-      <Container>
-      <div className=" ms-auto" style={{ position: 'absolute', top: 77, right: 95}}>
-          {(userStatus === "User logged in" || userStatus === "Admin logged in") && (
-            <>
-              <Button variant="outline-primary" className="ms-4" onClick={() => navigate("/")}>Home</Button>
-              <Button variant="outline-primary" className="ms-4" onClick={() => navigate("/user-company-page")}>Your Business</Button>
+    <>
+      {/* Background Images */}
+      <div style={{ position: 'fixed', top: 0, right: 0, width: '200px', height: '300px', backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', zIndex: 999 }} />
+      <div style={{ position: 'fixed', top: 500, right: -50, width: '500px', height: '310px', backgroundImage: `url(${backgroundBottom})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', zIndex: 999 }} />
+      <div style={{ position: 'fixed', top: 400, left: 0, width: '150px', height: '400px', backgroundImage: `url(${backgroundIv})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', zIndex: 999 }} />
 
-            </>
+      <div className="min-vh-100 w-100 position-relative">
+        {/* Navbar */}
+        <Navbar bg="light" expand="lg" className="shadow-sm">
+          <Container>
+            <Navbar.Brand onClick={() => navigate("/")} style={{ cursor: 'pointer' }}>
+              <img src={logoImage} alt="Logo" style={{ width: '80px' }} />
+            </Navbar.Brand>
+            <Navbar.Toggle aria-controls="navbar-nav" />
+            <Navbar.Collapse id="navbar-nav">
+              <Nav className="ms-auto">
+                <Nav.Link onClick={() => navigate("/")}>Home</Nav.Link>
+                <Nav.Link onClick={() => navigate("/user-profile")}>Profile</Nav.Link>
+                <Nav.Link onClick={() => navigate("/companies-page")}>Companies</Nav.Link>
+                <Nav.Link onClick={() => navigate("/opportunities-page")}>See Opportunities</Nav.Link>
+                <Nav.Link onClick={() => navigate("/deals-page")}>See Deals</Nav.Link>
+                <NavDropdown title="Admin">
+                  <NavDropdown.Item onClick={() => navigate('/adminPanelOp')}>Approve Opportunity</NavDropdown.Item>
+                  <NavDropdown.Item onClick={() => navigate('/adminPanelUser')}>Approve User</NavDropdown.Item>
+                </NavDropdown>
+              </Nav>
+            </Navbar.Collapse>
+          </Container>
+        </Navbar>
+
+        {/* Profile Section */}
+        <Container className="d-flex flex-column justify-content-center align-items-center mt-5">
+          {isLoading ? (
+            <Spinner animation="border" />
+          ) : (
+            <Card style={{ width: '28rem' }} className="text-center shadow">
+              <Card.Img
+                variant="top"
+                src={avatarImage}
+                className="rounded-circle mx-auto mt-4"
+                style={{ width: "40%", height: "auto" }}
+              />
+              <Card.Body>
+                <Card.Title>{firstName} {lastName}</Card.Title>
+                <Card.Text>{userBio || "No bio provided"}</Card.Text>
+                <Card.Text><strong>Location:</strong> {userLocation || "Not specified"}</Card.Text>
+                <Card.Text><strong>Website:</strong> {userWebsite || "No website"}</Card.Text>
+                <Button variant="primary" onClick={() => setIsEditing(true)}>Edit Profile</Button>
+              </Card.Body>
+            </Card>
           )}
-        </div>
-        <Card.Img variant="top" src={logoImage}  className="me-auto img-fluid" style={{width:'10%'}} />
-        <Navbar.Toggle aria-controls="basic-navbar" className="me-auto" />
-        <Navbar.Collapse id="basic-navbar-nav" className="me-auto img-fluid">
-            <NavDropdown title="Dropdown" id="basic-nav-dropdown">
-            <NavDropdown.Item onClick={handleClick}>Home Page</NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.2">
-                Companies
-              </NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.3">Feed</NavDropdown.Item>
-              <NavDropdown.Divider />
-              <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>
-            </NavDropdown>
 
-        </Navbar.Collapse>
-      </Container>
-    </Navbar>
-
-    {/* User Profile Card */}
-
-    <Container className="d-flex justify-content-center align-items-center mt-0 min-vh-100">
-
-      <Card style={{ width: '28rem', paddingTop: '5rem'  }}>
-        <div  className="d-flex justify-content-center align-items-center">
-        <Card.Img variant="top" src={avatarImage}/* will be pulled from database*/  className="rounded-circle img-fluid h-50 w-50" />
-        </div>
-          <Card.Body>
-            {/* Display user's first and last name */}
-            <Card.Title>{firstName} {lastName}</Card.Title>
-              {/* Display user's bio */}
-              <Card.Text>
-                {userBio || "No bio provided"}
-              </Card.Text>
-
-              {/* Display user's location */} 
-
-            <Card.Text>
-              <strong>Located in:</strong> {userLocation || "No location provided"}
-            </Card.Text>
-
-            {/* Display user's website */}
-            <Card.Text>
-              <strong>Find {firstName} at: </strong>
-              {userWebsite || "No website provided"}
-            </Card.Text>
-            {/* User Profile Edit Button */}
-            <div className="d-flex justify-content-center align-items-center"> 
-            <Button variant="primary" onClick={() => setIsEditing(true)}>
-              Edit Profile
+          <div className="mt-4">
+            <Button variant="primary" onClick={() => navigate('/company-post-page')} className="me-3">
+              Post a Deal
             </Button>
-            </div>
-          </Card.Body>
-        </Card>
-        <Button variant="primary" onClick={() => navigate ('/company-post-page')} className="mt-3">
-          Post a Deal
-        </Button>
+            <Button variant="primary" onClick={() => navigate('/deals-page')}>
+              Latest Deals
+            </Button>
+          </div>
 
-        <Button variant="primary" onClick={() => navigate ('/deals-page')} className="mt-3">
-          Latest Deals
-        </Button>
-      </Container>
-
- 
-
-
-   {/* User Profile Edit */}
-    {isEditing && ( // form is only visible when isEditing is true
-      <Container className="mt-3">
-           {/* Form for editing */}
-           <Form>
-               {/* input field for editing first name */}
-               <Form.Group className="mb-3">
+          {/* Edit Profile Form */}
+          {isEditing && (
+            <Card className="mt-5 p-4 shadow-sm" style={{ width: '100%', maxWidth: '700px' }}>
+              <Form>
+                <Form.Group className="mb-3">
                   <Form.Label>First Name</Form.Label>
-                  <Form.Control
-                    type="text" // input type is text
-                    value={firstName} // value is set to firstName. See up there as I set vals. 
-                    onChange={(e) => setFirstName(e.target.value)} // onChange event handler to update firstName. / When user types, update `firstName` state
-                    />
-                  </Form.Group>
-
-                {/* input field for editing last name */}
+                  <Form.Control type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+                </Form.Group>
                 <Form.Group className="mb-3">
                   <Form.Label>Last Name</Form.Label>
-                  <Form.Control
-                    type="text" // input type is text
-                    value={lastName} // value is set to lastName
-                    onChange={(e) => setLastName(e.target.value)} // onChange event handler to update lastName
-                  />
+                  <Form.Control type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} />
                 </Form.Group>
-
-                {/* input field for editing bio */}
                 <Form.Group className="mb-3">
                   <Form.Label>Bio</Form.Label>
-                  <Form.Control
-                    as="textarea" // input type is textarea
-                    value={userBio} // value is set to userBio which I set up there in the beginning of the code
-                    onChange={(e) => setUserBio(e.target.value)} // onChange event handler to update userBio. When user types, update `userBio` state
-                    />
-                  </Form.Group>
-                  {/* input field for editing location */}
-                  <Form.Group className="mb-3">
-                    <Form.Label>Location</Form.Label>
-                    <Form.Control
-                      type="text" // input is text
-                      value={userLocation}
-                      onChange={(e) => setUserLocation(e.target.value)}
-                      />
-                  </Form.Group>
-                  
-                  {/* input field for editing website */} 
-                  <Form.Group className="mb-3">
-                    <Form.Label>Website</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={userWebsite}
-                      onChange={(e) => setUserWebsite(e.target.value)} // onChange event handler to update userWebsite. When user types, update `userWebsite` state
-                    />
-                  </Form.Group>
-
-                  {/* Save button */}
-                  <Button variant="primary" onClick={handleSave} disabled={isLoading}>  {/* The button is disabled while the profile is being saved (i.e., when `isLoading` is true) */}
-
-                    {isLoading ? "Saving..." : "Save Changes"} {/* If `isLoading` is true, show "Saving..." text; otherwise, show "Save Changes" */}
-                  </Button>
-
-                  {/* Display an error message if there was an issue during the save */}
-                  {error && <Alert variant="danger" className="mt-3">{error}</Alert>}
-        </Form>
-      </Container>
-    )}
-
-
-                                          {/* Background image positioned in the top-right corner of the navbar */}
-                                          <div
-                                            style={{
-                                            position: 'absolute',  // Positioning it within the navbar
-                                            top: 0,
-                                            right: 0,
-                                            width: '150px',  // Set a small size for the background image
-                                            height: '350px',  // Set a small size for the background image
-                                            backgroundImage: `url(${backgroundImage})`,  // Background image URL
-                                            backgroundSize: 'cover',  // Ensure the background image covers the div
-                                            backgroundRepeat: 'no-repeat',  // Prevent repeating the image
-                                            }}
-                                />
-                
-                                <div
-                                            style={{
-                                            position: 'absolute',  // Positioning it within the navbar
-                                            top: 70,
-                                            right: 1350,
-                                            width: '250px',  // Set a small size for the background image
-                                            height: '750px',  // Set a small size for the background image
-                                            backgroundImage: `url(${backgroundIv})`,  // Background image URL
-                                            backgroundSize: 'cover',  // Ensure the background image covers the div
-                                            backgroundRepeat: 'no-repeat',  // Prevent repeating the image
-                                            }}
-                                />   
-
-    
-
-
-
-
-
-
+                  <Form.Control as="textarea" value={userBio} onChange={(e) => setUserBio(e.target.value)} />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Location</Form.Label>
+                  <Form.Control type="text" value={userLocation} onChange={(e) => setUserLocation(e.target.value)} />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Website</Form.Label>
+                  <Form.Control type="text" value={userWebsite} onChange={(e) => setUserWebsite(e.target.value)} />
+                </Form.Group>
+                <Button variant="primary" onClick={handleSave} disabled={isLoading}>
+                  {isLoading ? "Saving..." : "Save Changes"}
+                </Button>
+                {error && <Alert variant="danger" className="mt-3">{error}</Alert>}
+              </Form>
+            </Card>
+          )}
+        </Container>
       </div>
-  
+    </>
   );
 }
 
-
 export default UserProfile;
-
-
-

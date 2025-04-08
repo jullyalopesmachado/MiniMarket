@@ -93,7 +93,7 @@ export function DealsPage() {
 
         {/* Deals List */}
         <Container className="mt-5">
-          <h3 className="mb-4">Latest Deals from Companies</h3>
+          <h3 className="mb-4">Latest Deals from Small Businesses</h3>
           <Row>
             {currentItems.map((deal) => (
               <Col md={6} key={deal.id} className="mb-4">
@@ -104,7 +104,7 @@ export function DealsPage() {
                     <Card.Text>
                       <strong>Expires:</strong> {new Date(deal.expirationDate).toLocaleDateString()}
                     </Card.Text>
-                    <Button variant="primary" onClick={() => handleShowModal(deal)}>
+                    <Button variant="outline-primary" onClick={() => handleShowModal(deal)}>
                       View Details
                     </Button>
                   </Card.Body>
