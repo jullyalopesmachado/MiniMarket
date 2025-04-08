@@ -3,32 +3,21 @@ import { FaSearch } from "react-icons/fa";
 import "./SearchBar.css";
 import { fetchData } from "../App";
 
-
 export const SearchBar = ({ query, setQuery, setResults, setSearchActive }) => {
-
-
-  
-
-  
-
   const handleChange = async (e) => {
     const value = e.target.value;
     setQuery(value);
 
     if (value.trim()) {
       setSearchActive(true);
-
       try {
-      const json = await fetchData({value, action: "search"});
-
-      const Results = Array.isArray(json) ? json : []; 
-      console.log("Results:", Results);
-      setResults(Results);
+        const json = await fetchData({ value, action: "search" });
+        const Results = Array.isArray(json) ? json : [];
+        setResults(Results);
       } catch (error) {
         console.error("Error fetching users:", error);
         setResults([]);
       }
-      
     } else {
       setSearchActive(false);
       setResults([]);

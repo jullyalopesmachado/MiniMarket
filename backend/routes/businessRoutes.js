@@ -102,7 +102,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
       console.log("💬 Owner ID in DB:", business.owner_id);
       console.log("🔐 Requesting user ID:", requestingUser._id);
       
-
+      return res.status(403).json({ message: "Not authorized" });
     }
 
     if (name) business.name = name;

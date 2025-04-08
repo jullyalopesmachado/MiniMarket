@@ -1,28 +1,26 @@
-// Importing React and useState hook for managing component state
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import {
-  Container, Row, Col, Button, Dropdown, Alert, Breadcrumb,
-  Card, Form, Nav, Navbar, NavDropdown, Modal
-} from 'react-bootstrap';
+  Container, Row, Col, Button, Dropdown, Card,
+  Form, Nav, Navbar, Modal
+} from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
-import logoImage from "../Assets/Logo3.png"; 
+import logoImage from "../Assets/Logo3.png";
 import companyPhoto from "../Assets/compphoto1.png";
-import backgroundImage from "../Assets/home-banner-background.png"; 
-import backgroundIv from "../Assets/about-background.png"; 
-import backgroundBottom from "../Assets/bottom-background.png"; 
+import backgroundImage from "../Assets/home-banner-background.png";
+import backgroundIv from "../Assets/about-background.png";
+import backgroundBottom from "../Assets/bottom-background.png";
 
 export function CompanyList({ user }) {
   const [userStatus, setUserStatus] = useState("User not logged in");
-  const navigate = useNavigate();
-
   const [companies, setCompanies] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showMessageModal, setShowMessageModal] = useState(false);
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [messagem, setMessage] = useState("");
+  const navigate = useNavigate();
 
   const fetchCompany = async () => {
     const token = localStorage.getItem("token");
@@ -76,7 +74,6 @@ export function CompanyList({ user }) {
     const companyToUpdate = companies.find(company => company.id === id);
     const token = localStorage.getItem("token");
 
-    // Validate required fields
     if (!companyToUpdate.companyName || !companyToUpdate.companyBio || !companyToUpdate.companyLocation) {
       alert("Company name, bio, and location are required.");
       return;
@@ -89,8 +86,6 @@ export function CompanyList({ user }) {
       location: companyToUpdate.companyLocation,
       email: companyToUpdate.companyEmail || "example@example.com"
     };
-
-    console.log("Sending payload:", JSON.stringify(payload, null, 2));
 
     try {
       const response = await fetch(`http://localhost:3000/api/business/${id}`, {
@@ -161,22 +156,29 @@ export function CompanyList({ user }) {
   };
 
   return (
-    <div className="min-vh-100 w-100">
-      <Navbar expand="lg" className="img-fluid">
-        <Container className="mt-4">
-          <Card.Img variant="top" src={logoImage} className="me-auto img-fluid" style={{ width: '10%' }} />
-          <Navbar.Toggle aria-controls="basic-navbar" className="me-auto" />
-          <Navbar.Collapse id="basic-navbar-nav" className="me-auto img-fluid">
+    <div className="min-vh-100 w-100 position-relative">
+
+      {/* Navbar - DealsPage style */}
+      <Navbar bg="light" expand="lg" className="shadow-sm">
+        <Container>
+          <Navbar.Brand onClick={() => navigate("/")} style={{ cursor: 'pointer' }}>
+            <img src={logoImage} alt="Logo" style={{ width: '80px' }} />
+          </Navbar.Brand>
+          <Navbar.Toggle aria-controls="navbar-nav" />
+          <Navbar.Collapse id="navbar-nav">
             <Nav className="ms-auto">
-              <NavDropdown title="Dropdown" id="basic-nav-dropdown">
-                <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>
-              </NavDropdown>
+              <Nav.Link onClick={() => navigate("/")}>Home</Nav.Link>
+              <Nav.Link onClick={() => navigate("/user-profile")}>Profile</Nav.Link>
+              <Nav.Link onClick={() => navigate("/companies-page")}>Companies</Nav.Link>
+              <Nav.Link onClick={() => navigate("/opportunities-page")}>See Opportunities</Nav.Link>
+              <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
             </Nav>
           </Navbar.Collapse>
         </Container>
       </Navbar>
 
-      <Container className="mt-4">
+      {/* Company Cards */}
+      <Container className="mt-5">
         <Row>
           {companies.map(company => (
             <Col md={4} key={company.id}>
@@ -236,7 +238,11 @@ export function CompanyList({ user }) {
                       <Card.Title>{company.companyName}</Card.Title>
                       <Card.Text>{company.companyBio}</Card.Text>
                       <Card.Text><strong>Location:</strong> {company.companyLocation}</Card.Text>
-                      <Card.Text><strong>Website:</strong> <a href={company.companyWebsite} target="_blank" rel="noopener noreferrer">{company.companyWebsite}</a></Card.Text>
+                      <Card.Text><strong>Website:</strong>{" "}
+                        <a href={company.companyWebsite} target="_blank" rel="noopener noreferrer">
+                          {company.companyWebsite}
+                        </a>
+                      </Card.Text>
 
                       {(user || userStatus !== "User not logged in") && (
                         <Button variant="primary" onClick={() => handleMessageClick(company)}>Message</Button>
@@ -256,6 +262,7 @@ export function CompanyList({ user }) {
         </Row>
       </Container>
 
+      {/* Message Modal */}
       <Modal show={showMessageModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
           <Modal.Title>Send Message to {selectedCompany?.companyName}</Modal.Title>
@@ -280,18 +287,40 @@ export function CompanyList({ user }) {
         </Modal.Footer>
       </Modal>
 
-      <Dropdown style={{ position: "absolute", top: "100px", right: "150px" }}>
-        <Dropdown.Toggle variant="primary">{userStatus}</Dropdown.Toggle>
-        <Dropdown.Menu>
-          <Dropdown.Item onClick={() => setUserStatus("User logged in")}>User logged in</Dropdown.Item>
-          <Dropdown.Item onClick={() => setUserStatus("Admin logged in")}>Admin logged in</Dropdown.Item>
-          <Dropdown.Item onClick={() => setUserStatus("User not logged in")}>User not logged in</Dropdown.Item>
-        </Dropdown.Menu>
-      </Dropdown>
-
-      <div style={{ position: 'absolute', top: 0, right: 0, width: '150px', height: '350px', backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat' }} />
-      <div style={{ position: 'absolute', top: 500, right: 0, width: '350px', height: '300px', backgroundImage: `url(${backgroundBottom})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat' }} />
-      <div style={{ position: 'absolute', top: 10, right: 1350, width: '250px', height: '750px', backgroundImage: `url(${backgroundIv})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat' }} />
+      {/* Background Decorations */}
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        right: 0,
+        width: '200px',
+        height: '300px',
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+        zIndex: 999
+      }} />
+      <div style={{
+        position: 'fixed',
+        top: 500,
+        right: 2,
+        width: '300px',
+        height: '300px',
+        backgroundImage: `url(${backgroundBottom})`,
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+        zIndex: 999
+      }} />
+      <div style={{
+        position: 'fixed',
+        top: 400,
+        left: -40,
+        width: '150px',
+        height: '400px',
+        backgroundImage: `url(${backgroundIv})`,
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+        zIndex: 999
+      }} />
     </div>
   );
 }
