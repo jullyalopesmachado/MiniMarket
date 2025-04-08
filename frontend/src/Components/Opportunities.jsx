@@ -75,7 +75,7 @@ function OppListPage() {
     <>
       {/* Background Decorations - On Top */}
       <div style={{ position: 'fixed', top: 0, right: 0, width: '200px', height: '300px', backgroundImage: `url(${backRightImage})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', zIndex: 999 }} />
-      <div style={{ position: 'fixed', top: 500, right: 0, width: '250px', height: '300px', backgroundImage: `url(${backgroundPeopleImage})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', zIndex: 999 }} />
+      <div style={{ position: 'fixed', top: 500, right: 2, width: '300px', height: '300px', backgroundImage: `url(${backgroundPeopleImage})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', zIndex: 999 }} />
       <div style={{ position: 'fixed', top: 400, left: 0, width: '150px', height: '400px', backgroundImage: `url(${backgroundIv})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', zIndex: 999 }} />
 
       <div className="min-vh-100 w-100 position-relative">
