@@ -1,206 +1,179 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Container, Row, Col, Button, Card, Pagination, Navbar, NavDropdown } from 'react-bootstrap';
-import { Nav } from 'react-bootstrap';
-import { Dropdown } from 'react-bootstrap';
-import backgroundPeopleImage from '../Assets/about-background-image.png'; // Import background image asset
-import backgroundIv from '../Assets/about-background.png'; // Import background image asset
+import {
+  Container, Row, Col, Button, Card, Pagination, Navbar,
+  NavDropdown, Nav, Form, Modal
+} from 'react-bootstrap';
+
+import backgroundPeopleImage from '../Assets/nobackground.png';
+import backgroundIv from '../Assets/about-background.png';
 import logoImage from "../Assets/Logo3.png";
 import backRightImage from "../Assets/home-banner-background.png";
+
 function OppListPage() {
-    
-    // State to store fetched opportunities
-    const [opportunities, setOpportunities] = useState([]);
-    // State to track the current page in pagination
-    const [currentPage, setCurrentPage] = useState(1);
-    // Number of items to display per page
-    const itemsPerPage = 2;
-    // React Router hook for navigation (not currently used in this component)
-    const navigate = useNavigate();
-    // State to manage user status in the dropdown menu
-    const [userStatus, setUserStatus] = useState("User logged in");
+  const [opportunities, setOpportunities] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [filterType, setFilterType] = useState("All");
+  const [selectedOpportunity, setSelectedOpportunity] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const itemsPerPage = 2;
+  const navigate = useNavigate();
 
-    // Fetch opportunities from an API when the component mounts
-    useEffect(() => {
-        const fetchOpportunities = async () => {
-            try {
-                const response = await fetch("birb"); // API URL for opportunities
-                const data = await response.json();
-                setOpportunities(data); // Store the fetched data in state
-            } catch (error) {
-                console.error("Error fetching opportunities:", error);
-            }
-        };
-        fetchOpportunities();
-    }, []);
+  useEffect(() => {
+    const fetchOpportunities = async () => {
+      try {
+        const mockData = [
+          {
+            _id: "1",
+            type: "Volunteer",
+            title: "Park Clean-Up Volunteer Needed",
+            description: "Join us this weekend to help clean up the city park and make it beautiful again!",
+            posted_by: "GreenCity Org",
+            createdAt: "2025-04-05T10:00:00Z",
+          },
+          {
+            _id: "2",
+            type: "Job",
+            title: "Part-Time Cashier at Local Grocery",
+            description: "We’re hiring a part-time cashier to join our friendly neighborhood store. Flexible hours!",
+            posted_by: "FreshMart",
+            createdAt: "2025-04-06T12:30:00Z",
+          },
+          {
+            _id: "3",
+            type: "Internship",
+            title: "Social Media Intern at Café",
+            description: "Help our local café grow its online presence! Great for marketing students.",
+            posted_by: "BeanBuzz Café",
+            createdAt: "2025-04-07T09:00:00Z",
+          }
+        ];
 
-    // Calculate pagination indexes
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    // Get the items for the current page
-    const currentItems = opportunities.slice(indexOfFirstItem, indexOfLastItem);
-    // Calculate the total number of pages needed
-    const totalPages = Math.ceil(opportunities.length / itemsPerPage);
-
-    // Handle page change when a user clicks a pagination button
-    const handlePageChange = (pageNumber) => {
-        setCurrentPage(pageNumber);
+        setOpportunities(mockData);
+      } catch (error) {
+        console.error("Error fetching opportunities:", error);
+      }
     };
 
-    return (
-        <div className="min-vh-100 w-100">
-    
-        {/* Navigation Bar */}
-        <Container className="mt-4 d-flex justify-content-start align-items-center">
-            <Navbar expand="lg">
-                <Container className="mt-4 d-flex justify-content-start align-items-center">
+    fetchOpportunities();
+  }, []);
 
-                    {/* Logo and Navbar */}
-                    <Card.Img variant="top" src={logoImage} className="me-auto img-fluid" style={{ width: '15%' }} />
-                    <Navbar.Toggle aria-controls="basic-navbar" />
-                    <Navbar.Collapse id="basic-navbar-nav">
-                        <Nav className="me-auto">
-                            {/* Display navigation options based on user status */}
-                            {(userStatus === "User logged in" || userStatus === "Admin logged in") && (
-                                <>
-                                    <Button variant="outline-success" className="ms-4" onClick={() => navigate("/")}>Home</Button>
-                                    <Button variant="outline-success" className="ms-4" onClick={() => navigate("/profilePage")}>Profile</Button>
-                                    <Button variant="outline-success" className="ms-4" onClick={() => navigate("/userListPage")}>Users</Button>
-      
-                                </>
-                            )}
-                        </Nav>
+  const filteredOpportunities = filterType === "All"
+    ? opportunities
+    : opportunities.filter(opp => opp.type === filterType);
 
-                        <Nav className="me-auto">
-                            {userStatus === "Admin logged in" && (
-                                <NavDropdown title="Administrator">
-                                    <NavDropdown.Item onClick={() => navigate('/adminPanelOp')}>Approve Opportunity</NavDropdown.Item>
-                                    <NavDropdown.Item onClick={() => navigate('/adminPanelUser')}>Approve User</NavDropdown.Item>
-                                </NavDropdown>
-                            )}
-                        
-                        </Nav>
-                    </Navbar.Collapse>
-                </Container>
-            </Navbar>
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredOpportunities.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredOpportunities.length / itemsPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  return (
+    <>
+      {/* Background Decorations - On Top */}
+      <div style={{ position: 'fixed', top: 0, right: 0, width: '200px', height: '300px', backgroundImage: `url(${backRightImage})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', zIndex: 999 }} />
+      <div style={{ position: 'fixed', top: 500, right: 0, width: '250px', height: '300px', backgroundImage: `url(${backgroundPeopleImage})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', zIndex: 999 }} />
+      <div style={{ position: 'fixed', top: 400, left: 0, width: '150px', height: '400px', backgroundImage: `url(${backgroundIv})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', zIndex: 999 }} />
+
+      <div className="min-vh-100 w-100 position-relative">
+        <Navbar bg="light" expand="lg" className="shadow-sm">
+          <Container>
+            <Navbar.Brand onClick={() => navigate("/")} style={{ cursor: 'pointer' }}>
+              <img src={logoImage} alt="Logo" style={{ width: '80px' }} />
+            </Navbar.Brand>
+            <Navbar.Toggle aria-controls="navbar-nav" />
+            <Navbar.Collapse id="navbar-nav">
+              <Nav className="ms-auto">
+                <Nav.Link onClick={() => navigate("/")}>Home</Nav.Link>
+                <Nav.Link onClick={() => navigate("/profilePage")}>Profile</Nav.Link>
+                <Nav.Link onClick={() => navigate("/userListPage")}>Users</Nav.Link>
+                <Nav.Link onClick={() => navigate("/post-opportunity")}>Post Opportunity</Nav.Link>
+                <NavDropdown title="Admin">
+                  <NavDropdown.Item onClick={() => navigate('/adminPanelOp')}>Approve Opportunity</NavDropdown.Item>
+                  <NavDropdown.Item onClick={() => navigate('/adminPanelUser')}>Approve User</NavDropdown.Item>
+                </NavDropdown>
+              </Nav>
+            </Navbar.Collapse>
+          </Container>
+        </Navbar>
+
+        <Container className="mt-4">
+          <Row className="mb-4">
+            <Col md={4}>
+              <Form.Select value={filterType} onChange={(e) => setFilterType(e.target.value)}>
+                <option value="All">All Opportunities</option>
+                <option value="Job">Job</option>
+                <option value="Volunteer">Volunteer</option>
+                <option value="Internship">Internship</option>
+              </Form.Select>
+            </Col>
+          </Row>
+          <Row>
+            {currentItems.map((opportunity) => (
+              <Col key={opportunity._id} md={6} className="mb-4">
+                <Card className="text-center shadow-sm">
+                  <Card.Header>{opportunity.type.toUpperCase()}</Card.Header>
+                  <Card.Body>
+                    <Card.Title>{opportunity.title}</Card.Title>
+                    <Card.Text>{opportunity.description}</Card.Text>
+                    <Button
+                      variant="primary"
+                      onClick={() => {
+                        setSelectedOpportunity(opportunity);
+                        setShowModal(true);
+                      }}
+                    >
+                      View Details
+                    </Button>
+                  </Card.Body>
+                  <Card.Footer className="text-muted">
+                    Posted by {opportunity.posted_by} on {new Date(opportunity.createdAt).toLocaleDateString()}
+                  </Card.Footer>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+
+          {totalPages > 1 && (
+            <Pagination className="justify-content-center mt-4">
+              <Pagination.First onClick={() => setCurrentPage(1)} disabled={currentPage === 1} />
+              <Pagination.Prev onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} />
+              {[...Array(totalPages)].map((_, index) => (
+                <Pagination.Item
+                  key={index + 1}
+                  active={index + 1 === currentPage}
+                  onClick={() => handlePageChange(index + 1)}
+                >
+                  {index + 1}
+                </Pagination.Item>
+              ))}
+              <Pagination.Next onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages} />
+              <Pagination.Last onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages} />
+            </Pagination>
+          )}
         </Container>
-        {/* Profile Card */}
 
-            {/* Opportunities Section - Display available opportunities */}
-            <Container className="mt-5">
-                <Row>
-                    {currentItems.map((opportunity) => (
-                        <Col key={opportunity._id} md={6} className="mb-4">
-                            <Card className="text-center">
-                                {/* Opportunity Type */}
-                                <Card.Header>{opportunity.type.toUpperCase()}</Card.Header>
-                                <Card.Body>
-                                    {/* Title and Description */}
-                                    <Card.Title>{opportunity.title}</Card.Title>
-                                    <Card.Text>{opportunity.description}</Card.Text>
-                                    {/* Button to view details (currently non-functional) */}
-                                    <Button
-                                        variant="outline-success"
-                                        onClick={() => navigate(`/opportunity/${opportunity._id}`)} // Navigate to OpportunityDetailPage
-                                    >
-                                        View Details
-                                    </Button>
-                                </Card.Body>
-                                {/* Footer with posted by information */}
-                                <Card.Footer className="text-muted">
-                                    Posted by {opportunity.posted_by} on {new Date(opportunity.createdAt).toLocaleDateString()}
-                                </Card.Footer>
-                            </Card>
-                        </Col>
-                    ))}
-                </Row>
-
-                {/* Pagination - Controls for navigating between pages */}
-                {totalPages > 1 && (
-                    <Pagination className="justify-content-center mt-4">
-                        <Pagination.First onClick={() => setCurrentPage(1)} disabled={currentPage === 1} />
-                        <Pagination.Prev onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} />
-
-                        {/* Create pagination buttons dynamically based on total pages */}
-                        {[...Array(totalPages)].map((_, index) => (
-                            <Pagination.Item
-                                key={index + 1}
-                                active={index + 1 === currentPage}
-                                onClick={() => handlePageChange(index + 1)}
-                            >
-                                {index + 1}
-                            </Pagination.Item>
-                        ))}
-
-                        <Pagination.Next onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages} />
-                        <Pagination.Last onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages} />
-                    </Pagination>
-                )}
-            </Container>
-
-            {/* User Status Dropdown */}
-            <Container className="d-flex justify-content-center align-items-center mt-5 mb-5">
-                <Dropdown>
-                    <Dropdown.Toggle variant="success">
-                        {userStatus}
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu>
-                        <Dropdown.Item onClick={() => setUserStatus("User logged in")}>User logged in</Dropdown.Item>
-                        <Dropdown.Item onClick={() => setUserStatus("Admin logged in")}>Admin logged in</Dropdown.Item>
-                    </Dropdown.Menu>
-                </Dropdown>
-            </Container>
-            {/* Background images positioned in the top-right corner of the navbar */}
-
-            <Container className="d-flex justify-content-center align-items-center mt-5 mb-5">
-
-        {/* Background image positioned in the top-right corner of the navbar */}
-                    <div
-                    style={{
-                    position: 'absolute',  // Positioning it within the navbar
-                    top: 0,
-                    right: -5,
-                    width: '310px',  // Set a small size for the background image
-                    height: '350px',  // Set a small size for the background image
-                    backgroundImage: `url(${backRightImage})`,  // Background image URL
-                    backgroundSize: 'cover',  // Ensure the background image covers the div
-                    backgroundRepeat: 'no-repeat',  // Prevent repeating the image
-                    }}
-                    />
-                    <div
-                    style={{
-                    position: 'absolute',  // Positioning it within the navbar
-                    top: 470,
-                    right: -5,
-                    width: '310px',  // Set a small size for the background image
-                    height: '350px',  // Set a small size for the background image
-                    backgroundImage: `url(${backgroundPeopleImage})`,  // Background image URL
-                    backgroundSize: 'cover',  // Ensure the background image covers the div
-                    backgroundRepeat: 'no-repeat',  // Prevent repeating the image
-                    }}
-                    />
-
-                    <div
-                    style={{
-                    position: 'absolute',  // Positioning it within the navbar
-                    top: 490,
-                    right: 1100,
-                    width: '400px',  // Set a small size for the background image
-                    height: '350px',  // Set a small size for the background image
-                    backgroundImage: `url(${backgroundIv})`,  // Background image URL
-                    backgroundSize: 'cover',  // Ensure the background image covers the div
-                    backgroundRepeat: 'no-repeat',  // Prevent repeating the image
-                    }}
-                    />
-
-                    </Container>
-
-
-
-        </div>
-
-        
-    );
+        {/* Detail Modal */}
+        <Modal show={showModal} onHide={() => setShowModal(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>{selectedOpportunity?.title}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p><strong>Type:</strong> {selectedOpportunity?.type}</p>
+            <p><strong>Description:</strong> {selectedOpportunity?.description}</p>
+            <p><strong>Posted By:</strong> {selectedOpportunity?.posted_by}</p>
+            <p><strong>Date:</strong> {new Date(selectedOpportunity?.createdAt).toLocaleDateString()}</p>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowModal(false)}>Close</Button>
+          </Modal.Footer>
+        </Modal>
+      </div>
+    </>
+  );
 }
 
 export default OppListPage;

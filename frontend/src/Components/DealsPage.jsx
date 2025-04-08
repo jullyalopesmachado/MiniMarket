@@ -64,7 +64,7 @@ export function DealsPage() {
           <Navbar.Toggle aria-controls="basic-navbar" className="me-auto" />
           <Navbar.Collapse id="basic-navbar-nav" className="me-auto img-fluid">
             <Nav className="ms-auto">
-              <Nav.Link onClick={() => navigate("/companies")}>Back to Companies</Nav.Link>
+              <Nav.Link onClick={() => navigate("/user-profile")}>Back to Profile</Nav.Link>
             </Nav>
           </Navbar.Collapse>
         </Container>
