@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import {
-  Container, Row, Col, Card, Navbar, Nav, Pagination, NavDropdown
+  Container, Row, Col, Card, Navbar, Nav, Pagination, NavDropdown, Modal, Button
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
@@ -13,6 +13,8 @@ import backgroundBottom from "../Assets/delivery-image-Photoroom.png";
 export function DealsPage() {
   const [deals, setDeals] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedDeal, setSelectedDeal] = useState(null);
+  const [showModal, setShowModal] = useState(false);
   const itemsPerPage = 2;
   const navigate = useNavigate();
 
@@ -40,7 +42,6 @@ export function DealsPage() {
         expirationDate: "2025-04-20",
       },
     ];
-
     setDeals(exampleDeals);
   }, []);
 
@@ -53,14 +54,25 @@ export function DealsPage() {
     setCurrentPage(pageNumber);
   };
 
+  const handleShowModal = (deal) => {
+    setSelectedDeal(deal);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedDeal(null);
+  };
+
   return (
     <>
-      {/* Background Decorations - On Top */}
+      {/* Background Decorations */}
       <div style={{ position: 'fixed', top: 0, right: 0, width: '200px', height: '300px', backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', zIndex: 999 }} />
       <div style={{ position: 'fixed', top: 500, right: -50, width: '500px', height: '310px', backgroundImage: `url(${backgroundBottom})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', zIndex: 999 }} />
       <div style={{ position: 'fixed', top: 400, left: 0, width: '150px', height: '400px', backgroundImage: `url(${backgroundIv})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', zIndex: 999 }} />
 
       <div className="min-vh-100 w-100 position-relative">
+        {/* Navbar */}
         <Navbar bg="light" expand="lg" className="shadow-sm">
           <Container>
             <Navbar.Brand onClick={() => navigate("/")} style={{ cursor: 'pointer' }}>
@@ -74,13 +86,12 @@ export function DealsPage() {
                 <Nav.Link onClick={() => navigate("/companies-page")}>Companies</Nav.Link>
                 <Nav.Link onClick={() => navigate("/opportunities-page")}>See Opportunities</Nav.Link>
                 <Nav.Link onClick={() => navigate("/deals-page")}>See Deals</Nav.Link>
-
-
               </Nav>
             </Navbar.Collapse>
           </Container>
         </Navbar>
 
+        {/* Deals List */}
         <Container className="mt-5">
           <h3 className="mb-4">Latest Deals from Companies</h3>
           <Row>
@@ -90,16 +101,19 @@ export function DealsPage() {
                   <Card.Body>
                     <Card.Title>{deal.title}</Card.Title>
                     <Card.Subtitle className="mb-2 text-muted">by {deal.company}</Card.Subtitle>
-                    <Card.Text>{deal.description}</Card.Text>
                     <Card.Text>
-                      <strong>Expires on:</strong> {new Date(deal.expirationDate).toLocaleDateString()}
+                      <strong>Expires:</strong> {new Date(deal.expirationDate).toLocaleDateString()}
                     </Card.Text>
+                    <Button variant="primary" onClick={() => handleShowModal(deal)}>
+                      View Details
+                    </Button>
                   </Card.Body>
                 </Card>
               </Col>
             ))}
           </Row>
 
+          {/* Pagination */}
           {totalPages > 1 && (
             <Pagination className="justify-content-center mt-4">
               <Pagination.First onClick={() => setCurrentPage(1)} disabled={currentPage === 1} />
@@ -118,6 +132,21 @@ export function DealsPage() {
             </Pagination>
           )}
         </Container>
+
+        {/* Modal for Deal Details */}
+        <Modal show={showModal} onHide={handleCloseModal}>
+          <Modal.Header closeButton>
+            <Modal.Title>{selectedDeal?.title}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p><strong>Company:</strong> {selectedDeal?.company}</p>
+            <p><strong>Description:</strong> {selectedDeal?.description}</p>
+            <p><strong>Expires on:</strong> {new Date(selectedDeal?.expirationDate).toLocaleDateString()}</p>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleCloseModal}>Close</Button>
+          </Modal.Footer>
+        </Modal>
       </div>
     </>
   );
