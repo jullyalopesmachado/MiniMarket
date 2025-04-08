@@ -8,7 +8,7 @@ import avatarImage from "../Assets/userBlue.png";
 import logoImage from "../Assets/Logo3.png";
 import backgroundIv from "../Assets/about-background.png";
 import backgroundImage from "../Assets/home-banner-background.png";
-import backgroundBottom from "../Assets/delivery-image-Photoroom.png";
+import backgroundBottom from "../Assets/nobackground.png";
 
 import { updateData } from "../App";
 
@@ -133,19 +133,22 @@ export function UserProfile() {
                 <Card.Text>{userBio || "No bio provided"}</Card.Text>
                 <Card.Text><strong>Location:</strong> {userLocation || "Not specified"}</Card.Text>
                 <Card.Text><strong>Website:</strong> {userWebsite || "No website"}</Card.Text>
-                <Button variant="primary" onClick={() => setIsEditing(true)}>Edit Profile</Button>
+                <div className="d-flex justify-content-center mt-4 gap-3 flex-wrap">
+                <Button variant="outline-primary" onClick={() => setIsEditing(true)}>
+                  Edit Profile
+                </Button>
+                <Button variant="outline-primary" onClick={() => navigate('/company-post-page')}>
+                  Post a Deal
+                </Button>
+                <Button variant="outline-primary" onClick={() => navigate('/deals-page')}>
+                  Latest Deals
+                </Button>
+              </div>
+
               </Card.Body>
             </Card>
           )}
 
-          <div className="mt-4">
-            <Button variant="primary" onClick={() => navigate('/company-post-page')} className="me-3">
-              Post a Deal
-            </Button>
-            <Button variant="primary" onClick={() => navigate('/deals-page')}>
-              Latest Deals
-            </Button>
-          </div>
 
           {/* Edit Profile Form */}
           {isEditing && (
