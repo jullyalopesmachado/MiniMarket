@@ -74,11 +74,8 @@ export function DealsPage() {
                 <Nav.Link onClick={() => navigate("/companies-page")}>Companies</Nav.Link>
                 <Nav.Link onClick={() => navigate("/opportunities-page")}>See Opportunities</Nav.Link>
                 <Nav.Link onClick={() => navigate("/deals-page")}>See Deals</Nav.Link>
-                <Nav.Link onClick={() => navigate("/post-opportunity")}>Post Opportunity</Nav.Link>
-                <NavDropdown title="Admin">
-                  <NavDropdown.Item onClick={() => navigate('/adminPanelOp')}>Approve Opportunity</NavDropdown.Item>
-                  <NavDropdown.Item onClick={() => navigate('/adminPanelUser')}>Approve User</NavDropdown.Item>
-                </NavDropdown>
+
+
               </Nav>
             </Navbar.Collapse>
           </Container>
