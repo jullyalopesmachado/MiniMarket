@@ -17,6 +17,8 @@ import UserProfile from "./Components/UserProfile"; // Import UserProfile
 import CompanyList from './Components/CompanyList';
 import Opportunities from './Components/Opportunities';
 import UserCompany from './Components/UserCompany';
+import PostDeal from './Components/PostDealPage';
+import SeeDeals from './Components/DealsPage';
 
 
 
@@ -164,7 +166,7 @@ function App() {
 
   return (
     <div className="App">
-      {location.pathname !== "/login-signup" && location.pathname !== "/user-profile" && location.pathname !== "/companies-page" && location.pathname !== "/opportunities-page" && location.pathname !== "/user-company-page" &&(
+      {location.pathname !== "/login-signup" && location.pathname !== "/user-profile" && location.pathname !== "/companies-page" && location.pathname !== "/opportunities-page" && location.pathname !== "/user-company-page" && location.pathname !== "/company-post-page" &&(
         <div className="search-bar-container" style={{ position: "relative", zIndex: 1000 }}>
           <SearchBar
             query={query}
@@ -202,6 +204,8 @@ function App() {
 
         <Route path="/opportunities-page" element={<Opportunities />} />
         <Route path="/user-company-page" element={<UserCompany />} />
+        <Route path="/company-post-page" element={<PostDeal />} />
+        <Route path="/deals-page" element={<SeeDeals />} />
 
         {/* <Route path="/companies-page" element={<CompanyList  />} /> */}  {/* This route is without admin priviledges */}
         {/* <Route path="/companies-page" element={<CompanyList isAdmin={isAdmin} />} />  {/* The 'isAdmin' prop is */}

@@ -197,6 +197,9 @@ if (!firstName || !lastName ) {
             </div>
           </Card.Body>
         </Card>
+        <Button variant="primary" onClick={() => navigate ('/company-post-page')} className="mt-3">
+          Post a Deal
+        </Button>
       </Container>
 
  
