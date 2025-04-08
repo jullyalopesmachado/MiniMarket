@@ -111,6 +111,7 @@ export function CompanyList({ user }) {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    setUserStatus("User not logged in");
     navigate("/login-signup");
   };
 
@@ -158,7 +159,7 @@ export function CompanyList({ user }) {
   return (
     <div className="min-vh-100 w-100 position-relative">
 
-      {/* Navbar - DealsPage style */}
+      {/* ✅ Navbar with conditional links */}
       <Navbar bg="light" expand="lg" className="shadow-sm">
         <Container>
           <Navbar.Brand onClick={() => navigate("/")} style={{ cursor: 'pointer' }}>
@@ -168,10 +169,15 @@ export function CompanyList({ user }) {
           <Navbar.Collapse id="navbar-nav">
             <Nav className="ms-auto">
               <Nav.Link onClick={() => navigate("/")}>Home</Nav.Link>
-              <Nav.Link onClick={() => navigate("/user-profile")}>Profile</Nav.Link>
-              <Nav.Link onClick={() => navigate("/companies-page")}>Companies</Nav.Link>
-              <Nav.Link onClick={() => navigate("/opportunities-page")}>See Opportunities</Nav.Link>
-              <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
+
+              {(userStatus === "User logged in" || userStatus === "Admin logged in") && (
+                <>
+                  <Nav.Link onClick={() => navigate("/user-profile")}>Profile</Nav.Link>
+                  <Nav.Link onClick={() => navigate("/companies-page")}>Companies</Nav.Link>
+                  <Nav.Link onClick={() => navigate("/opportunities-page")}>See Opportunities</Nav.Link>
+                  <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
+                </>
+              )}
             </Nav>
           </Navbar.Collapse>
         </Container>
@@ -313,7 +319,7 @@ export function CompanyList({ user }) {
       <div style={{
         position: 'fixed',
         top: 400,
-        left: -40,
+        left: -35,
         width: '150px',
         height: '400px',
         backgroundImage: `url(${backgroundIv})`,
