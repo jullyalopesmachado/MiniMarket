@@ -69,7 +69,7 @@ export function CompanyList({user}) {
                 companyPhoto: null,  // You need to add image URLs in the backend
                 companyName: company.name,
                 companyBio: company.description,
-                companyLocation: `${company.address.city}, ${company.address.state}, ${company.address.country}`,
+                companyLocation: company.location, 
                 companyWebsite: company.website || "N/A",
                 isEditing: false, // Default editing state
             })));
