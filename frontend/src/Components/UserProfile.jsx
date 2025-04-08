@@ -2,25 +2,28 @@
 import React, { useState } from "react";
 
 // Importing an avatar image for the user profile
-import avatarImage from "../Assets/dummyPic.png"; 
+import avatarImage from "../Assets/userBlue.png"; 
 import logoImage from "../Assets/Logo3.png"; 
 import { Link } from "react-router-dom";
+import backgroundIv from "../Assets/about-background.png"; 
+import backgroundImage from "../Assets/home-banner-background.png"; 
 // Importing Bootstrap styles for UI components
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./UserProfile.css";
 import Axios from "axios";
 import { useEffect } from "react";
 import { updateData } from "../App";
+// In UserProfile.jsx
+import { useNavigate } from "react-router-dom";
 
 // Importing Bootstrap components (Note: Fixed typo in 'bootstrap' and 'Breadcrumb')
 import { Container, Row, Col, Button, Alert, Breadcrumb, Card, Form, Nav, Navbar, NavDropdown, NavbarCollapse, Spinner } from 'react-bootstrap';
 
-import { useNavigate } from "react-router-dom"; 
+
 
 
 export function UserProfile() {
 
-  
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -31,15 +34,9 @@ export function UserProfile() {
   const [firstName, setFirstName] = useState("Layne");
   const [lastName, setLastName] = useState("Staley");
   const [userBio, setUserBio] = useState(null);
-  const [userLocation, setUserLocation] = useState({
-    country: "",
-    state: "",
-    city: "",
-    street: "",
-  });
-  
+  const [userLocation, setUserLocation] = useState(null);
   const [userWebsite, setUserWebsite] = useState(null);
-  
+  const [userStatus, setUserStatus] = useState("User logged in"); // State for authentication status
 
   const [isLoading, setIsLoading] = useState(false); // tracks loading
   const [error, setError] = useState(null); // tracks error
@@ -71,13 +68,7 @@ export function UserProfile() {
         // Set other profile data
         setUserId(profile._id);
         setUserBio(profile.bio || "");
-        setUserLocation({
-          country: profile.location?.country || "",
-          state: profile.location?.state || "",
-          city: profile.location?.city || "",
-          street: profile.location?.street || "",
-        });
-        
+        setUserLocation(profile.location || "");
         setUserWebsite(profile.website || "");
       } else {
         console.error("Error fetching user profile:", response.statusText);
@@ -106,13 +97,13 @@ if (!firstName || !lastName ) {
 
     const updatedProfile = {
       _id: userId,
-      firstName,
-      lastName,
+      name: firstName, lastName,
+
       bio: userBio,
-      location: userLocation, // Now an object
+      location: userLocation,
       website: userWebsite,
+      //logo: userlogo,
     };
-    
 
     try{
       // Updates data on the server
@@ -145,11 +136,18 @@ if (!firstName || !lastName ) {
 <div className="min-vh-100 w-100" >
     <Navbar expand="lg" className="img-fluid">
       <Container>
+      <div className=" ms-auto" style={{ position: 'absolute', top: 77, right: 95}}>
+          {(userStatus === "User logged in" || userStatus === "Admin logged in") && (
+            <>
+              <Button variant="outline-primary" className="ms-4" onClick={() => navigate("/")}>Home</Button>
+              <Button variant="outline-primary" className="ms-4" onClick={() => navigate("/user-company-page")}>Your Business</Button>
+
+            </>
+          )}
+        </div>
         <Card.Img variant="top" src={logoImage}  className="me-auto img-fluid" style={{width:'10%'}} />
         <Navbar.Toggle aria-controls="basic-navbar" className="me-auto" />
         <Navbar.Collapse id="basic-navbar-nav" className="me-auto img-fluid">
-          <Nav className="ms-auto">
-
             <NavDropdown title="Dropdown" id="basic-nav-dropdown">
             <NavDropdown.Item onClick={handleClick}>Home Page</NavDropdown.Item>
               <NavDropdown.Item href="#action/3.2">
@@ -159,16 +157,16 @@ if (!firstName || !lastName ) {
               <NavDropdown.Divider />
               <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>
             </NavDropdown>
-          </Nav>
+
         </Navbar.Collapse>
       </Container>
     </Navbar>
 
     {/* User Profile Card */}
 
-    <Container className="d-flex justify-content-center align-items-center mt-4 min-vh-100">
+    <Container className="d-flex justify-content-center align-items-center mt-0 min-vh-100">
 
-      <Card style={{ width: '28rem', paddingTop: '5rem' ,  background: 'linear-gradient(rgba(199, 200, 216, 0.9), rgba(255, 255, 255, 0.93), rgba(255, 255, 255, 0.9)' }}>
+      <Card style={{ width: '28rem', paddingTop: '5rem'  }}>
         <div  className="d-flex justify-content-center align-items-center">
         <Card.Img variant="top" src={avatarImage}/* will be pulled from database*/  className="rounded-circle img-fluid h-50 w-50" />
         </div>
@@ -193,7 +191,7 @@ if (!firstName || !lastName ) {
             </Card.Text>
             {/* User Profile Edit Button */}
             <div className="d-flex justify-content-center align-items-center"> 
-            <Button variant="outline-primary" onClick={() => setIsEditing(true)}>
+            <Button variant="primary" onClick={() => setIsEditing(true)}>
               Edit Profile
             </Button>
             </div>
@@ -237,35 +235,16 @@ if (!firstName || !lastName ) {
                     value={userBio} // value is set to userBio which I set up there in the beginning of the code
                     onChange={(e) => setUserBio(e.target.value)} // onChange event handler to update userBio. When user types, update `userBio` state
                     />
-                  <Form.Group className="mb-4">
-                <Form.Label className="mt-4">Country</Form.Label>
-                      <Form.Control
-                        type="text"
-                        value={userLocation.country}
-                        onChange={(e) => setUserLocation({ ...userLocation, country: e.target.value })}
-                      />
-                      <Form.Label className="mt-4">State</Form.Label>
-                      <Form.Control
-                        type="text"
-                        value={userLocation.state}
-                        onChange={(e) => setUserLocation({ ...userLocation, state: e.target.value })}
-                      />
-                      <Form.Label className="mt-4">City</Form.Label>
-                      <Form.Control
-                        type="text"
-                        value={userLocation.city}
-                        onChange={(e) => setUserLocation({ ...userLocation, city: e.target.value })}
-                      />
-                      <Form.Label className="mt-4">Street address</Form.Label>
-                      <Form.Control
-                        type="text"
-                        value={userLocation.street}
-                        onChange={(e) => setUserLocation({ ...userLocation, street: e.target.value })}
-                      />
-
-                    </Form.Group>
                   </Form.Group>
-
+                  {/* input field for editing location */}
+                  <Form.Group className="mb-3">
+                    <Form.Label>Location</Form.Label>
+                    <Form.Control
+                      type="text" // input is text
+                      value={userLocation}
+                      onChange={(e) => setUserLocation(e.target.value)}
+                      />
+                  </Form.Group>
                   
                   {/* input field for editing website */} 
                   <Form.Group className="mb-3">
@@ -278,7 +257,7 @@ if (!firstName || !lastName ) {
                   </Form.Group>
 
                   {/* Save button */}
-                  <Button variant="success" onClick={handleSave} disabled={isLoading}>  {/* The button is disabled while the profile is being saved (i.e., when `isLoading` is true) */}
+                  <Button variant="primary" onClick={handleSave} disabled={isLoading}>  {/* The button is disabled while the profile is being saved (i.e., when `isLoading` is true) */}
 
                     {isLoading ? "Saving..." : "Save Changes"} {/* If `isLoading` is true, show "Saving..." text; otherwise, show "Save Changes" */}
                   </Button>
@@ -288,6 +267,42 @@ if (!firstName || !lastName ) {
         </Form>
       </Container>
     )}
+
+
+                                          {/* Background image positioned in the top-right corner of the navbar */}
+                                          <div
+                                            style={{
+                                            position: 'absolute',  // Positioning it within the navbar
+                                            top: 0,
+                                            right: 0,
+                                            width: '150px',  // Set a small size for the background image
+                                            height: '350px',  // Set a small size for the background image
+                                            backgroundImage: `url(${backgroundImage})`,  // Background image URL
+                                            backgroundSize: 'cover',  // Ensure the background image covers the div
+                                            backgroundRepeat: 'no-repeat',  // Prevent repeating the image
+                                            }}
+                                />
+                
+                                <div
+                                            style={{
+                                            position: 'absolute',  // Positioning it within the navbar
+                                            top: 70,
+                                            right: 1350,
+                                            width: '250px',  // Set a small size for the background image
+                                            height: '750px',  // Set a small size for the background image
+                                            backgroundImage: `url(${backgroundIv})`,  // Background image URL
+                                            backgroundSize: 'cover',  // Ensure the background image covers the div
+                                            backgroundRepeat: 'no-repeat',  // Prevent repeating the image
+                                            }}
+                                />   
+
+    
+
+
+
+
+
+
       </div>
   
   );
@@ -295,7 +310,6 @@ if (!firstName || !lastName ) {
 
 
 export default UserProfile;
-
 
 
 
