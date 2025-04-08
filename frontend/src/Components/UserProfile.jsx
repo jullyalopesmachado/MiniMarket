@@ -103,14 +103,10 @@ export function UserProfile() {
             <Navbar.Collapse id="navbar-nav">
               <Nav className="ms-auto">
                 <Nav.Link onClick={() => navigate("/")}>Home</Nav.Link>
-                <Nav.Link onClick={() => navigate("/user-profile")}>Profile</Nav.Link>
                 <Nav.Link onClick={() => navigate("/companies-page")}>Companies</Nav.Link>
                 <Nav.Link onClick={() => navigate("/opportunities-page")}>See Opportunities</Nav.Link>
                 <Nav.Link onClick={() => navigate("/deals-page")}>See Deals</Nav.Link>
-                <NavDropdown title="Admin">
-                  <NavDropdown.Item onClick={() => navigate('/adminPanelOp')}>Approve Opportunity</NavDropdown.Item>
-                  <NavDropdown.Item onClick={() => navigate('/adminPanelUser')}>Approve User</NavDropdown.Item>
-                </NavDropdown>
+
               </Nav>
             </Navbar.Collapse>
           </Container>
