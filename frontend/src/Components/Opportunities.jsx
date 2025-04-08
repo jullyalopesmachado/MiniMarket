@@ -170,7 +170,7 @@ function OppListPage() {
                     <div
                     style={{
                     position: 'absolute',  // Positioning it within the navbar
-                    top: 490,
+                    top: 470,
                     right: -5,
                     width: '310px',  // Set a small size for the background image
                     height: '350px',  // Set a small size for the background image

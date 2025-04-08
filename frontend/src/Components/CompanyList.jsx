@@ -10,81 +10,94 @@ import produceImage from "../Assets/shopphoto.jpg";
 import veggiesImage from "../Assets/shopPhoto1.jpg"; 
 import peachesImage from "../Assets/peachesPhoto.jpg"; 
 import background from "../Assets/home-banner-background.png"; 
+import backgroundIv from "../Assets/about-background.png"; 
+import backgroundBottom from "../Assets/bottom-background.png"; 
+
+import companyPhoto from "../Assets/compphoto1.png";
+
+import backgroundImage from "../Assets/home-banner-background.png"; 
+import { useEffect } from "react";
 
 import { useNavigate } from "react-router-dom";
-export function CompanyList({user}) { // Passing isAdmin as a prop here.
-      const [userStatus, setUserStatus] = useState("User not logged in");
+export function CompanyList({user}) { 
+        // Passing isAdmin as a prop here.
+        const [userStatus, setUserStatus] = useState("User not logged in");
 
 
-      const handleSignupClick = () => {
-        if (userStatus === "User not logged in") {
-          navigate("/login-signup");
-        }
-      };
+        const handleSignupClick = () => {
+          if (userStatus === "User not logged in") {
+            navigate("/login-signup");
+          }
+        };
+      
+
+    const [isEditing, setIsEditing] = useState(false);
+    const [companyName, setCompanyName] = useState("Layne");
+    const [companyBio, setCompanyBio] = useState(null);
+    const [companyStreet, setCompanyStreet] = useState(null);
+    const [companyCity, setCompanyCity] = useState(null);
+    const [companyState, setCompanyState] = useState(null);
+    const [companyCountry, setCompanyCountry] = useState(null);
+    const [companyWebsite, setCompanyWebsite] = useState(null);
+    const [companyId, setCompanyId] = useState(null);
     
+    const [isLoading, setIsLoading] = useState(false); // tracks loading
+    const [error, setError] = useState(null); // tracks error
+    
+    
+    const fetchCompany = async () => {
+        const token = localStorage.getItem("token"); // Retrieve token from local storage
+        try {
+            const response = await fetch("http://localhost:3000/api/business", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+    
+            if (!response.ok) {
+                throw new Error(`Error: ${response.statusText}`);
+            }
+    
+            const companyData = await response.json();
+            console.log("Fetched Companies:", companyData);
+    
+            // Update the companies state with fetched data
+            setCompanies(companyData.map(company => ({
+                id: company._id,  // MongoDB _id
+                companyPhoto: null,  // You need to add image URLs in the backend
+                companyName: company.name,
+                companyBio: company.description,
+                companyLocation: `${company.address.city}, ${company.address.state}, ${company.address.country}`,
+                companyWebsite: company.website || "N/A",
+                isEditing: false, // Default editing state
+            })));
+        } catch (error) {
+            console.error("Error fetching companies:", error.message);
+            setError("Failed to load company data.");
+        }
+    };
+    
+    // Fetch companies when the component mounts
+    useEffect(() => {
+        fetchCompany();
+    }, []);
+    
+
 
     const [companies, setCompanies] = useState([ 
 
         // sample data until backend is connected here
         {
-            id: 1,
-            companyPhoto: veggiesImage,
-            companyName: "Mom&Pop Shop",
-            companyBio: "Small local business specializing in handmade crafts and artisanal goods.",
-            companyLocation: "Seattle, WA",
-            companyWebsite: "aliceinchains.com",
-            isEditing: false, // State to track if the company is being edited
+            id: '',
+            companyPhoto: '',
+            companyName: "",
+            companyBio: "",
+            companyLocation: "",
+            companyWebsite: "",
+            isEditing: "", // State to track if the company is being edited
         },
-        {
-            id: 2,
-            companyPhoto: crochetImage,
-            companyName: "CrochetGoods",
-            companyBio: "Small shop for crochet patterns and supplies.",
-            companyLocation: "Seattle, WA",
-            companyWebsite: "crochetgoods.com",  
-            isEditing: false,
-
-        },
-        {
-            id: 3,
-            companyPhoto: peachesImage,
-            companyName: "Peaches & Apples",
-            companyBio: "Fruits from a grandma's garden.",
-            companyLocation: "DeLand, FL",
-            companyWebsite: "grandmafruits.com",  
-            isEditing: false,
-        },
-
-        {
-            id: 4,
-            companyPhoto: breadImage,
-            companyName: "Bread, Strawberries & Grapes",
-            companyBio: "Fruits from a mom's garden.",
-            companyLocation: "Orlando, FL",
-            companyWebsite: "momsfruits.com",  
-            isEditing: false,
-        },
-
-        {
-            id: 5,
-            companyPhoto: honeyImage,
-            companyName: "Honey & Jam",
-            companyBio: "Family honey and jam.",
-            companyLocation: "Winter Garden, FL",
-            companyWebsite: "honeyfruits.com",  
-            isEditing: false,
-        },
-
-        {
-            id: 6,
-            companyPhoto: produceImage,
-            companyName: "Lettuce & Veggies",
-            companyBio: "Fruits from a grandma's garden.",
-            companyLocation: "DeLand, FL",
-            companyWebsite: "grandmaveggies.com",  
-            isEditing: false,
-        },
-
 
     ]); // State to hold the initial list of companies
 
@@ -163,31 +176,12 @@ export function CompanyList({user}) { // Passing isAdmin as a prop here.
 
     // Function to save the edited data
     //  (this would eventually send the data to the backend)
-    const handleSave = (id, companyName, companyBio, companyLocation, companyWebsite) => {
-        // Here I will later send the updated data to the backend
-        // For now, I'll just log it to the console
-        console.log("Saved data for company: ", {companyName, companyBio, companyLocation, companyWebsite});
-
-        // Update the companies state to reflect the changes
-        // Use the map() function to iterate over all companies in the companies array
-        setCompanies(companies.map(company =>
-            // Check if the current company's id matches the id we're trying to update
-            company.id === id ? 
-                // If the id matches, create a new object with updated properties
-                {
-                    ...company, // Spread the existing properties of the company
-                    companyName, // Update the company name
-                    companyBio, // Update the company bio
-                    companyLocation, // Update the company location
-                    companyWebsite, // Update the company website
-                    isEditing: false // Set editing mode to false after saving the changes
-                }
-                : 
-                // If the id doesn't match, return the company unchanged
-                company
+    const handleSave = (id) => {
+        setCompanies(companies.map(company => 
+            company.id === id ? { ...company, isEditing: false } : company
         ));
-        // After map() finishes, setCompanies() updates the state with the new companies array
-    }
+    };
+    
 
     // log out handler
     const handleLogout = () => {
@@ -204,7 +198,7 @@ export function CompanyList({user}) { // Passing isAdmin as a prop here.
             {/* Navbar Section */}
             <Navbar expand="lg" className="img-fluid">
                 <Container className="mt-4"              style={{ 
-                backgroundImage: `url(${background})`, 
+
                 backgroundSize: '130px',  // Adjust to your preferred smaller size
                 backgroundPosition: 'right', // Keep the image aligned to the left
                 backgroundRepeat: 'no-repeat' // Ensure the image doesn't repeat
@@ -232,7 +226,7 @@ export function CompanyList({user}) { // Passing isAdmin as a prop here.
                     {companies.map(company => (
                         <Col md={4} key={company.id}>
                             <Card style={{ width: "19rem" }} className="mb-5">
-                                <Card.Img variant="top" src={company.companyPhoto} />
+                                <Card.Img variant="top" src={companyPhoto} />
                                 {/* This line displays the company's logo image at the top of the card using the 'logoImage' variable */}
                                 <Card.Body>
                                     {/* Start of the card body where the company information is displayed */}
@@ -259,6 +253,8 @@ export function CompanyList({user}) { // Passing isAdmin as a prop here.
                                             </Form.Group>
 
                                             <Form.Group className="mb-2">
+
+                                                
                                                 <Form.Label>Company Bio</Form.Label>
                                                 <Form.Control
                                                     as="textarea"
@@ -387,6 +383,49 @@ export function CompanyList({user}) { // Passing isAdmin as a prop here.
         <Dropdown.Item onClick={() => setUserStatus("User not logged in")}>User not logged in</Dropdown.Item>
     </Dropdown.Menu>
 </Dropdown>
+            
+
+{/* Background image positioned in the top-right corner of the navbar */}
+<div
+                                            style={{
+                                            position: 'absolute',  // Positioning it within the navbar
+                                            top: 0,
+                                            right: 0,
+                                            width: '150px',  // Set a small size for the background image
+                                            height: '350px',  // Set a small size for the background image
+                                            backgroundImage: `url(${backgroundImage})`,  // Background image URL
+                                            backgroundSize: 'cover',  // Ensure the background image covers the div
+                                            backgroundRepeat: 'no-repeat',  // Prevent repeating the image
+                                            }}
+                                />
+
+                                <div
+                                            style={{
+                                            position: 'absolute',  // Positioning it within the navbar
+                                            top: 500,
+                                            right: 0,
+                                            width: '350px',  // Set a small size for the background image
+                                            height: '300px',  // Set a small size for the background image
+                                            backgroundImage: `url(${backgroundBottom})`,  // Background image URL
+                                            backgroundSize: 'cover',  // Ensure the background image covers the div
+                                            backgroundRepeat: 'no-repeat',  // Prevent repeating the image
+                                            }}
+                                />
+                
+                                        <div
+                                            style={{
+                                            position: 'absolute',  // Positioning it within the navbar
+                                            top: 10,
+                                            right: 1350,
+                                            width: '250px',  // Set a small size for the background image
+                                            height: '750px',  // Set a small size for the background image
+                                            backgroundImage: `url(${backgroundIv})`,  // Background image URL
+                                            backgroundSize: 'cover',  // Ensure the background image covers the div
+                                            backgroundRepeat: 'no-repeat',  // Prevent repeating the image
+                                            }}
+                                />                  
+
+
 
         </div>
     );

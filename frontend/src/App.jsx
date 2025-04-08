@@ -16,6 +16,7 @@ import LoginSignup from "./Components/LoginSignup";
 import UserProfile from "./Components/UserProfile"; // Import UserProfile
 import CompanyList from './Components/CompanyList';
 import Opportunities from './Components/Opportunities';
+import UserCompany from './Components/UserCompany';
 
 
 
@@ -163,7 +164,7 @@ function App() {
 
   return (
     <div className="App">
-      {location.pathname !== "/login-signup" && location.pathname !== "/user-profile" && location.pathname !== "/companies-page" && location.pathname !== "/opportunities-page" && (
+      {location.pathname !== "/login-signup" && location.pathname !== "/user-profile" && location.pathname !== "/companies-page" && location.pathname !== "/opportunities-page" && location.pathname !== "/user-company-page" &&(
         <div className="search-bar-container" style={{ position: "relative", zIndex: 1000 }}>
           <SearchBar
             query={query}
@@ -200,6 +201,7 @@ function App() {
         <Route path="/companies-page" element={<CompanyList user={user} />} />
 
         <Route path="/opportunities-page" element={<Opportunities />} />
+        <Route path="/user-company-page" element={<UserCompany />} />
 
         {/* <Route path="/companies-page" element={<CompanyList  />} /> */}  {/* This route is without admin priviledges */}
         {/* <Route path="/companies-page" element={<CompanyList isAdmin={isAdmin} />} />  {/* The 'isAdmin' prop is */}

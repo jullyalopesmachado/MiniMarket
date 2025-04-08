@@ -4,6 +4,7 @@ import { Dropdown } from "react-bootstrap";
 import { FiArrowRight } from "react-icons/fi";
 import Navbar from "./Navbar";
 import BannerBackground from "../Assets/home-banner-background.png";
+import { Container, Row, Col, Button, Card, Pagination, NavDropdown } from 'react-bootstrap';
 import BannerImage from "../Assets/home-banner-image.png";
 
 const Home = () => {
@@ -43,14 +44,13 @@ const Home = () => {
           )}
 
           {userStatus === "User logged in" && (
-          <button className="secondary-button" onClick={() => navigate("/opportunities-page")}   style={{
-            variant: "primary",
+          <Button variant="outline-primary" className="secondary-button"  onClick={() => navigate("/opportunities-page")}   style={{
             position: "absolute",
-            top: "100px",
-            right: "150px",
+            top: "450px",
+            right: "1050px",
           }}>
             Services <FiArrowRight />
-          </button>
+          </Button>
           )}
 
       {userStatus === "Admin logged in" && (
