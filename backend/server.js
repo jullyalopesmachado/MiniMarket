@@ -21,8 +21,15 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-// ✅ CORS
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+// At the top of server.js
+const cors = require("cors");
+
+app.use(cors({
+  origin: ["http://localhost:5173", "http://localhost:5174"], 
+  credentials: true
+}));
+
+
 
 // ✅ Middleware
 app.use(express.json());

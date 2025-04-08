@@ -82,4 +82,44 @@ router.get("/:id", async (req, res) => {
     }
 });
 
+
+router.put('/:id', authMiddleware, async (req, res) => {
+  try {
+    const { name, description, website, location, email } = req.body;
+
+    const business = await Business.findById(req.params.id);
+    if (!business) {
+      return res.status(404).json({ message: "Business not found" });
+    }
+
+    const requestingUser = req.user;
+    if (
+      business.owner_id.toString() !== requestingUser._id.toString() &&
+      !requestingUser.isAdmin
+      
+    )
+     {
+      console.log("💬 Owner ID in DB:", business.owner_id);
+      console.log("🔐 Requesting user ID:", requestingUser._id);
+      
+
+    }
+
+    if (name) business.name = name;
+    if (description) business.description = description;
+    if (website) business.website = website;
+    if (location) business.location = location;
+    if (email) business.email = email;
+
+    await business.save();
+    res.status(200).json({ message: "Business updated successfully", business });
+  } catch (error) {
+    console.error("❌ Error saving business:", error); // <-- THIS IS CRITICAL
+    res.status(400).json({ message: "Failed to update business", error });
+  }
+});
+
+
+
+
 module.exports = router;
