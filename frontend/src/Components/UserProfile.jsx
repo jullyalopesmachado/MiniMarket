@@ -57,7 +57,6 @@ export function UserProfile() {
     const token = localStorage.getItem("token");
     try {
       const response = await fetch("http://localhost:3000/api/business/add", {
-
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -225,6 +224,9 @@ export function UserProfile() {
                   </Button>
                   <Button variant="outline-primary" onClick={() => navigate('/deals-page')}>
                     Latest Deals
+                  </Button>
+                  <Button variant="outline-success" onClick={() => navigate('/user-company-page')}>
+                    View Company (Preview)
                   </Button>
                 </div>
               </Card.Body>
