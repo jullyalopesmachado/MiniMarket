@@ -10,55 +10,15 @@ import backgroundIv from "../Assets/about-background.png";
 import backgroundImage from "../Assets/home-banner-background.png";
 import backgroundBottom from "../Assets/nobackground.png";
 
-<<<<<<< HEAD
-// Importing an avatar image for the user profile
-import avatarImage from "../Assets/dummyPic.png"; 
-import logoImage from "../Assets/Logo3.png"; 
-import { Link } from "react-router-dom";
-// Importing Bootstrap styles for UI components
-import "bootstrap/dist/css/bootstrap.min.css";
-import "./UserProfile.css";
-import Axios from "axios";
-import { useEffect } from "react";
-import { updateData } from "./api";
-=======
 import { updateData } from "../App";
->>>>>>> 94e26e5398b5cb181f3367076c0c63e22a55aa2c
 
 export function UserProfile() {
   const navigate = useNavigate();
-<<<<<<< HEAD
-
-  const handleClick = (path) => {
-    const pathname = path === "home" ? "/" :
-                    path === "opportunity" ? "/opportunities/view" 
-                    : path === "profile" ? "/user-profile" :
-                    path === "companies" ? "/companies" : "/";
-    // Check if the path is valid and navigate accordingly
-    if (!pathname) {
-      console.error("Invalid path:", pathname);
-      return;
-    }
-    navigate(pathname); // Navigate to the specified path
-  };
-
-=======
->>>>>>> 94e26e5398b5cb181f3367076c0c63e22a55aa2c
   const [isEditing, setIsEditing] = useState(false);
   const [firstName, setFirstName] = useState("Layne");
   const [lastName, setLastName] = useState("Staley");
   const [userBio, setUserBio] = useState(null);
-<<<<<<< HEAD
-  const [userLocation, setUserLocation] = useState({
-    street: "",
-    state: "",
-    city: "",
-    country: "",
-  });
-  
-=======
   const [userLocation, setUserLocation] = useState(null);
->>>>>>> 94e26e5398b5cb181f3367076c0c63e22a55aa2c
   const [userWebsite, setUserWebsite] = useState(null);
   const [userId, setUserId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -78,43 +38,18 @@ export function UserProfile() {
     const token = localStorage.getItem("token");
     try {
       const response = await fetch("http://localhost:3000/api/business/add", {
-
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       });
 
       if (response.ok) {
         const profile = await response.json();
-<<<<<<< HEAD
-
-        console.log("User Profile:", profile);
-
-        // Split user.name into firstName and lastName
-        const [firstName, lastName] = (profile.name || "").split(" ");
-        const location = profile.location || {
-          street: profile.location?.street || "",
-          city: profile.location?.city || "",
-          state: profile.location?.state || "",
-          country: profile.location?.country || "",
-        }
-      
-        
-        setFirstName(firstName || "");
-        setLastName(lastName || "");
-
-        // Set other profile data
-        setUserId(profile._id);
-        setUserBio(profile.bio || "");
-        setUserLocation(location);
-        
-=======
         const [first, last] = (profile.name || "").split(" ");
         setFirstName(first || "");
         setLastName(last || "");
         setUserId(profile._id);
         setUserBio(profile.bio || "");
         setUserLocation(profile.location || "");
->>>>>>> 94e26e5398b5cb181f3367076c0c63e22a55aa2c
         setUserWebsite(profile.website || "");
       } else {
         console.error("Error fetching user profile:", response.statusText);
@@ -224,23 +159,6 @@ export function UserProfile() {
       <div style={{ position: 'fixed', top: 500, right: -50, width: '500px', height: '310px', backgroundImage: `url(${backgroundBottom})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', zIndex: 999 }} />
       <div style={{ position: 'fixed', top: 400, left: 0, width: '150px', height: '400px', backgroundImage: `url(${backgroundIv})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', zIndex: 999 }} />
 
-<<<<<<< HEAD
-            <NavDropdown title="Dropdown" id="basic-nav-dropdown">
-            <NavDropdown.Item onClick={handleClick("home")}>Home Page</NavDropdown.Item>
-              <NavDropdown.Item onClick={handleClick("profile")}>Profile</NavDropdown.Item>
-              <NavDropdown.Item onClick={handleClick("companies")}>
-                Companies
-              </NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.3">Feed</NavDropdown.Item>
-              <NavDropdown.Item onClick={handleClick("opportunity")}>Opportunities</NavDropdown.Item>
-              <NavDropdown.Divider />
-              <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>
-            </NavDropdown>
-          </Nav>
-        </Navbar.Collapse>
-      </Container>
-    </Navbar>
-=======
       <div className="min-vh-100 w-100 position-relative">
         {/* Navbar */}
         <Navbar bg="light" expand="lg" className="shadow-sm">
@@ -260,7 +178,6 @@ export function UserProfile() {
             </Navbar.Collapse>
           </Container>
         </Navbar>
->>>>>>> 94e26e5398b5cb181f3367076c0c63e22a55aa2c
 
         {/* Profile Section */}
         <Container className="d-flex flex-column justify-content-center align-items-center mt-5">
@@ -289,67 +206,19 @@ export function UserProfile() {
                   <Button variant="outline-primary" onClick={() => navigate('/deals-page')}>
                     Latest Deals
                   </Button>
+                  <Button variant="outline-success" onClick={() => navigate('/user-company-page')}>
+                    View Company (Preview)
+                  </Button>
                 </div>
               </Card.Body>
             </Card>
           )}
 
-<<<<<<< HEAD
-    <Container className="d-flex justify-content-center align-items-center mt-4 min-vh-100">
-
-      <Card style={{ width: '28rem', paddingTop: '5rem' ,  background: 'linear-gradient(rgba(199, 200, 216, 0.9), rgba(255, 255, 255, 0.93), rgba(255, 255, 255, 0.9)' }}>
-        <div  className="d-flex justify-content-center align-items-center">
-        <Card.Img variant="top" src={avatarImage}/* will be pulled from database*/  className="rounded-circle img-fluid h-50 w-50" />
-        </div>
-          <Card.Body>
-            {/* Display user's first and last name */}
-            <Card.Title>{firstName} {lastName}</Card.Title>
-              {/* Display user's bio */}
-              <Card.Text>
-                {userBio || "No bio provided"}
-              </Card.Text>
-
-              {/* Display user's location */} 
-
-            <Card.Text>
-              <strong>Located in:</strong>{" "}
-               {userLocation 
-                ? `${userLocation.street || ""}, ${userLocation.city || ""}, ${userLocation.state || ""}, ${userLocation.country || ""}`
-                : "No location provided"}
-            </Card.Text>
-
-            {/* Display user's website */}
-            <Card.Text>
-              <strong>Find {firstName} at: </strong>
-              {userWebsite || "No website provided"}
-            </Card.Text>
-            {/* User Profile Edit Button */}
-            <div className="d-flex justify-content-center align-items-center"> 
-            <Button variant="outline-primary" onClick={() => setIsEditing(true)}>
-              Edit Profile
-            </Button>
-            </div>
-          </Card.Body>
-        </Card>
-      </Container>
-
- 
-
-
-   {/* User Profile Edit */}
-    {isEditing && ( // form is only visible when isEditing is true
-      <Container className="mt-3">
-           {/* Form for editing */}
-           <Form>
-               {/* input field for editing first name */}
-               <Form.Group className="mb-3">
-=======
           {/* Edit Profile Form */}
           {isEditing && (
             <Card className="mt-5 p-4 shadow-sm" style={{ width: '100%', maxWidth: '700px' }}>
               <Form>
                 <Form.Group className="mb-3">
->>>>>>> 94e26e5398b5cb181f3367076c0c63e22a55aa2c
                   <Form.Label>First Name</Form.Label>
                   <Form.Control type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
                 </Form.Group>
@@ -359,38 +228,6 @@ export function UserProfile() {
                 </Form.Group>
                 <Form.Group className="mb-3">
                   <Form.Label>Bio</Form.Label>
-<<<<<<< HEAD
-                  <Form.Control
-                    as="textarea" // input type is textarea
-                    value={userBio} // value is set to userBio which I set up there in the beginning of the code
-                    onChange={(e) => setUserBio(e.target.value)} // onChange event handler to update userBio. When user types, update `userBio` state
-                    />
-                  <Form.Group className="mb-4">
-                <Form.Label className="mt-4">Country</Form.Label>
-                      <Form.Control
-                        type="text"
-                        value={userLocation.country}
-                        onChange={(e) => setUserLocation(e.target.value)}
-                      />
-                      <Form.Label className="mt-4">State</Form.Label>
-                      <Form.Control
-                        type="text"
-                        value={userLocation.state}
-                        onChange={(e) => setUserLocation(e.target.value)}
-                      />
-                      <Form.Label className="mt-4">City</Form.Label>
-                      <Form.Control
-                        type="text"
-                        value={userLocation.city}
-                        onChange={(e) => setUserLocation(e.target.value)}
-                      />
-                      <Form.Label className="mt-4">Street address</Form.Label>
-                      <Form.Control
-                        type="text"
-                        value={userLocation.street}
-                        onChange={(e) => setUserLocation(e.target.value)}
-                      />
-=======
                   <Form.Control as="textarea" value={userBio} onChange={(e) => setUserBio(e.target.value)} />
                 </Form.Group>
                 <Form.Group className="mb-3">
@@ -409,7 +246,6 @@ export function UserProfile() {
             </Card>
           )}
         </Container>
->>>>>>> 94e26e5398b5cb181f3367076c0c63e22a55aa2c
 
         {/* Create Company Modal */}
         <Modal show={showCreateModal} onHide={() => setShowCreateModal(false)}>
