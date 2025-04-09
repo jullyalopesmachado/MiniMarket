@@ -12,11 +12,7 @@ const Deal = require('./models/Deal'); // ✅ Added Deal model
 const opportunityRoutes = require('./routes/opportunityRoutes');
 const userRoutes = require('./routes/userRoutes');
 const businessRoutes = require('./routes/businessRoutes');
-const messageRoutes = require('./routes/messageRoutes');
-const opportunityRoutes = require('./routes/opportunityRoutes'); 
-const apiRoutes = require('./models/api'); // ✅ Ensure correct API route import
-const authMiddleware = require('./middleware/auth');
-
+const messageRoutes = require('./routes/messageRoutes'); 
 const apiRoutes = require('./models/api');
 const authMiddleware = require('./middleware/auth');
 
