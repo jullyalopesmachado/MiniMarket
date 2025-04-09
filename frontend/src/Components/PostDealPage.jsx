@@ -10,11 +10,11 @@ import backgroundImage from "../Assets/home-banner-background.png";
 import backgroundIv from "../Assets/about-background.png";
 import backgroundBottom from "../Assets/bottom-background.png";
 
-export function PostDealPage({ user }) {
+export function PostDealPage() {
   const [deal, setDeal] = useState({
     title: "",
     description: "",
-    expirationDate: "",
+    expirationDate: ""
   });
 
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -36,22 +36,29 @@ export function PostDealPage({ user }) {
       return;
     }
 
-    try { // CREATE API DEAL ENDPOINT URGENT
+    try {
       const response = await fetch("http://localhost:3000/api/deals", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify(deal),
+        body: JSON.stringify(deal)
       });
 
       if (!response.ok) {
-        throw new Error("Failed to post deal.");
+        const data = await response.json();
+        throw new Error(data.message || "Failed to post deal.");
       }
 
       setShowSuccessModal(true);
       setDeal({ title: "", description: "", expirationDate: "" });
+
+      // Redirect to the deals page after success
+      setTimeout(() => {
+        setShowSuccessModal(false);
+        navigate("/deals-page");
+      }, 2000);
     } catch (err) {
       setError(err.message);
     }
@@ -127,7 +134,7 @@ export function PostDealPage({ user }) {
         </Modal.Header>
         <Modal.Body>Your deal was posted successfully!</Modal.Body>
         <Modal.Footer>
-          <Button variant="success" onClick={() => setShowSuccessModal(false)}>
+          <Button variant="success" onClick={() => navigate("/deals-page")}>
             OK
           </Button>
         </Modal.Footer>

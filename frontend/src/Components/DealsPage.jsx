@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import {
-  Container, Row, Col, Card, Navbar, Nav, Pagination, NavDropdown, Modal, Button
+  Container, Row, Col, Card, Navbar, Nav, Pagination, Modal, Button
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
@@ -19,30 +19,20 @@ export function DealsPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const exampleDeals = [
-      {
-        id: 1,
-        company: "TechNova",
-        title: "50% Off All Services",
-        description: "Get half off on all our web development packages until the end of the month!",
-        expirationDate: "2025-04-30",
-      },
-      {
-        id: 2,
-        company: "EcoFresh Co.",
-        title: "Free Delivery on Orders Over $25",
-        description: "Enjoy free delivery on all eco-friendly grocery orders above $25.",
-        expirationDate: "2025-05-10",
-      },
-      {
-        id: 3,
-        company: "BrightEdu",
-        title: "2-Week Free Coding Bootcamp",
-        description: "Sign up now and get a free trial of our online coding bootcamp. Offer valid for new students only.",
-        expirationDate: "2025-04-20",
-      },
-    ];
-    setDeals(exampleDeals);
+    const fetchDeals = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/deals");
+        if (!response.ok) {
+          throw new Error("Failed to fetch deals");
+        }
+        const data = await response.json();
+        setDeals(data);
+      } catch (error) {
+        console.error("Error fetching deals:", error);
+      }
+    };
+
+    fetchDeals();
   }, []);
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -96,11 +86,11 @@ export function DealsPage() {
           <h3 className="mb-4">Latest Deals from Small Businesses</h3>
           <Row>
             {currentItems.map((deal) => (
-              <Col md={6} key={deal.id} className="mb-4">
+              <Col md={6} key={deal._id} className="mb-4">
                 <Card className="text-center shadow-sm">
                   <Card.Body>
                     <Card.Title>{deal.title}</Card.Title>
-                    <Card.Subtitle className="mb-2 text-muted">by {deal.company}</Card.Subtitle>
+                    <Card.Subtitle className="mb-2 text-muted">by {deal.businessName}</Card.Subtitle>
                     <Card.Text>
                       <strong>Expires:</strong> {new Date(deal.expirationDate).toLocaleDateString()}
                     </Card.Text>
@@ -139,7 +129,7 @@ export function DealsPage() {
             <Modal.Title>{selectedDeal?.title}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <p><strong>Company:</strong> {selectedDeal?.company}</p>
+            <p><strong>Company:</strong> {selectedDeal?.businessName}</p>
             <p><strong>Description:</strong> {selectedDeal?.description}</p>
             <p><strong>Expires on:</strong> {new Date(selectedDeal?.expirationDate).toLocaleDateString()}</p>
           </Modal.Body>
