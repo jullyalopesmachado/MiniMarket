@@ -78,8 +78,14 @@ function App() {
 
   return (
     <div className="App">
-      {location.pathname !== "/login-signup" && location.pathname !== "/user-profile" && location.pathname !== "/companies-page" && location.pathname !== "/opportunities-page" && location.pathname !== "/user-company-page" && location.pathname !== "/company-post-page" && location.pathname !== "/deals-page" &&(
-        <div className="search-bar-container" style={{ position: "relative", zIndex: 1000 }}>
+      {location.pathname !== "/login-signup" &&
+ location.pathname !== "/user-profile" &&
+ location.pathname !== "/companies-page" &&
+ location.pathname !== "/opportunities-page" &&
+ location.pathname !== "/user-company-page" &&
+ location.pathname !== "/company-post-page" &&
+ location.pathname !== "/deals-page" && (
+     <div className="search-bar-container" style={{ position: "relative", zIndex: 1000 }}>
           <SearchBar
             query={query}
             setQuery={setQuery}
