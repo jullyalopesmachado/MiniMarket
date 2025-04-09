@@ -75,7 +75,6 @@ export function DealsPage() {
                 <Nav.Link onClick={() => navigate("/user-profile")}>Profile</Nav.Link>
                 <Nav.Link onClick={() => navigate("/companies-page")}>Companies</Nav.Link>
                 <Nav.Link onClick={() => navigate("/opportunities-page")}>See Opportunities</Nav.Link>
-                <Nav.Link onClick={() => navigate("/deals-page")}>See Deals</Nav.Link>
               </Nav>
             </Navbar.Collapse>
           </Container>

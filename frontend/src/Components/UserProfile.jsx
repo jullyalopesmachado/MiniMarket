@@ -18,7 +18,10 @@ import { updateData } from "./api";
 
 export function UserProfile() {
   const navigate = useNavigate();
-
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login-signup"); // or "/"
+  };  
   const handleClick = (path) => {
     const pathname = path === "home" ? "/" :
                     path === "opportunities" ? "/opportunities-page" 
@@ -187,13 +190,14 @@ export function UserProfile() {
             </Navbar.Brand>
             <Navbar.Toggle aria-controls="navbar-nav" />
             <Navbar.Collapse id="navbar-nav">
-              <Nav className="ms-auto">
+                <Nav className="ms-auto">
                 <Nav.Link onClick={() => handleClick("home")}>Home</Nav.Link>
                 <Nav.Link onClick={() => handleClick("companies")}>Companies</Nav.Link>
                 <Nav.Link onClick={() => handleClick("opportunities")}>See Opportunities</Nav.Link>
                 <Nav.Link onClick={() => handleClick("deals")}>See Deals</Nav.Link>
                 <Nav.Link onClick={handleMyCompanyClick}>My Company</Nav.Link>
               </Nav>
+              <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
             </Navbar.Collapse>
           </Container>
         </Navbar>
@@ -225,7 +229,7 @@ export function UserProfile() {
                   <Button variant="outline-primary" onClick={() => navigate('/deals-page')}>
                     Latest Deals
                   </Button>
-                  <Button variant="outline-success" onClick={() => navigate('/user-company-page')}>
+                  <Button variant="primary" onClick={() => navigate('/user-company-page')}>
                     View Company (Preview)
                   </Button>
                 </div>

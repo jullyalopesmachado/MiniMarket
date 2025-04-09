@@ -29,7 +29,7 @@ export const SearchBar = ({ query, setQuery, setResults, setSearchActive }) => {
       <FaSearch id="search-icon" />
       <input
         className="text-lg"
-        placeholder="Search participating companies"
+        placeholder="Search businesses"
         value={query}
         onChange={handleChange}
       />

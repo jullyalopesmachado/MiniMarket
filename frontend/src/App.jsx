@@ -11,7 +11,7 @@ import Work from "./Components/Work";
 import Testimonial from "./Components/Testimonial";
 import Contact from "./Components/Contact";
 import Footer from "./Components/Footer";
-import LoginSignup from "./Components/LoginSignup";
+import LoginSignup from "./Components/LoginSignup"; // Import LoginSignup component
 import UserProfile from "./Components/UserProfile"; // Import UserProfile
 import CompanyList from './Components/CompanyList';
 import Opportunities from './Components/Opportunities';
@@ -29,7 +29,7 @@ function App() {
 
   const location = useLocation();
 
-  const isAdmin = true; {/* Replace this with actual authentication logic. This allows for editing mode (admin) in company page list. */} 
+  const isAdmin = true; {/* This allows for editing mode (admin) in company page list. */} 
 
   const handleSelect = (businessName) => {
     setQuery(businessName);
@@ -70,37 +70,11 @@ function App() {
     } catch (error) {
       console.error("Error fetching user profile:", error);
     }
-  };
-
-  const hiddenRoutes = ["/login-signup", "/user-profile", "/companies-page", "/opportunities"];
-  const showSearchBar = !hiddenRoutes.includes(location.pathname);  
-
+  }; 
 
   return (
+    
     <div className="App">
-      {location.pathname !== "/login-signup" &&
- location.pathname !== "/user-profile" &&
- location.pathname !== "/companies-page" &&
- location.pathname !== "/opportunities-page" &&
- location.pathname !== "/user-company-page" &&
- location.pathname !== "/company-post-page" &&
- location.pathname !== "/deals-page" && (
-     <div className="search-bar-container" style={{ position: "relative", zIndex: 1000 }}>
-          <SearchBar
-            query={query}
-            setQuery={setQuery}
-            setResults={setResults}
-            setSearchActive={setSearchActive}
-          />
-          {searchActive && results.length > 0 && (
-            <SearchResultList results={results} onSelect={handleSelect} />
-          )}
-          {searchActive && results.length === 0 && (
-            <p className="no-results">No users found.</p>
-          )}
-        </div>
-      )}
-
       <Routes>
         <Route
           path="/"

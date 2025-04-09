@@ -8,7 +8,7 @@ const multer = require('multer');
 
 const User = require('./models/User');
 const Deal = require('./models/Deal'); // ✅ Added Deal model
-
+const dealRoutes = require('./routes/dealRoutes');
 const opportunityRoutes = require('./routes/opportunityRoutes');
 const userRoutes = require('./routes/userRoutes');
 const businessRoutes = require('./routes/businessRoutes');
@@ -36,6 +36,9 @@ app.use(cors({
 
 // ✅ Middleware
 app.use(express.json());
+app.use('/api/deals', dealRoutes);
+app.use('/api/opportunities', opportunityRoutes); // 
+
 
 // ✅ Enable Mongoose debug mode
 mongoose.set('debug', true);

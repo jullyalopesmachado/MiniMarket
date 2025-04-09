@@ -1,10 +1,13 @@
+.search-container {
+  position: absolute;
+  top: 10px;              /* Adjust this if your navbar height changes */
+  right: -10%;            /* Distance from the right edge */
+  z-index: 999;
+  max-width: 1000px;
+}
+
 .input-wrapper {
-  position: absolute;     /* Absolute positioning relative to nearest positioned ancestor */
-  top: 30px;              /* Distance from top of the page or container */
-  left: 0px;
-  right: 10px;
-  width: 100%;             /* Distance from the left side */
-  
+  position: relative;
   background-color: rgb(68, 139, 225);
   border-radius: 20px;
   height: 2.5rem;
@@ -12,9 +15,7 @@
   box-shadow: 0px 0px 8px #ddd;
   display: flex;
   align-items: center;
-  max-width: 300px;
 }
-
 
 .input-wrapper input {
   background-color: #ddd;
@@ -27,18 +28,16 @@
   border: none;
 }
 
-.input-wrapper input:focus {
-  outline: none;
-}
-
-#search-icon {
-  font-size: 14px;
-  color: rgb(7, 22, 136);
-  margin-right: 6px;
-}
-
-.text-lg {
-  border: none;
-  outline: none;
+.results-list {
+  position: absolute;
+  top: 100%;         /* appear just below the input */
+  left: 0;
   width: 100%;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 150px;
+  overflow-y: auto;
+  border-top: none;
 }

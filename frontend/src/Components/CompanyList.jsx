@@ -13,7 +13,7 @@ import backgroundIv from "../Assets/about-background.png";
 import backgroundBottom from "../Assets/bottom-background.png";
 
 export function CompanyList({ user }) {
-  const [userStatus, setUserStatus] = useState("User not logged in");
+  const [userStatus, setUserStatus] = useState("User logged in");
   const [companies, setCompanies] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);

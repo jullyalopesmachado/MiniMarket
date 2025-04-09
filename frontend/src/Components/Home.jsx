@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Dropdown } from "react-bootstrap";
 import { FiArrowRight } from "react-icons/fi";
@@ -6,6 +6,7 @@ import Navbar from "./Navbar";
 import BannerBackground from "../Assets/home-banner-background.png";
 import { Container, Row, Col, Button, Card, Pagination, NavDropdown } from 'react-bootstrap';
 import BannerImage from "../Assets/home-banner-image.png";
+
 
 const Home = () => {
   const [userStatus, setUserStatus] = useState("User not logged in");
@@ -16,6 +17,27 @@ const Home = () => {
       navigate("/login-signup");
     }
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const now = Math.floor(Date.now() / 1000);
+        if (payload.exp && payload.exp > now) {
+          setUserStatus("User logged in");
+        } else {
+          localStorage.removeItem("token");
+          setUserStatus("User not logged in");
+        }
+      } catch (err) {
+        console.error("Invalid token:", err);
+        localStorage.removeItem("token");
+        setUserStatus("User not logged in");
+      }
+    }
+  }, []);
+  
 
   return (
     <div id="home" className="home-container">
@@ -43,16 +65,6 @@ const Home = () => {
           </button>
           )}
 
-          {userStatus === "User logged in" && (
-          <Button variant="outline-primary" className="secondary-button"  onClick={() => navigate("/opportunities-page")}   style={{
-            position: "absolute",
-            top: "450px",
-            right: "1050px",
-          }}>
-            Services <FiArrowRight />
-          </Button>
-          )}
-
       {userStatus === "Admin logged in" && (
           <button className="secondary-button" onClick={() => navigate("/user-profile")}>
             User Profile <FiArrowRight />
@@ -73,22 +85,7 @@ const Home = () => {
     position: "absolute",
     top: "600px",
     right: "10px",
-  }}
->
-  <Dropdown.Toggle variant="primary">{userStatus}</Dropdown.Toggle>
-  <Dropdown.Menu>
-    <Dropdown.Item onClick={() => setUserStatus("User logged in")}>
-      User logged in
-    </Dropdown.Item>
-    <Dropdown.Item onClick={() => setUserStatus("Admin logged in")}>
-      Admin logged in
-    </Dropdown.Item>
-    <Dropdown.Item onClick={() => setUserStatus("User not logged in")}>
-      Logged out
-    </Dropdown.Item>
-  </Dropdown.Menu>
-</Dropdown>
-
+  }}></Dropdown>
     </div>
   );
 };

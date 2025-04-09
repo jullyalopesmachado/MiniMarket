@@ -11,6 +11,11 @@
   overflow-y: auto;
   border-top: none;
 }
+.search-container {
+  position: relative;
+  max-width: 300px; /* match input width */
+  margin: 0 auto;
+}
 
 .result-item {
   padding: 8px;
