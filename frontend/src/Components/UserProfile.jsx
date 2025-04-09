@@ -1,6 +1,16 @@
-// Importing React and useState hook for managing component state
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Container, Row, Col, Button, Alert, Card, Form, Nav, Navbar, Spinner, Modal
+} from 'react-bootstrap';
 
+import avatarImage from "../Assets/userBlue.png";
+import logoImage from "../Assets/Logo3.png";
+import backgroundIv from "../Assets/about-background.png";
+import backgroundImage from "../Assets/home-banner-background.png";
+import backgroundBottom from "../Assets/nobackground.png";
+
+<<<<<<< HEAD
 // Importing an avatar image for the user profile
 import avatarImage from "../Assets/dummyPic.png"; 
 import logoImage from "../Assets/Logo3.png"; 
@@ -11,17 +21,13 @@ import "./UserProfile.css";
 import Axios from "axios";
 import { useEffect } from "react";
 import { updateData } from "./api";
-
-// Importing Bootstrap components (Note: Fixed typo in 'bootstrap' and 'Breadcrumb')
-import { Container, Row, Col, Button, Alert, Breadcrumb, Card, Form, Nav, Navbar, NavDropdown, NavbarCollapse, Spinner } from 'react-bootstrap';
-
-import { useNavigate } from "react-router-dom"; 
-
+=======
+import { updateData } from "../App";
+>>>>>>> 94e26e5398b5cb181f3367076c0c63e22a55aa2c
 
 export function UserProfile() {
-
-  
   const navigate = useNavigate();
+<<<<<<< HEAD
 
   const handleClick = (path) => {
     const pathname = path === "home" ? "/" :
@@ -36,10 +42,13 @@ export function UserProfile() {
     navigate(pathname); // Navigate to the specified path
   };
 
+=======
+>>>>>>> 94e26e5398b5cb181f3367076c0c63e22a55aa2c
   const [isEditing, setIsEditing] = useState(false);
   const [firstName, setFirstName] = useState("Layne");
   const [lastName, setLastName] = useState("Staley");
   const [userBio, setUserBio] = useState(null);
+<<<<<<< HEAD
   const [userLocation, setUserLocation] = useState({
     street: "",
     state: "",
@@ -47,28 +56,36 @@ export function UserProfile() {
     country: "",
   });
   
+=======
+  const [userLocation, setUserLocation] = useState(null);
+>>>>>>> 94e26e5398b5cb181f3367076c0c63e22a55aa2c
   const [userWebsite, setUserWebsite] = useState(null);
-  
-
-  const [isLoading, setIsLoading] = useState(false); // tracks loading
-  const [error, setError] = useState(null); // tracks error
-
-  
-  //const [userlogo, setUserLogo] = useState(avatarImage);
   const [userId, setUserId] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newCompany, setNewCompany] = useState({
+    name: "",
+    location: "",
+    email: "",
+    website: "",
+    description: "",
+  });
+  const [creationSuccess, setCreationSuccess] = useState(false);
 
   const fetchProfile = async () => {
-    const token = localStorage.getItem("token"); // Retrieve token from local storage
+    const token = localStorage.getItem("token");
     try {
-      const response = await fetch("http://localhost:3000/api/profile", {
+      const response = await fetch("http://localhost:3000/api/business/add", {
+
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (response.ok) {
         const profile = await response.json();
+<<<<<<< HEAD
 
         console.log("User Profile:", profile);
 
@@ -90,6 +107,14 @@ export function UserProfile() {
         setUserBio(profile.bio || "");
         setUserLocation(location);
         
+=======
+        const [first, last] = (profile.name || "").split(" ");
+        setFirstName(first || "");
+        setLastName(last || "");
+        setUserId(profile._id);
+        setUserBio(profile.bio || "");
+        setUserLocation(profile.location || "");
+>>>>>>> 94e26e5398b5cb181f3367076c0c63e22a55aa2c
         setUserWebsite(profile.website || "");
       } else {
         console.error("Error fetching user profile:", response.statusText);
@@ -103,65 +128,103 @@ export function UserProfile() {
     fetchProfile();
   }, []);
 
-
-  // Function to handle the form submission
   const handleSave = async () => {
-if (!firstName || !lastName ) {
-  setError("Required information missing");
-  return;
-}
+    if (!firstName || !lastName) {
+      setError("Required information missing");
+      return;
+    }
 
-    setIsLoading(true); // Set loading state to true
-    setError(null); // Reset error state
-
-    //prepare data to be saved 
+    setIsLoading(true);
+    setError(null);
 
     const updatedProfile = {
       _id: userId,
-      firstName,
-      lastName,
+      name: firstName + " " + lastName,
       bio: userBio,
-      location: userLocation, // Now an object
+      location: userLocation,
       website: userWebsite,
     };
-    
 
-    try{
-      // Updates data on the server
-      const updatedUser = await updateData(updatedProfile);
-      console.log("User Profile Updated:", updatedUser);
-      setIsEditing(false); // Set editing state to false
+    try {
+      await updateData(updatedProfile);
+      setIsEditing(false);
     } catch (err) {
-    
-      console.error("error updating profile", err);
       setError("Failed to update profile");
-
     } finally {
-      setIsLoading(false); // Set loading state to false
+      setIsLoading(false);
     }
-
   };
 
-  if (isLoading) {
-    return <Spinner animation="border" />;
-  }
-    // log out handler
-    const handleLogout = () => {
-      //remove token from local storage
-      localStorage.removeItem("token");
-      // now redirect user to the login page
-      navigate("/login-signup");  
-  }
+  const handleMyCompanyClick = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch("http://localhost:3000/api/business", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) throw new Error("Error checking company");
+
+      const data = await response.json();
+      const userCompany = data.find((company) => company.owner_id === userId);
+
+      if (userCompany) {
+        navigate("/user-company", { state: { userId } });
+      } else {
+        setShowCreateModal(true);
+      }
+    } catch (err) {
+      console.error("Error checking user's company:", err);
+    }
+  };
+
+  const createCompany = async () => {
+    const token = localStorage.getItem("token");
+    if (!token || !userId) return;
+
+    const payload = {
+      ...newCompany,
+      owner_id: userId,
+    };
+
+    try {
+      const response = await fetch("http://localhost:3000/api/business", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error creating company");
+      }
+
+      setCreationSuccess(true);
+      setNewCompany({ name: "", location: "", email: "", website: "", description: "" });
+
+      setTimeout(() => {
+        setCreationSuccess(false);
+        setShowCreateModal(false);
+      }, 2000);
+    } catch (err) {
+      alert(`Failed to create company: ${err.message}`);
+    }
+  };
 
   return (
-<div className="min-vh-100 w-100" >
-    <Navbar expand="lg" className="img-fluid">
-      <Container>
-        <Card.Img variant="top" src={logoImage}  className="me-auto img-fluid" style={{width:'10%'}} />
-        <Navbar.Toggle aria-controls="basic-navbar" className="me-auto" />
-        <Navbar.Collapse id="basic-navbar-nav" className="me-auto img-fluid">
-          <Nav className="ms-auto">
+    <>
+      {/* Background Images */}
+      <div style={{ position: 'fixed', top: 0, right: 0, width: '200px', height: '300px', backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', zIndex: 999 }} />
+      <div style={{ position: 'fixed', top: 500, right: -50, width: '500px', height: '310px', backgroundImage: `url(${backgroundBottom})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', zIndex: 999 }} />
+      <div style={{ position: 'fixed', top: 400, left: 0, width: '150px', height: '400px', backgroundImage: `url(${backgroundIv})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', zIndex: 999 }} />
 
+<<<<<<< HEAD
             <NavDropdown title="Dropdown" id="basic-nav-dropdown">
             <NavDropdown.Item onClick={handleClick("home")}>Home Page</NavDropdown.Item>
               <NavDropdown.Item onClick={handleClick("profile")}>Profile</NavDropdown.Item>
@@ -177,9 +240,61 @@ if (!firstName || !lastName ) {
         </Navbar.Collapse>
       </Container>
     </Navbar>
+=======
+      <div className="min-vh-100 w-100 position-relative">
+        {/* Navbar */}
+        <Navbar bg="light" expand="lg" className="shadow-sm">
+          <Container>
+            <Navbar.Brand onClick={() => navigate("/")} style={{ cursor: 'pointer' }}>
+              <img src={logoImage} alt="Logo" style={{ width: '80px' }} />
+            </Navbar.Brand>
+            <Navbar.Toggle aria-controls="navbar-nav" />
+            <Navbar.Collapse id="navbar-nav">
+              <Nav className="ms-auto">
+                <Nav.Link onClick={() => navigate("/")}>Home</Nav.Link>
+                <Nav.Link onClick={() => navigate("/companies-page")}>Companies</Nav.Link>
+                <Nav.Link onClick={() => navigate("/opportunities-page")}>See Opportunities</Nav.Link>
+                <Nav.Link onClick={() => navigate("/deals-page")}>See Deals</Nav.Link>
+                <Nav.Link onClick={handleMyCompanyClick}>My Company</Nav.Link>
+              </Nav>
+            </Navbar.Collapse>
+          </Container>
+        </Navbar>
+>>>>>>> 94e26e5398b5cb181f3367076c0c63e22a55aa2c
 
-    {/* User Profile Card */}
+        {/* Profile Section */}
+        <Container className="d-flex flex-column justify-content-center align-items-center mt-5">
+          {isLoading ? (
+            <Spinner animation="border" />
+          ) : (
+            <Card style={{ width: '28rem' }} className="text-center shadow">
+              <Card.Img
+                variant="top"
+                src={avatarImage}
+                className="rounded-circle mx-auto mt-4"
+                style={{ width: "40%", height: "auto" }}
+              />
+              <Card.Body>
+                <Card.Title>{firstName} {lastName}</Card.Title>
+                <Card.Text>{userBio || "No bio provided"}</Card.Text>
+                <Card.Text><strong>Location:</strong> {userLocation || "Not specified"}</Card.Text>
+                <Card.Text><strong>Website:</strong> {userWebsite || "No website"}</Card.Text>
+                <div className="d-flex justify-content-center mt-4 gap-3 flex-wrap">
+                  <Button variant="outline-primary" onClick={() => setIsEditing(true)}>
+                    Edit Profile
+                  </Button>
+                  <Button variant="outline-primary" onClick={() => navigate('/company-post-page')}>
+                    Post a Deal
+                  </Button>
+                  <Button variant="outline-primary" onClick={() => navigate('/deals-page')}>
+                    Latest Deals
+                  </Button>
+                </div>
+              </Card.Body>
+            </Card>
+          )}
 
+<<<<<<< HEAD
     <Container className="d-flex justify-content-center align-items-center mt-4 min-vh-100">
 
       <Card style={{ width: '28rem', paddingTop: '5rem' ,  background: 'linear-gradient(rgba(199, 200, 216, 0.9), rgba(255, 255, 255, 0.93), rgba(255, 255, 255, 0.9)' }}>
@@ -228,27 +343,23 @@ if (!firstName || !lastName ) {
            <Form>
                {/* input field for editing first name */}
                <Form.Group className="mb-3">
+=======
+          {/* Edit Profile Form */}
+          {isEditing && (
+            <Card className="mt-5 p-4 shadow-sm" style={{ width: '100%', maxWidth: '700px' }}>
+              <Form>
+                <Form.Group className="mb-3">
+>>>>>>> 94e26e5398b5cb181f3367076c0c63e22a55aa2c
                   <Form.Label>First Name</Form.Label>
-                  <Form.Control
-                    type="text" // input type is text
-                    value={firstName} // value is set to firstName. See up there as I set vals. 
-                    onChange={(e) => setFirstName(e.target.value)} // onChange event handler to update firstName. / When user types, update `firstName` state
-                    />
-                  </Form.Group>
-
-                {/* input field for editing last name */}
+                  <Form.Control type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+                </Form.Group>
                 <Form.Group className="mb-3">
                   <Form.Label>Last Name</Form.Label>
-                  <Form.Control
-                    type="text" // input type is text
-                    value={lastName} // value is set to lastName
-                    onChange={(e) => setLastName(e.target.value)} // onChange event handler to update lastName
-                  />
+                  <Form.Control type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} />
                 </Form.Group>
-
-                {/* input field for editing bio */}
                 <Form.Group className="mb-3">
                   <Form.Label>Bio</Form.Label>
+<<<<<<< HEAD
                   <Form.Control
                     as="textarea" // input type is textarea
                     value={userBio} // value is set to userBio which I set up there in the beginning of the code
@@ -279,40 +390,65 @@ if (!firstName || !lastName ) {
                         value={userLocation.street}
                         onChange={(e) => setUserLocation(e.target.value)}
                       />
+=======
+                  <Form.Control as="textarea" value={userBio} onChange={(e) => setUserBio(e.target.value)} />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Location</Form.Label>
+                  <Form.Control type="text" value={userLocation} onChange={(e) => setUserLocation(e.target.value)} />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Website</Form.Label>
+                  <Form.Control type="text" value={userWebsite} onChange={(e) => setUserWebsite(e.target.value)} />
+                </Form.Group>
+                <Button variant="primary" onClick={handleSave} disabled={isLoading}>
+                  {isLoading ? "Saving..." : "Save Changes"}
+                </Button>
+                {error && <Alert variant="danger" className="mt-3">{error}</Alert>}
+              </Form>
+            </Card>
+          )}
+        </Container>
+>>>>>>> 94e26e5398b5cb181f3367076c0c63e22a55aa2c
 
-                    </Form.Group>
-                  </Form.Group>
-
-                  
-                  {/* input field for editing website */} 
-                  <Form.Group className="mb-3">
-                    <Form.Label>Website</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={userWebsite}
-                      onChange={(e) => setUserWebsite(e.target.value)} // onChange event handler to update userWebsite. When user types, update `userWebsite` state
-                    />
-                  </Form.Group>
-
-                  {/* Save button */}
-                  <Button variant="success" onClick={handleSave} disabled={isLoading}>  {/* The button is disabled while the profile is being saved (i.e., when `isLoading` is true) */}
-
-                    {isLoading ? "Saving..." : "Save Changes"} {/* If `isLoading` is true, show "Saving..." text; otherwise, show "Save Changes" */}
-                  </Button>
-
-                  {/* Display an error message if there was an issue during the save */}
-                  {error && <Alert variant="danger" className="mt-3">{error}</Alert>}
-        </Form>
-      </Container>
-    )}
+        {/* Create Company Modal */}
+        <Modal show={showCreateModal} onHide={() => setShowCreateModal(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Create New Company</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {creationSuccess && <Alert variant="success">Company created successfully!</Alert>}
+            <Form>
+              <Form.Group className="mb-2">
+                <Form.Label>Name</Form.Label>
+                <Form.Control value={newCompany.name} onChange={(e) => setNewCompany({ ...newCompany, name: e.target.value })} />
+              </Form.Group>
+              <Form.Group className="mb-2">
+                <Form.Label>Location</Form.Label>
+                <Form.Control value={newCompany.location} onChange={(e) => setNewCompany({ ...newCompany, location: e.target.value })} />
+              </Form.Group>
+              <Form.Group className="mb-2">
+                <Form.Label>Email</Form.Label>
+                <Form.Control type="email" value={newCompany.email} onChange={(e) => setNewCompany({ ...newCompany, email: e.target.value })} />
+              </Form.Group>
+              <Form.Group className="mb-2">
+                <Form.Label>Website</Form.Label>
+                <Form.Control value={newCompany.website} onChange={(e) => setNewCompany({ ...newCompany, website: e.target.value })} />
+              </Form.Group>
+              <Form.Group className="mb-2">
+                <Form.Label>Description</Form.Label>
+                <Form.Control as="textarea" rows={3} value={newCompany.description} onChange={(e) => setNewCompany({ ...newCompany, description: e.target.value })} />
+              </Form.Group>
+            </Form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowCreateModal(false)}>Cancel</Button>
+            <Button variant="primary" onClick={createCompany}>Create Company</Button>
+          </Modal.Footer>
+        </Modal>
       </div>
-  
+    </>
   );
 }
 
-
 export default UserProfile;
-
-
-
-

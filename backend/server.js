@@ -1,21 +1,25 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors'); // ✅ Added for frontend connection
+const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
-const User = require('./models/User');
-const Upload = require('./models/Upload');
 const bcrypt = require('bcryptjs');
+const multer = require('multer');
+
+const User = require('./models/User');
+
 const userRoutes = require('./routes/userRoutes');
 const businessRoutes = require('./routes/businessRoutes');
 const messageRoutes = require('./routes/messageRoutes');
+<<<<<<< HEAD
 const opportunityRoutes = require('./routes/opportunityRoutes'); 
 const apiRoutes = require('./models/api'); // ✅ Ensure correct API route import
 const authMiddleware = require('./middleware/auth');
+=======
+>>>>>>> 94e26e5398b5cb181f3367076c0c63e22a55aa2c
 
-const multer = require('multer');
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const apiRoutes = require('./models/api');
+const authMiddleware = require('./middleware/auth');
 
 dotenv.config();
 
@@ -23,33 +27,45 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // ✅ CORS
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174'];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // allow requests with no origin like mobile apps or curl
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true
+}));
+
 
 // ✅ Middleware
 app.use(express.json());
+
+// ✅ Enable Mongoose debug mode
 mongoose.set('debug', true);
 
-// ✅ Env check
+// ✅ Environment variable check
 if (!process.env.MONGODB_URI || !process.env.JWT_SECRET) {
     console.error("❌ Missing environment variables. Check your .env file.");
     process.exit(1);
 }
 
-// ✅ MongoDB Connection
+// ✅ MongoDB connection
 mongoose.connect(process.env.MONGODB_URI, {
     serverSelectionTimeoutMS: 5000,
     socketTimeoutMS: 45000,
     family: 4
 })
-    .then(() => {
-        console.log("✅ Connected to MongoDB ->", mongoose.connection.name);
-    })
+    .then(() => console.log(`✅ Connected to MongoDB -> ${mongoose.connection.name}`))
     .catch((err) => {
         console.error('❌ MongoDB connection error:', err);
         process.exit(1);
     });
 
-// ✅ Login Route (manual token + password comparison)
+// ✅ Login Route
 app.post('/api/login', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -66,7 +82,7 @@ app.post('/api/login', async (req, res) => {
 
         const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-        return res.json({ message: 'Login successful', token });
+        res.json({ message: 'Login successful', token });
     } catch (error) {
         console.error("❌ Login Error:", error);
         res.status(500).json({ message: 'Server error', error: error.message });
@@ -75,12 +91,19 @@ app.post('/api/login', async (req, res) => {
 
 // ✅ Routes
 app.use('/api/users', userRoutes);
+<<<<<<< HEAD
 app.use("/api/business", businessRoutes);
 app.use("/api/inbox", messageRoutes);
 app.use("/api/opportunities", opportunityRoutes); 
 app.use("/api", apiRoutes);
+=======
+app.use('/api/business', businessRoutes);
+app.use('/api/messages', messageRoutes);
+>>>>>>> 94e26e5398b5cb181f3367076c0c63e22a55aa2c
 
-// ✅ Protected route
+app.use('/api', apiRoutes);
+
+// ✅ Protected profile route
 app.get('/api/profile', authMiddleware, async (req, res) => {
     try {
         const user = await User.findById(req.user._id).select('-password');
@@ -91,7 +114,7 @@ app.get('/api/profile', authMiddleware, async (req, res) => {
     }
 });
 
-// ✅ Error handling
+// ✅ Global error handler
 app.use((err, req, res, next) => {
     console.error("❌ Server Error:", err.stack);
     res.status(500).send('Something broke!');
