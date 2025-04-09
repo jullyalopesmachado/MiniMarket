@@ -1,7 +1,7 @@
 import React from "react";
 import { FaSearch } from "react-icons/fa";
 import "./SearchBar.css";
-import { fetchData } from "../App";
+import { fetchData } from "./api";
 
 
 export const SearchBar = ({ query, setQuery, setResults, setSearchActive }) => {

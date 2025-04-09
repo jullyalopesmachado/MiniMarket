@@ -4,8 +4,8 @@ import "./LoginSignup.css";
 import user_icon from "../Assets/person.png";
 import email_icon from "../Assets/email.png";
 import password_icon from "../Assets/password.png";
-import { sendData } from "../App";
-import { fetchData } from "../App";
+import { sendData } from "./api";
+import { fetchData } from "./api";
 
 const LoginSignup = () => {
   const [action, setAction] = useState("Sign Up");

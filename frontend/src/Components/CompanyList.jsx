@@ -1,5 +1,5 @@
 // Importing React and useState hook for managing component state
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Container, Row, Col, Button, Dropdown, Alert, Breadcrumb, Card, Form, Nav, Navbar, NavDropdown, NavbarCollapse, Modal } from 'react-bootstrap';
 import logoImage from "../Assets/Logo3.png"; 
@@ -12,9 +12,12 @@ import peachesImage from "../Assets/peachesPhoto.jpg";
 import background from "../Assets/home-banner-background.png"; 
 
 import { useNavigate } from "react-router-dom";
+import { fetchData } from "./api";
+
+
 export function CompanyList({user}) { // Passing isAdmin as a prop here.
       const [userStatus, setUserStatus] = useState("User not logged in");
-
+    
 
       const handleSignupClick = () => {
         if (userStatus === "User not logged in") {
@@ -23,70 +26,15 @@ export function CompanyList({user}) { // Passing isAdmin as a prop here.
       };
     
 
-    const [companies, setCompanies] = useState([ 
+    const [companies, setCompanies] = useState([]); // State to hold the initial list of companies
 
-        // sample data until backend is connected here
-        {
-            id: 1,
-            companyPhoto: veggiesImage,
-            companyName: "Mom&Pop Shop",
-            companyBio: "Small local business specializing in handmade crafts and artisanal goods.",
-            companyLocation: "Seattle, WA",
-            companyWebsite: "aliceinchains.com",
-            isEditing: false, // State to track if the company is being edited
-        },
-        {
-            id: 2,
-            companyPhoto: crochetImage,
-            companyName: "CrochetGoods",
-            companyBio: "Small shop for crochet patterns and supplies.",
-            companyLocation: "Seattle, WA",
-            companyWebsite: "crochetgoods.com",  
-            isEditing: false,
-
-        },
-        {
-            id: 3,
-            companyPhoto: peachesImage,
-            companyName: "Peaches & Apples",
-            companyBio: "Fruits from a grandma's garden.",
-            companyLocation: "DeLand, FL",
-            companyWebsite: "grandmafruits.com",  
-            isEditing: false,
-        },
-
-        {
-            id: 4,
-            companyPhoto: breadImage,
-            companyName: "Bread, Strawberries & Grapes",
-            companyBio: "Fruits from a mom's garden.",
-            companyLocation: "Orlando, FL",
-            companyWebsite: "momsfruits.com",  
-            isEditing: false,
-        },
-
-        {
-            id: 5,
-            companyPhoto: honeyImage,
-            companyName: "Honey & Jam",
-            companyBio: "Family honey and jam.",
-            companyLocation: "Winter Garden, FL",
-            companyWebsite: "honeyfruits.com",  
-            isEditing: false,
-        },
-
-        {
-            id: 6,
-            companyPhoto: produceImage,
-            companyName: "Lettuce & Veggies",
-            companyBio: "Fruits from a grandma's garden.",
-            companyLocation: "DeLand, FL",
-            companyWebsite: "grandmaveggies.com",  
-            isEditing: false,
-        },
-
-
-    ]); // State to hold the initial list of companies
+    useEffect(() => {
+        const fetchBusinesses = async () => {
+            const data = await fetchData({ action: "business" });
+            setCompanies(data);
+        };
+        fetchBusinesses();
+    }, []);
 
     const  [showMessageModal, setShowMessageModal] = useState(false); // State to control the visibility of the message modal
     const [selectedCompany, setSelectedCompany] = useState(null); // State to hold the selected company for messaging
@@ -118,7 +66,7 @@ export function CompanyList({user}) { // Passing isAdmin as a prop here.
         try {
 
             // This is assuming there's an API endpoint to send a message to
-            const response = await fetch( `/api/companies/${selectedCompany.id}/message`, {
+            const response = await fetch( `/api/inbox/${selectedCompany.id}/message`, {
                 method: "POST",
                 headers:{
                     "Content-Type": "application/json",
@@ -229,7 +177,12 @@ export function CompanyList({user}) { // Passing isAdmin as a prop here.
             <Container className="mt-4">
                 <Row >
                     {/* Loop through each company and render a card for each */}
-                    {companies.map(company => (
+
+                {loading ? (
+                    <p>Loading companies...</p>
+                ) : (
+                companies && companies.length > 0 ? (
+                    companies.map((company) => (
                         <Col md={4} key={company.id}>
                             <Card style={{ width: "19rem" }} className="mb-5">
                                 <Card.Img variant="top" src={company.companyPhoto} />
@@ -342,7 +295,10 @@ export function CompanyList({user}) { // Passing isAdmin as a prop here.
                                 </Card.Body>
                             </Card>
                         </Col>
-                    ))}
+                    ))
+                ) : (
+                    <p>No companies found</p>
+                ))}
                 </Row>
             </Container>
 

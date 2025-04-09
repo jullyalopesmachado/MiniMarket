@@ -14,35 +14,83 @@ function OppListPage() {
     // State to track the current page in pagination
     const [currentPage, setCurrentPage] = useState(1);
     // Number of items to display per page
-    const itemsPerPage = 2;
+    const itemsPerPage = 10;
     // React Router hook for navigation (not currently used in this component)
     const navigate = useNavigate();
     // State to manage user status in the dropdown menu
     const [userStatus, setUserStatus] = useState("User logged in");
 
-    // Fetch opportunities from an API when the component mounts
-    useEffect(() => {
+    const  [searchTitle, setSearchTitle] = useState("");
+    const [searchType, setSearchType] = useState("");
+    const [searchLocation, setSearchLocation] = useState("");
+    const [loading, setLoading] = useState(true); // State to manage loading status
+
+    // Fetch opportunities from an API when the component mounts or when the current page or search parameters change
         const fetchOpportunities = async () => {
+            setLoading(true); // Set loading to true while fetching data
             try {
-                const response = await fetch("birb"); // API URL for opportunities
+// Base API URL
+const baseUrl = `${import.meta.env.VITE_API_URL}/api/opportunities/view`;
+
+// Dynamically build query parameters
+const params = new URLSearchParams({
+    page: currentPage,
+    limit: itemsPerPage,
+});
+
+        // Add search parameters only if they are defined
+            if (searchTitle) params.append("title", searchTitle);
+            if (searchType) params.append("type", searchType);
+            if (searchLocation) params.append("location", searchLocation);
+
+        // Construct the full API URL
+                const apiUrl = `${baseUrl}?${params.toString()}`;
+                console.log("API URL:", apiUrl); // Log the API URL for debugging
+        // Fetch data from the API
+                const response = await fetch(apiUrl);
                 const data = await response.json();
-                setOpportunities(data); // Store the fetched data in state
+
+            if (data.success) {
+                console.log("Fetched opportunities:", data.opportunities); // Log fetched opportunities for debugging
+                setOpportunities(data.opportunities || []); // Store the fetched data in state
+                
+            } else {
+                console.error("Failed to fetch opportunities:", data.message);
+                setOpportunities([]); // Set opportunities to an empty array if fetch fails
+            }
             } catch (error) {
                 console.error("Error fetching opportunities:", error);
+                setOpportunities([]); // Set opportunities to an empty array if fetch fails
+                
+            } finally {
+                setLoading(false); // Set loading to false after fetching data
             }
         };
+
+        useEffect(() => {
         fetchOpportunities();
-    }, []);
+    }, [currentPage, searchTitle, searchType, searchLocation]); // Re-fetch data when currentPage or search parameters change
 
-    // Calculate pagination indexes
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    // Get the items for the current page
-    const currentItems = opportunities.slice(indexOfFirstItem, indexOfLastItem);
-    // Calculate the total number of pages needed
-    const totalPages = Math.ceil(opportunities.length / itemsPerPage);
-
+    const deleteOpportunity = async (id) => {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/opportunities/${id}`, {
+                method: "DELETE",
+            });
+            const data = await response.json();
+            if (data.success) {
+                alert("Opportunity deleted successfully!");
+                fetchOpportunities(); // Re-fetch opportunities after deletion
+            } else {
+                alert("Failed to delete opportunity:", data.message);
+                console.error("Failed to delete opportunity:", data.message);
+            }
+        } catch (error) {
+            console.error("Error deleting opportunity:", error);
+            
+        }
+    }
     // Handle page change when a user clicks a pagination button
+    const totalPages = Math.ceil(opportunities.length / itemsPerPage); // Calculate total pages based on opportunities length and items per page
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
     };
@@ -64,7 +112,7 @@ function OppListPage() {
                             {(userStatus === "User logged in" || userStatus === "Admin logged in") && (
                                 <>
                                     <Button variant="outline-success" className="ms-4" onClick={() => navigate("/")}>Home</Button>
-                                    <Button variant="outline-success" className="ms-4" onClick={() => navigate("/profilePage")}>Profile</Button>
+                                    <Button variant="outline-success" className="ms-4" onClick={() => navigate("/user-profile")}>Profile</Button>
                                     <Button variant="outline-success" className="ms-4" onClick={() => navigate("/userListPage")}>Users</Button>
       
                                 </>
@@ -89,30 +137,39 @@ function OppListPage() {
             {/* Opportunities Section - Display available opportunities */}
             <Container className="mt-5">
                 <Row>
-                    {currentItems.map((opportunity) => (
+                {loading ? (
+                    <p>Loading opportunities...</p>
+                ) : 
+                    opportunities && opportunities.length > 0 ? (
+                    opportunities.map((opportunity) => (
                         <Col key={opportunity._id} md={6} className="mb-4">
                             <Card className="text-center">
                                 {/* Opportunity Type */}
-                                <Card.Header>{opportunity.type.toUpperCase()}</Card.Header>
-                                <Card.Body>
-                                    {/* Title and Description */}
-                                    <Card.Title>{opportunity.title}</Card.Title>
-                                    <Card.Text>{opportunity.description}</Card.Text>
-                                    {/* Button to view details (currently non-functional) */}
-                                    <Button
-                                        variant="outline-success"
-                                        onClick={() => navigate(`/opportunity/${opportunity._id}`)} // Navigate to OpportunityDetailPage
-                                    >
-                                        View Details
-                                    </Button>
-                                </Card.Body>
-                                {/* Footer with posted by information */}
-                                <Card.Footer className="text-muted">
-                                    Posted by {opportunity.posted_by} on {new Date(opportunity.createdAt).toLocaleDateString()}
+                    <Card.Header>{opportunity.type ? opportunity.type.toUpperCase() : "N/A"}</Card.Header>
+                    <Card.Body>
+                        {/* Title and Description */}
+                        <Card.Title>{opportunity.title || "No Title Available"}</Card.Title>
+                        <Card.Text>{opportunity.description || "No Description Available"}</Card.Text>
+                        {/* Button to view details */}
+                        <Button
+                            variant="outline-success"
+                            onClick={() => navigate(`/opportunity/${opportunity._id}`)} // Navigate to OpportunityDetailPage
+                        >
+                            View Details
+                        </Button>
+                    </Card.Body>
+                    {/* Footer with posted by information */}
+                    <Card.Footer className="text-muted">
+                        Posted by {opportunity.posted_by || "Unknown"} on{" "}
+                        {opportunity.createdAt
+                            ? new Date(opportunity.createdAt).toLocaleDateString()
+                            : "Unknown Date"}
                                 </Card.Footer>
                             </Card>
                         </Col>
-                    ))}
+                    ))): (
+                    <p>No opportunities found.</p>
+                    )}
                 </Row>
 
                 {/* Pagination - Controls for navigating between pages */}

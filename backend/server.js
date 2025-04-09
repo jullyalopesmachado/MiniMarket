@@ -9,6 +9,7 @@ const bcrypt = require('bcryptjs');
 const userRoutes = require('./routes/userRoutes');
 const businessRoutes = require('./routes/businessRoutes');
 const messageRoutes = require('./routes/messageRoutes');
+const opportunityRoutes = require('./routes/opportunityRoutes'); 
 const apiRoutes = require('./models/api'); // ✅ Ensure correct API route import
 const authMiddleware = require('./middleware/auth');
 
@@ -75,7 +76,9 @@ app.post('/api/login', async (req, res) => {
 // ✅ Routes
 app.use('/api/users', userRoutes);
 app.use("/api/business", businessRoutes);
-app.use("/api", apiRoutes); // ✅ Connects to `api.js`
+app.use("/api/inbox", messageRoutes);
+app.use("/api/opportunities", opportunityRoutes); 
+app.use("/api", apiRoutes);
 
 // ✅ Protected route
 app.get('/api/profile', authMiddleware, async (req, res) => {

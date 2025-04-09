@@ -10,7 +10,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./UserProfile.css";
 import Axios from "axios";
 import { useEffect } from "react";
-import { updateData } from "../App";
+import { updateData } from "./api";
 
 // Importing Bootstrap components (Note: Fixed typo in 'bootstrap' and 'Breadcrumb')
 import { Container, Row, Col, Button, Alert, Breadcrumb, Card, Form, Nav, Navbar, NavDropdown, NavbarCollapse, Spinner } from 'react-bootstrap';
@@ -23,8 +23,17 @@ export function UserProfile() {
   
   const navigate = useNavigate();
 
-  const handleClick = () => {
-    navigate("/");
+  const handleClick = (path) => {
+    const pathname = path === "home" ? "/" :
+                    path === "opportunity" ? "/opportunities/view" 
+                    : path === "profile" ? "/user-profile" :
+                    path === "companies" ? "/companies" : "/";
+    // Check if the path is valid and navigate accordingly
+    if (!pathname) {
+      console.error("Invalid path:", pathname);
+      return;
+    }
+    navigate(pathname); // Navigate to the specified path
   };
 
   const [isEditing, setIsEditing] = useState(false);
@@ -32,10 +41,10 @@ export function UserProfile() {
   const [lastName, setLastName] = useState("Staley");
   const [userBio, setUserBio] = useState(null);
   const [userLocation, setUserLocation] = useState({
-    country: "",
+    street: "",
     state: "",
     city: "",
-    street: "",
+    country: "",
   });
   
   const [userWebsite, setUserWebsite] = useState(null);
@@ -65,18 +74,21 @@ export function UserProfile() {
 
         // Split user.name into firstName and lastName
         const [firstName, lastName] = (profile.name || "").split(" ");
+        const location = profile.location || {
+          street: profile.location?.street || "",
+          city: profile.location?.city || "",
+          state: profile.location?.state || "",
+          country: profile.location?.country || "",
+        }
+      
+        
         setFirstName(firstName || "");
         setLastName(lastName || "");
 
         // Set other profile data
         setUserId(profile._id);
         setUserBio(profile.bio || "");
-        setUserLocation({
-          country: profile.location?.country || "",
-          state: profile.location?.state || "",
-          city: profile.location?.city || "",
-          street: profile.location?.street || "",
-        });
+        setUserLocation(location);
         
         setUserWebsite(profile.website || "");
       } else {
@@ -151,11 +163,13 @@ if (!firstName || !lastName ) {
           <Nav className="ms-auto">
 
             <NavDropdown title="Dropdown" id="basic-nav-dropdown">
-            <NavDropdown.Item onClick={handleClick}>Home Page</NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.2">
+            <NavDropdown.Item onClick={handleClick("home")}>Home Page</NavDropdown.Item>
+              <NavDropdown.Item onClick={handleClick("profile")}>Profile</NavDropdown.Item>
+              <NavDropdown.Item onClick={handleClick("companies")}>
                 Companies
               </NavDropdown.Item>
               <NavDropdown.Item href="#action/3.3">Feed</NavDropdown.Item>
+              <NavDropdown.Item onClick={handleClick("opportunity")}>Opportunities</NavDropdown.Item>
               <NavDropdown.Divider />
               <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>
             </NavDropdown>
@@ -183,7 +197,10 @@ if (!firstName || !lastName ) {
               {/* Display user's location */} 
 
             <Card.Text>
-              <strong>Located in:</strong> {userLocation || "No location provided"}
+              <strong>Located in:</strong>{" "}
+               {userLocation 
+                ? `${userLocation.street || ""}, ${userLocation.city || ""}, ${userLocation.state || ""}, ${userLocation.country || ""}`
+                : "No location provided"}
             </Card.Text>
 
             {/* Display user's website */}
@@ -242,25 +259,25 @@ if (!firstName || !lastName ) {
                       <Form.Control
                         type="text"
                         value={userLocation.country}
-                        onChange={(e) => setUserLocation({ ...userLocation, country: e.target.value })}
+                        onChange={(e) => setUserLocation(e.target.value)}
                       />
                       <Form.Label className="mt-4">State</Form.Label>
                       <Form.Control
                         type="text"
                         value={userLocation.state}
-                        onChange={(e) => setUserLocation({ ...userLocation, state: e.target.value })}
+                        onChange={(e) => setUserLocation(e.target.value)}
                       />
                       <Form.Label className="mt-4">City</Form.Label>
                       <Form.Control
                         type="text"
                         value={userLocation.city}
-                        onChange={(e) => setUserLocation({ ...userLocation, city: e.target.value })}
+                        onChange={(e) => setUserLocation(e.target.value)}
                       />
                       <Form.Label className="mt-4">Street address</Form.Label>
                       <Form.Control
                         type="text"
                         value={userLocation.street}
-                        onChange={(e) => setUserLocation({ ...userLocation, street: e.target.value })}
+                        onChange={(e) => setUserLocation(e.target.value)}
                       />
 
                     </Form.Group>
