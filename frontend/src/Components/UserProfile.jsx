@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Container, Row, Col, Button, Alert, Card, Form, Nav, Navbar, NavDropdown, Spinner
+  Container, Row, Col, Button, Alert, Card, Form, Nav, Navbar, Spinner, Modal
 } from 'react-bootstrap';
 
 import avatarImage from "../Assets/userBlue.png";
@@ -24,10 +24,21 @@ export function UserProfile() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newCompany, setNewCompany] = useState({
+    name: "",
+    location: "",
+    email: "",
+    website: "",
+    description: "",
+  });
+  const [creationSuccess, setCreationSuccess] = useState(false);
+
   const fetchProfile = async () => {
     const token = localStorage.getItem("token");
     try {
-      const response = await fetch("http://localhost:3000/api/profile", {
+      const response = await fetch("http://localhost:3000/api/business/add", {
+
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -80,9 +91,66 @@ export function UserProfile() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login-signup");
+  const handleMyCompanyClick = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch("http://localhost:3000/api/business", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) throw new Error("Error checking company");
+
+      const data = await response.json();
+      const userCompany = data.find((company) => company.owner_id === userId);
+
+      if (userCompany) {
+        navigate("/user-company", { state: { userId } });
+      } else {
+        setShowCreateModal(true);
+      }
+    } catch (err) {
+      console.error("Error checking user's company:", err);
+    }
+  };
+
+  const createCompany = async () => {
+    const token = localStorage.getItem("token");
+    if (!token || !userId) return;
+
+    const payload = {
+      ...newCompany,
+      owner_id: userId,
+    };
+
+    try {
+      const response = await fetch("http://localhost:3000/api/business", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error creating company");
+      }
+
+      setCreationSuccess(true);
+      setNewCompany({ name: "", location: "", email: "", website: "", description: "" });
+
+      setTimeout(() => {
+        setCreationSuccess(false);
+        setShowCreateModal(false);
+      }, 2000);
+    } catch (err) {
+      alert(`Failed to create company: ${err.message}`);
+    }
   };
 
   return (
@@ -106,7 +174,7 @@ export function UserProfile() {
                 <Nav.Link onClick={() => navigate("/companies-page")}>Companies</Nav.Link>
                 <Nav.Link onClick={() => navigate("/opportunities-page")}>See Opportunities</Nav.Link>
                 <Nav.Link onClick={() => navigate("/deals-page")}>See Deals</Nav.Link>
-
+                <Nav.Link onClick={handleMyCompanyClick}>My Company</Nav.Link>
               </Nav>
             </Navbar.Collapse>
           </Container>
@@ -130,21 +198,19 @@ export function UserProfile() {
                 <Card.Text><strong>Location:</strong> {userLocation || "Not specified"}</Card.Text>
                 <Card.Text><strong>Website:</strong> {userWebsite || "No website"}</Card.Text>
                 <div className="d-flex justify-content-center mt-4 gap-3 flex-wrap">
-                <Button variant="outline-primary" onClick={() => setIsEditing(true)}>
-                  Edit Profile
-                </Button>
-                <Button variant="outline-primary" onClick={() => navigate('/company-post-page')}>
-                  Post a Deal
-                </Button>
-                <Button variant="outline-primary" onClick={() => navigate('/deals-page')}>
-                  Latest Deals
-                </Button>
-              </div>
-
+                  <Button variant="outline-primary" onClick={() => setIsEditing(true)}>
+                    Edit Profile
+                  </Button>
+                  <Button variant="outline-primary" onClick={() => navigate('/company-post-page')}>
+                    Post a Deal
+                  </Button>
+                  <Button variant="outline-primary" onClick={() => navigate('/deals-page')}>
+                    Latest Deals
+                  </Button>
+                </div>
               </Card.Body>
             </Card>
           )}
-
 
           {/* Edit Profile Form */}
           {isEditing && (
@@ -178,6 +244,42 @@ export function UserProfile() {
             </Card>
           )}
         </Container>
+
+        {/* Create Company Modal */}
+        <Modal show={showCreateModal} onHide={() => setShowCreateModal(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Create New Company</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {creationSuccess && <Alert variant="success">Company created successfully!</Alert>}
+            <Form>
+              <Form.Group className="mb-2">
+                <Form.Label>Name</Form.Label>
+                <Form.Control value={newCompany.name} onChange={(e) => setNewCompany({ ...newCompany, name: e.target.value })} />
+              </Form.Group>
+              <Form.Group className="mb-2">
+                <Form.Label>Location</Form.Label>
+                <Form.Control value={newCompany.location} onChange={(e) => setNewCompany({ ...newCompany, location: e.target.value })} />
+              </Form.Group>
+              <Form.Group className="mb-2">
+                <Form.Label>Email</Form.Label>
+                <Form.Control type="email" value={newCompany.email} onChange={(e) => setNewCompany({ ...newCompany, email: e.target.value })} />
+              </Form.Group>
+              <Form.Group className="mb-2">
+                <Form.Label>Website</Form.Label>
+                <Form.Control value={newCompany.website} onChange={(e) => setNewCompany({ ...newCompany, website: e.target.value })} />
+              </Form.Group>
+              <Form.Group className="mb-2">
+                <Form.Label>Description</Form.Label>
+                <Form.Control as="textarea" rows={3} value={newCompany.description} onChange={(e) => setNewCompany({ ...newCompany, description: e.target.value })} />
+              </Form.Group>
+            </Form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowCreateModal(false)}>Cancel</Button>
+            <Button variant="primary" onClick={createCompany}>Create Company</Button>
+          </Modal.Footer>
+        </Modal>
       </div>
     </>
   );

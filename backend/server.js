@@ -7,11 +7,11 @@ const bcrypt = require('bcryptjs');
 const multer = require('multer');
 
 const User = require('./models/User');
-const Post = require('./models/Post');
+
 const userRoutes = require('./routes/userRoutes');
 const businessRoutes = require('./routes/businessRoutes');
 const messageRoutes = require('./routes/messageRoutes');
-const postRoutes = require('./routes/postRoutes');
+
 const apiRoutes = require('./models/api');
 const authMiddleware = require('./middleware/auth');
 
@@ -21,7 +21,19 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // ✅ CORS
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174'];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // allow requests with no origin like mobile apps or curl
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true
+}));
+
 
 // ✅ Middleware
 app.use(express.json());
@@ -75,7 +87,7 @@ app.post('/api/login', async (req, res) => {
 app.use('/api/users', userRoutes);
 app.use('/api/business', businessRoutes);
 app.use('/api/messages', messageRoutes);
-app.use('/api/posts', postRoutes);
+
 app.use('/api', apiRoutes);
 
 // ✅ Protected profile route

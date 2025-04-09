@@ -1,4 +1,10 @@
 .input-wrapper {
+  position: absolute;     /* Absolute positioning relative to nearest positioned ancestor */
+  top: 30px;              /* Distance from top of the page or container */
+  left: 0px;
+  right: 10px;
+  width: 100%;             /* Distance from the left side */
+  
   background-color: rgb(68, 139, 225);
   border-radius: 20px;
   height: 2.5rem;
@@ -7,9 +13,8 @@
   display: flex;
   align-items: center;
   max-width: 300px;
-  position: relative;
-  z-index: 10;
 }
+
 
 .input-wrapper input {
   background-color: #ddd;
