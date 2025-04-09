@@ -1,20 +1,18 @@
 const express = require("express");
 const Business = require("../models/Business");
-const User = require("../models/User");
+const User = require("../models/User"); // Import User model
 const router = express.Router();
 const authMiddleware = require("../middleware/auth");
 
-// ✅ Create a new business (Frontend form-compatible)
+// Add a new business (Protected Route)
 router.post('/add', authMiddleware, async (req, res) => {
   try {
     const { name, description, location, email, website } = req.body;
     const owner = req.user._id;
 
-    // Debug log for incoming data
     console.log("📦 Incoming body:", req.body);
     console.log("👤 Owner from token:", owner);
 
-    // Basic validation
     if (!name || !location || !email || !description) {
       return res.status(400).json({ message: "Missing required fields" });
     }
@@ -25,8 +23,7 @@ router.post('/add', authMiddleware, async (req, res) => {
       description,
       location,
       email,
-      website,
-      createdAt: new Date() // Explicit just to avoid any date issues
+      website
     });
 
     await newBusiness.save();
@@ -39,7 +36,7 @@ router.post('/add', authMiddleware, async (req, res) => {
   }
 });
 
-// ✅ Get all or search businesses
+// ✅ Get All Users or Search Users
 router.get("/", async (req, res) => {
   try {
     const { search } = req.query;
@@ -50,8 +47,8 @@ router.get("/", async (req, res) => {
         $or: [
           { name: { $regex: search, $options: "i" } },
           { owner: { $regex: search, $options: "i" } },
-          { description: { $regex: search, $options: "i" } },
-          { location: { $regex: search, $options: "i" } }
+          { industry: { $regex: search, $options: "i" } },
+          { "address.city": { $regex: search, $options: "i" } },
         ]
       });
     } else {
@@ -64,13 +61,12 @@ router.get("/", async (req, res) => {
   }
 });
 
-// ✅ Get business by ID
 router.get("/:id", async (req, res) => {
   try {
     const business = await Business.findById(req.params.id);
 
     if (!business) {
-      return res.status(404).json({ message: "Business not found" });
+      return res.status(404).json({ message: "User not found" });
     }
 
     res.json(business);
@@ -79,7 +75,6 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// ✅ Update business by ID (protected)
 router.put('/:id', authMiddleware, async (req, res) => {
   try {
     const { name, description, website, location, email } = req.body;
@@ -91,10 +86,10 @@ router.put('/:id', authMiddleware, async (req, res) => {
 
     const requestingUser = req.user;
     if (
-      business.owner.toString() !== requestingUser._id.toString() &&
+      business.owner_id.toString() !== requestingUser._id.toString() &&
       !requestingUser.isAdmin
     ) {
-      console.log("💬 Owner ID in DB:", business.owner);
+      console.log("💬 Owner ID in DB:", business.owner_id);
       console.log("🔐 Requesting user ID:", requestingUser._id);
       return res.status(403).json({ message: "Not authorized" });
     }
@@ -107,7 +102,6 @@ router.put('/:id', authMiddleware, async (req, res) => {
 
     await business.save();
     res.status(200).json({ message: "Business updated successfully", business });
-
   } catch (error) {
     console.error("❌ Error saving business:", error);
     res.status(400).json({ message: "Failed to update business", error });

@@ -11,7 +11,7 @@ const BusinessSchema = new mongoose.Schema({
   location: { type: String, required: true },
   email: { type: String, required: true },
   website: { type: String },
-  createdAt: { type: Date, default: Date.now }
-});
+  createdAt: { type: Date, default: Date.now },
+}, { collection: 'Business' });
 
-module.exports = mongoose.model("Business", BusinessSchema);
+module.exports = mongoose.model('Business', BusinessSchema);
