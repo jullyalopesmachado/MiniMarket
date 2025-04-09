@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-// Importing React and useState hook for managing component state
-=======
->>>>>>> 94e26e5398b5cb181f3367076c0c63e22a55aa2c
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import {
@@ -9,21 +5,12 @@ import {
   Form, Nav, Navbar, Modal
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-<<<<<<< HEAD
-import { fetchData } from "./api";
-
-
-export function CompanyList({user}) { // Passing isAdmin as a prop here.
-      const [userStatus, setUserStatus] = useState("User not logged in");
-    
-=======
 
 import logoImage from "../Assets/Logo3.png";
 import companyPhoto from "../Assets/compphoto1.png";
 import backgroundImage from "../Assets/home-banner-background.png";
 import backgroundIv from "../Assets/about-background.png";
 import backgroundBottom from "../Assets/bottom-background.png";
->>>>>>> 94e26e5398b5cb181f3367076c0c63e22a55aa2c
 
 export function CompanyList({ user }) {
   const [userStatus, setUserStatus] = useState("User not logged in");
@@ -35,117 +22,6 @@ export function CompanyList({ user }) {
   const [messagem, setMessage] = useState("");
   const navigate = useNavigate();
 
-<<<<<<< HEAD
-    const [companies, setCompanies] = useState([]); // State to hold the initial list of companies
-
-    useEffect(() => {
-        const fetchBusinesses = async () => {
-            const data = await fetchData({ action: "business" });
-            setCompanies(data);
-        };
-        fetchBusinesses();
-    }, []);
-
-    const  [showMessageModal, setShowMessageModal] = useState(false); // State to control the visibility of the message modal
-    const [selectedCompany, setSelectedCompany] = useState(null); // State to hold the selected company for messaging
-    const [messagem, setMessage] = useState(""); // State to hold the message content
-    const navigate = useNavigate();
-    
-    const handleMessageClick = (company) => {
-        if (user){ // Check if the user is logged in
-            alert ("You're about to send a message.");
-            // Redirect to login page
-        } else {
-            setSelectedCompany(company); // Set the selected company for messaging
-            setShowMessageModal(true); // Show the message modal
-        }
-    };
-
-    const handleCloseModal  = () => {   
-        setShowMessageModal(false); // Close the message modal
-        setMessage(""); // Reset the message content
-    };
-
-    const handleSendMessage = async () => {  
-        if (!messagem.trim()){
-            alert ("Please enter a message."); // Alert if the message is empty
-            return; 
-
-        }
-
-        try {
-
-            // This is assuming there's an API endpoint to send a message to
-            const response = await fetch( `/api/inbox/${selectedCompany.id}/message`, {
-                method: "POST",
-                headers:{
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`, // Include the token for authentication
-                },
-                body: JSON.stringify({message}),
-            });
-
-            if (response.ok) {
-                alert("Message sent successfully!"); // Alert on successful message sending 
-                handleCloseModal(); // Close the modal
-            } else {    
-                alert("Failed to send message.");
-
-            }
-        } catch (error) {
-            console.error("Error sending message:", error); // Log any errors that occur during the fetch
-        }
-    };
-
-// /////////////////////////////////////////////
-
-    const handleEditToggle = (id) => {
-        if (user?.isAdmin || userStatus === "Admin logged in") { // Check if the user is an admin
-            setCompanies(companies.map(company =>
-                company.id === id ? { ...company, isEditing: !company.isEditing } : company 
-            ));
-        } else {
-            alert("Only admnis can edit company details.");
-        }
-};
-
-
-    // The handleEditToggle function below does the following:
-    // map() function iterates over all companies in the companies array. 
-    // For each company, we check if its id matches the id passed to the function.
-    // If there's a match, we create a new object for that company, keeping all its properties unchanged 
-    // using the spread operator (...company), and we toggle its isEditing property.
-    // If the company.id doesn't match, we return the company without changes.
-    // The updated array is then passed to setCompanies() to update the state.
-    
-
-    // Function to save the edited data
-    //  (this would eventually send the data to the backend)
-    const handleSave = (id, companyName, companyBio, companyLocation, companyWebsite) => {
-        // Here I will later send the updated data to the backend
-        // For now, I'll just log it to the console
-        console.log("Saved data for company: ", {companyName, companyBio, companyLocation, companyWebsite});
-
-        // Update the companies state to reflect the changes
-        // Use the map() function to iterate over all companies in the companies array
-        setCompanies(companies.map(company =>
-            // Check if the current company's id matches the id we're trying to update
-            company.id === id ? 
-                // If the id matches, create a new object with updated properties
-                {
-                    ...company, // Spread the existing properties of the company
-                    companyName, // Update the company name
-                    companyBio, // Update the company bio
-                    companyLocation, // Update the company location
-                    companyWebsite, // Update the company website
-                    isEditing: false // Set editing mode to false after saving the changes
-                }
-                : 
-                // If the id doesn't match, return the company unchanged
-                company
-        ));
-        // After map() finishes, setCompanies() updates the state with the new companies array
-=======
   const fetchCompany = async () => {
     const token = localStorage.getItem("token");
     try {
@@ -201,7 +77,6 @@ export function CompanyList({ user }) {
     if (!companyToUpdate.companyName || !companyToUpdate.companyBio || !companyToUpdate.companyLocation) {
       alert("Company name, bio, and location are required.");
       return;
->>>>>>> 94e26e5398b5cb181f3367076c0c63e22a55aa2c
     }
 
     const payload = {
@@ -284,45 +159,6 @@ export function CompanyList({ user }) {
   return (
     <div className="min-vh-100 w-100 position-relative">
 
-<<<<<<< HEAD
-            {/* Company List Section */}
-            <Container className="mt-4">
-                <Row >
-                    {/* Loop through each company and render a card for each */}
-
-                {loading ? (
-                    <p>Loading companies...</p>
-                ) : (
-                companies && companies.length > 0 ? (
-                    companies.map((company) => (
-                        <Col md={4} key={company.id}>
-                            <Card style={{ width: "19rem" }} className="mb-5">
-                                <Card.Img variant="top" src={company.companyPhoto} />
-                                {/* This line displays the company's logo image at the top of the card using the 'logoImage' variable */}
-                                <Card.Body>
-                                    {/* Start of the card body where the company information is displayed */}
-                                    {/* Ternary operator to toggle between editing and viewing mode */}
-                                    {company.isEditing ? (
-                                        <>
-                                            {/* If the company is in editing mode, display form fields for company info */}
-                                            {/* Form group for the company name */}
-                                            <Form.Group className="mb-2">
-                                                {/* Label for the company name field */}
-                                                <Form.Label>Company Name</Form.Label>
-                                                {/* Input field to edit the company name */}
-                                                <Form.Control
-                                                    type="text" // Specifies this is a text input field (for entering text)
-                                                    value={company.companyName} // The value of this input field is the current company name from the 'company' object
-                                                    onChange={(e) => setCompanies(companies.map(c => 
-                                                        // When the value of the input changes (i.e., when the user types something):
-                                                        c.id === company.id ? { 
-                                                            ...c, // Spread the existing properties of the company (so we don't change other properties)
-                                                            companyName: e.target.value // Update the company name with the new value typed by the user
-                                                        } : c // If the company ID doesn't match, return the company unchanged
-                                                    ))}
-                                                />
-                                            </Form.Group>
-=======
       {/* ✅ Navbar with conditional links */}
       <Navbar bg="light" expand="lg" className="shadow-sm">
         <Container>
@@ -333,7 +169,6 @@ export function CompanyList({ user }) {
           <Navbar.Collapse id="navbar-nav">
             <Nav className="ms-auto">
               <Nav.Link onClick={() => navigate("/")}>Home</Nav.Link>
->>>>>>> 94e26e5398b5cb181f3367076c0c63e22a55aa2c
 
               {(userStatus === "User logged in" || userStatus === "Admin logged in") && (
                 <>
@@ -391,34 +226,6 @@ export function CompanyList({ user }) {
                         />
                       </Form.Group>
 
-<<<<<<< HEAD
-                                            
-                                            {/*}
-                                            // This line BELOW conditionally renders the "Edit" button only if the user is an admin.
-                                            // The 'isAdmin' prop is a boolean. If it is true, the button is displayed.
-                                            // The button has a 'warning' variant (yellow color), a margin on the left (ms-2),
-                                            // and when clicked, it triggers the 'handleEditToggle' function with the company id.
-                                            // This function toggles the 'isEditing' state for the specific company, allowing the user to enter edit mode.
-                                            */}
-                                            {user?.isAdmin || userStatus === "Admin logged in" && (
-                                                <Button variant="outline-primary" className="ms-2" onClick={() => handleEditToggle(company.id)}>
-                                                    Edit
-                                                </Button>
-                                            )}
-                                                                                    {/* If the user is an admin (i.e., isAdmin is true), show an "Edit" button.
-                                                Clicking it sets isEditing to true, which would switch to editing mode */}
-                                        </>
-                                    )}
-                                </Card.Body>
-                            </Card>
-                        </Col>
-                    ))
-                ) : (
-                    <p>No companies found</p>
-                ))}
-                </Row>
-            </Container>
-=======
                       <Form.Group className="mb-2">
                         <Form.Label>Company Website</Form.Label>
                         <Form.Control
@@ -429,7 +236,6 @@ export function CompanyList({ user }) {
                           ))}
                         />
                       </Form.Group>
->>>>>>> 94e26e5398b5cb181f3367076c0c63e22a55aa2c
 
                       <Button variant="primary" onClick={() => handleSave(company.id)}>Save</Button>
                     </>
