@@ -5,6 +5,7 @@ import {
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
+
 import logoImage from "../Assets/Logo3.png";
 import backgroundImage from "../Assets/home-banner-background.png";
 import backgroundIv from "../Assets/about-background.png";
@@ -24,23 +25,6 @@ export function PostDealPage() {
   const navigate = useNavigate();
 
 
-  useEffect(() => {
-      const fetchDeals= async () => {
-        try {
-          const response = await fetch("http://localhost:3000/api/deals/view");
-          if (!response.ok) {
-            throw new Error("Failed to fetch deals");
-          }
-          const data = await response.json();
-          console.log("Fetched deals:", data);
-          setOpportunities(data.deals);
-        } catch (error) {
-          console.error("Error fetching deals:", error);
-        }
-      };
-    
-      fetchDeals();
-    }, []);
     
 
   const handleChange = (e) => {
@@ -58,7 +42,7 @@ export function PostDealPage() {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/api/deals", {
+      const response = await fetch("http://localhost:3000/api/deals/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -5,7 +5,7 @@ const authMiddleware = require('../middleware/auth');
 const User = require('../models/User');
 
 // ✅ Create a new deal (with auth)
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/add', authMiddleware, async (req, res) => {
   try {
     const { title, description, expirationDate } = req.body;
 
