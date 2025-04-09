@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const BusinessSchema = new mongoose.Schema({
   owner: {
-    type: mongoose.Schema.Types.ObjectId, // Reference to the user
+    type: String, // Reference to the user
     required: true,
     ref: "User", // Reference the 'users' collection
   },
