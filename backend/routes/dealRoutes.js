@@ -5,7 +5,7 @@ const authMiddleware = require('../middleware/auth');
 const User = require('../models/User');
 
 // ✅ Create a new deal (with auth)
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/add', authMiddleware, async (req, res) => {
   try {
     const { title, description, expirationDate } = req.body;
 
@@ -31,7 +31,7 @@ router.post('/', authMiddleware, async (req, res) => {
 });
 
 // ✅ Get active deals (filter by expiration date)
-router.get('/', async (req, res) => {
+router.get('/view', async (req, res) => {
   try {
     const today = new Date();
     const activeDeals = await Deal.find({ expirationDate: { $gte: today } });

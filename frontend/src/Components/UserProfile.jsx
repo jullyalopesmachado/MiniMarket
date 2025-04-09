@@ -48,11 +48,9 @@ export function UserProfile() {
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newCompany, setNewCompany] = useState({
-    name: "",
-    location: "",
-    email: "",
-    website: "",
     description: "",
+    location: "",
+    website: ""
   });
   const [creationSuccess, setCreationSuccess] = useState(false);
 
@@ -115,7 +113,7 @@ export function UserProfile() {
   const handleMyCompanyClick = async () => {
     const token = localStorage.getItem("token");
     try {
-      const response = await fetch("http://localhost:3000/api/business", {
+      const response = await fetch("http://localhost:3000/api/business/owned", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -123,18 +121,20 @@ export function UserProfile() {
         },
       });
 
-      if (!response.ok) throw new Error("Error checking company");
-
-      const data = await response.json();
-      const userCompany = data.find((company) => company.owner_id === userId);
-
-      if (userCompany) {
-        navigate("/user-company", { state: { userId } });
+      if (!response.ok) {
+        if (response.status === 404) {
+          // No business found, show the create modal
+          setShowCreateModal(true);
+        } else {
+          throw new Error("Error fetching user's business");
+        }
       } else {
-        setShowCreateModal(true);
+        const business = await response.json();
+        // Navigate to the user's company page with the business data
+        navigate("/user-company-page", { state: { business } });
       }
     } catch (err) {
-      console.error("Error checking user's company:", err);
+      console.error("Error checking user's company:", err.message);
     }
   };
 
@@ -144,11 +144,10 @@ export function UserProfile() {
 
     const payload = {
       ...newCompany,
-      owner_id: userId,
     };
 
     try {
-      const response = await fetch("http://localhost:3000/api/business", {
+      const response = await fetch("http://localhost:3000/api/business/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

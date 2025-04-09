@@ -7,22 +7,34 @@ const authMiddleware = require("../middleware/auth");
 // Add a new business (Protected Route)
 router.post('/add', authMiddleware, async (req, res) => {
   try {
-    const { name, description, location, email, website } = req.body;
-    const owner = req.user._id;
+    const {description, location, website } = req.body;
+    
 
+    const user = await User.findById(req.user._id);
+            if (!user) {
+              return res.status(404).json({ message: 'User not found' });
+            }
+
+
+            if (!user.businessName || !user.email) {
+              return res.status(400).json({ message: "User is missing required fields (businessName or email)" });
+            }
+        
+            // Validate the request body
+            if (!description || !location) {
+              return res.status(400).json({ message: "Missing required fields" });
+            }
+          
+    console.log("👤 Owner from token:", user);
     console.log("📦 Incoming body:", req.body);
-    console.log("👤 Owner from token:", owner);
-
-    if (!name || !location || !email || !description) {
-      return res.status(400).json({ message: "Missing required fields" });
-    }
+    console.log("📦 User email and business:", user.email); // Debugging log
 
     const newBusiness = new Business({
-      owner,
-      name,
+      owner: user._id,
+      name: user.businessName,
       description,
       location,
-      email,
+      email: user.email,
       website
     });
 
@@ -38,7 +50,7 @@ router.post('/add', authMiddleware, async (req, res) => {
   }
 });
 
-// ✅ Get All Users or Search Users
+// ✅ Get All Businesses (with search functionality)
 router.get("/", async (req, res) => {
   try {
     const { search } = req.query;
@@ -60,6 +72,22 @@ router.get("/", async (req, res) => {
     res.json(businesses);
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+});
+
+router.get("/owned", authMiddleware, async (req, res) => {
+  try {
+    // Find the business associated with the authenticated user
+    const business = await Business.findOne({ owner: req.user._id });
+
+    if (!business) {
+      return res.status(404).json({ message: "No business found for this user" });
+    }
+
+    res.status(200).json(business);
+  } catch (error) {
+    console.error("Error fetching user's business:", error.message);
+    res.status(500).json({ message: "Server error" });
   }
 });
 

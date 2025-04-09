@@ -5,6 +5,7 @@ import {
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
+
 import logoImage from "../Assets/Logo3.png";
 import backgroundImage from "../Assets/home-banner-background.png";
 import backgroundIv from "../Assets/about-background.png";
@@ -14,13 +15,17 @@ export function PostDealPage() {
   const [deal, setDeal] = useState({
     title: "",
     description: "",
-    expirationDate: ""
+    expirationDate: "",
+    businessName: ""
   });
 
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [error, setError] = useState(null);
 
   const navigate = useNavigate();
+
+
+    
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -37,7 +42,7 @@ export function PostDealPage() {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/api/deals", {
+      const response = await fetch("http://localhost:3000/api/deals/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -52,7 +57,8 @@ export function PostDealPage() {
       }
 
       setShowSuccessModal(true);
-      setDeal({ title: "", description: "", expirationDate: "" });
+      setDeal({ title: "", description: "", expirationDate: "", businessName: "" });
+      setError(null); // Clear any previous error
 
       // Redirect to the deals page after success
       setTimeout(() => {

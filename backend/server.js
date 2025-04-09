@@ -8,11 +8,13 @@ const multer = require('multer');
 
 const User = require('./models/User');
 const Deal = require('./models/Deal'); // ✅ Added Deal model
-const dealRoutes = require('./routes/dealRoutes');
+
 const opportunityRoutes = require('./routes/opportunityRoutes');
 const userRoutes = require('./routes/userRoutes');
 const businessRoutes = require('./routes/businessRoutes');
-const messageRoutes = require('./routes/messageRoutes'); 
+const messageRoutes = require('./routes/messageRoutes');
+const dealRoutes = require('./routes/dealRoutes'); // ✅ Added Deal routes
+
 const apiRoutes = require('./models/api');
 const authMiddleware = require('./middleware/auth');
 
@@ -87,12 +89,15 @@ app.post('/api/login', async (req, res) => {
 
 // ✅ Routes
 app.use('/api/users', userRoutes);
+
 app.use("/api/business", businessRoutes);
 app.use("/api/inbox", messageRoutes);
 app.use("/api/opportunities", opportunityRoutes); 
 app.use("/api", apiRoutes);
 app.use('/api/business', businessRoutes);
 app.use('/api/messages', messageRoutes);
+
+app.use('/api/deals', dealRoutes); // ✅ Added Deal API route
 
 app.use('/api', apiRoutes); // ✅ Keeping your custom api.js
 
