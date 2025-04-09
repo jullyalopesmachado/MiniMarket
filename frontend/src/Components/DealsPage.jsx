@@ -15,13 +15,14 @@ export function DealsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedDeal, setSelectedDeal] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(true);
   const itemsPerPage = 2;
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchDeals = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/deals");
+        const response = await fetch("http://localhost:3000/api/deals/view");
         if (!response.ok) {
           throw new Error("Failed to fetch deals");
         }
@@ -29,6 +30,8 @@ export function DealsPage() {
         setDeals(data);
       } catch (error) {
         console.error("Error fetching deals:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -84,7 +87,10 @@ export function DealsPage() {
         <Container className="mt-5">
           <h3 className="mb-4">Latest Deals from Small Businesses</h3>
           <Row>
-            {currentItems.map((deal) => (
+            {loading ? 
+            ( <p>Loading...</p>) :
+            deals && deals.length > 0 ? (
+            currentItems.map((deal) => (
               <Col md={6} key={deal._id} className="mb-4">
                 <Card className="text-center shadow-sm">
                   <Card.Body>
@@ -99,7 +105,9 @@ export function DealsPage() {
                   </Card.Body>
                 </Card>
               </Col>
-            ))}
+            ))) : (
+              <p>No deals found</p>
+            )}
           </Row>
 
           {/* Pagination */}

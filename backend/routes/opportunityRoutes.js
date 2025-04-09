@@ -7,10 +7,10 @@ const authMiddleware = require('../middleware/auth');
 router.get('/view', opportunityController.getAllOpportunities);
 
 // Fetch a single opportunity by ID
-router.get('/:id', opportunityController.getOpportunityById);
+router.get('/:id', authMiddleware, opportunityController.getOpportunityById);
 
 // Create a new opportunity (protected route)
-router.post('/new', opportunityController.createOpportunity);
+router.post('/new', authMiddleware, opportunityController.createOpportunity);
 
 // Update an opportunity (protected route)
 router.put('/update/:id', authMiddleware, opportunityController.updateOpportunity);

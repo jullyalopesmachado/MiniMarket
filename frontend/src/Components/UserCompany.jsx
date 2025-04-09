@@ -22,40 +22,39 @@ export function UserCompany() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const storedId = localStorage.getItem("userId");
-    if (storedId) {
-      setUserId(storedId);
-      fetchCompany(storedId);
-    }
+    const fetchCompany = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+  
+      try {
+        const response = await fetch("http://localhost:3000/api/business/owned", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+  
+        if (!response.ok) throw new Error("Error fetching company");
+  
+        const userCompany = await response.json();
+      
+  
+        if (userCompany) {
+          setCompany(userCompany);
+        }
+      } catch (err) {
+        console.error("Failed to fetch company:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCompany();
+    
   }, []);
 
-  const fetchCompany = async (uid) => {
-    const token = localStorage.getItem("token");
-    if (!token || !uid) return;
-
-    try {
-      const response = await fetch("http://localhost:3000/api/business", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) throw new Error("Error fetching company");
-
-      const data = await response.json();
-      const userCompany = data.find((c) => c.owner === uid || c.owner_id === uid);
-
-      if (userCompany) {
-        setCompany(userCompany);
-      }
-    } catch (err) {
-      console.error("Failed to fetch company:", err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+ 
 
   return (
     <>

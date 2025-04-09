@@ -31,7 +31,7 @@ router.post('/', authMiddleware, async (req, res) => {
 });
 
 // ✅ Get active deals (filter by expiration date)
-router.get('/', async (req, res) => {
+router.get('/view', async (req, res) => {
   try {
     const today = new Date();
     const activeDeals = await Deal.find({ expirationDate: { $gte: today } });

@@ -1,4 +1,6 @@
 const Opportunity = require('../models/Opportunities');
+const User = require('../models/User');
+const mongoose = require('mongoose');
 
 class OpportunityController {
 
@@ -47,9 +49,15 @@ class OpportunityController {
 
 // POST create a new opportunity
 async createOpportunity(req, res) {
-    const { title, description, type, location = 'Remote', posted_by } = req.body;
+    const { title, description, type, location } = req.body;
+
+    const user = await User.findById(req.user._id);
+        if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+        }
+
     // Validate required fields
-    if (!title || !description || !posted_by) {
+    if (!title || !description || !type ) {
         return res.status(400).json({ 
             success: false,
              message: 'All fields are required' });
@@ -62,8 +70,8 @@ async createOpportunity(req, res) {
             title,
             description,
             type,
-            location: req.body.location || 'Remote', // Default to 'Remote' if not provided
-            posted_by,
+            location: location || 'Not specified',
+            posted_by: user.businessName, // Assuming user.businessName is available in the request context
         });
 
         await newOpportunity.save();

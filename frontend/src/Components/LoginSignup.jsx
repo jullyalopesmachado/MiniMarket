@@ -35,7 +35,6 @@ const handleAuth = async () => {
   
     if (response.ok) {
       console.log("continue");
-      alert(`${action} successful!`);
       const data = await response.json();
 
       if (action === "Sign Up") {

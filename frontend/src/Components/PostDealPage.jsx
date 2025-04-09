@@ -14,13 +14,34 @@ export function PostDealPage() {
   const [deal, setDeal] = useState({
     title: "",
     description: "",
-    expirationDate: ""
+    expirationDate: "",
+    businessName: ""
   });
 
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [error, setError] = useState(null);
 
   const navigate = useNavigate();
+
+
+  useEffect(() => {
+      const fetchDeals= async () => {
+        try {
+          const response = await fetch("http://localhost:3000/api/deals/view");
+          if (!response.ok) {
+            throw new Error("Failed to fetch deals");
+          }
+          const data = await response.json();
+          console.log("Fetched deals:", data);
+          setOpportunities(data.deals);
+        } catch (error) {
+          console.error("Error fetching deals:", error);
+        }
+      };
+    
+      fetchDeals();
+    }, []);
+    
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -52,7 +73,8 @@ export function PostDealPage() {
       }
 
       setShowSuccessModal(true);
-      setDeal({ title: "", description: "", expirationDate: "" });
+      setDeal({ title: "", description: "", expirationDate: "", businessName: "" });
+      setError(null); // Clear any previous error
 
       // Redirect to the deals page after success
       setTimeout(() => {
