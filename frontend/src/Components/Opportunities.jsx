@@ -65,24 +65,28 @@ function OppListPage() {
 
 
   const handleSubmit = async (e) => {
-
-
-
     e.preventDefault();
     const token = localStorage.getItem("token");
-
+    const businessId = localStorage.getItem("businessId");
+    const businessName = localStorage.getItem("businessName");
+  
     if (!newOpportunity.title || !newOpportunity.description || !newOpportunity.type || !newOpportunity.location) {
       setError("All fields are required.");
       return;
     }
-   
+  
+    if (!businessId || !businessName) {
+      setError("Missing business ID or name. Please make sure your business is registered.");
+      return;
+    }
+  
     const opportunityToSubmit = {
       ...newOpportunity,
-      posted_by: localStorage.getItem("businessName") || "Unknown",
+      businessId,
+      businessName,
+      posted_by: businessName
     };
-
-    console.log("Response from server:", opportunityToSubmit);
-
+  
     try {
       const response = await fetch("http://localhost:3000/api/opportunities/new", {
         method: "POST",
@@ -92,31 +96,26 @@ function OppListPage() {
         },
         body: JSON.stringify(opportunityToSubmit)
       });
-
-
-      
+  
       if (!response.ok) {
         const data = await response.json();
         throw new Error(data.message || "Failed to post opportunity.");
       }
-
-
-
+  
       setShowSuccessModal(true);
-      setNewOpportunity({ title: "", description: "", type: "", location: "", post_by: "" });
-      setError(null); // Clear any previous error
-
-      // Redirect to the opportunity page after success
+      setNewOpportunity({ title: "", description: "", type: "", location: "", posted_by: "" });
+      setError(null);
+  
       setTimeout(() => {
         setShowModal(false);
         navigate("/opportunities-page");
-        fetchOpportunities(); // Fetch updated opportunities after posting
+        fetchOpportunities(); // fetch new data
       }, 2000);
     } catch (err) {
       setError(err.message);
     }
   };
-
+  
   useEffect(() => {
     const fetchOpportunities = async () => {
       try {
