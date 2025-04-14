@@ -35,6 +35,10 @@ export function PostDealPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
+    
+
+    const businessId = localStorage.getItem("businessId");
+    const businessName = localStorage.getItem("businessName");
 
     if (!deal.title || !deal.description || !deal.expirationDate) {
       setError("All fields are required.");
@@ -48,7 +52,7 @@ export function PostDealPage() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify(deal)
+        body: JSON.stringify({ ...deal, businessId, businessName })
       });
 
       if (!response.ok) {

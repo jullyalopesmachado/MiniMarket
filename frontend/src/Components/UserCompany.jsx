@@ -42,7 +42,9 @@ export function UserCompany() {
   
         if (userCompany) {
           setCompany(userCompany);
-        }
+          localStorage.setItem("businessId", userCompany._id);
+          localStorage.setItem("businessName", userCompany.name); // optional for display
+        }        
       } catch (err) {
         console.error("Failed to fetch company:", err);
       } finally {

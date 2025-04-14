@@ -18,8 +18,8 @@ import Opportunities from './Components/Opportunities';
 import UserCompany from './Components/UserCompany';
 import PostDeal from './Components/PostDealPage';
 import SeeDeals from './Components/DealsPage';
-
-
+import CompanyPostsPage from './Components/CompanyPostsPage';
+import MessagesPage from './Components/MessagesPage';
 
 
 function App() {
@@ -93,7 +93,8 @@ function App() {
         <Route path="/user-profile" element={<UserProfile />} /> {/* Add route */}
         <Route path="/home-page" element={<Home />} />
         <Route path="/companies-page" element={<CompanyList user={user} />} />
-
+        <Route path="/company-posts/:companyId" element={<CompanyPostsPage />} />
+        <Route path="/messages/:companyId" element={<MessagesPage />} />
         <Route path="/opportunities-page" element={<Opportunities />} />
         <Route path="/user-company-page" element={<UserCompany />} />
         <Route path="/company-post-page" element={<PostDeal />} />

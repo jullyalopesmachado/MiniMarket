@@ -7,18 +7,19 @@ const User = require('../models/User');
 // ✅ Create a new deal (with auth)
 router.post('/add', authMiddleware, async (req, res) => {
   try {
-    const { title, description, expirationDate } = req.body;
+    const { title, description, expirationDate, businessId, businessName } = req.body;
 
-    const user = await User.findById(req.user._id);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+    // Optional: Validate required fields
+    if (!title || !description || !expirationDate || !businessId || !businessName) {
+      return res.status(400).json({ message: 'All deal fields are required.' });
     }
 
     const newDeal = new Deal({
       title,
       description,
       expirationDate,
-      businessName: user.businessName
+      businessId,
+      businessName
     });
 
     await newDeal.save();
@@ -29,6 +30,7 @@ router.post('/add', authMiddleware, async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
 
 // ✅ Get active deals (filter by expiration date)
 router.get('/view', async (req, res) => {

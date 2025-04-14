@@ -172,6 +172,27 @@ export function UserProfile() {
       alert(`Failed to create company: ${err.message}`);
     }
   };
+    const handleSeeMyPosts = async () => {
+      const token = localStorage.getItem("token");
+      console.log("Token in use:", token);
+
+      try {
+        const response = await fetch("http://localhost:3000/api/business/owned", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error("Failed to get company");
+    
+        const company = await response.json();
+        if (company && company._id) {
+          navigate(`/company-posts/${company._id}`);
+        } else {
+          alert("You don't own a company yet.");
+        }
+      } catch (err) {
+        console.error("Error navigating to posts:", err.message);
+      }
+    };
+  
 
   return (
     <>
@@ -229,7 +250,10 @@ export function UserProfile() {
                     Latest Deals
                   </Button>
                   <Button variant="primary" onClick={() => navigate('/user-company-page')}>
-                    View Company (Preview)
+                    View Company 
+                  </Button>
+                  <Button variant="outline-secondary" onClick={handleSeeMyPosts}>
+                    See My Posts
                   </Button>
                 </div>
               </Card.Body>
