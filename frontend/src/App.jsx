@@ -20,7 +20,7 @@ import PostDeal from './Components/PostDealPage';
 import SeeDeals from './Components/DealsPage';
 import CompanyPostsPage from './Components/CompanyPostsPage';
 import MessagesPage from './Components/MessagesPage';
-
+import PublicCompanyProfile from './Components/PublicCompanyProfile';
 
 function App() {
   const [results, setResults] = useState([]);
@@ -99,6 +99,7 @@ function App() {
         <Route path="/user-company-page" element={<UserCompany />} />
         <Route path="/company-post-page" element={<PostDeal />} />
         <Route path="/deals-page" element={<SeeDeals />} />
+        <Route path="/company/:companyId" element={<PublicCompanyProfile />} />
 
         {/* <Route path="/companies-page" element={<CompanyList  />} /> */}  {/* This route is without admin priviledges */}
         {/* <Route path="/companies-page" element={<CompanyList isAdmin={isAdmin} />} />  {/* The 'isAdmin' prop is */}

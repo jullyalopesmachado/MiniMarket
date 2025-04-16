@@ -241,7 +241,12 @@ export function CompanyList({ user }) {
                     </>
                   ) : (
                     <>
-                      <Card.Title>{company.companyName}</Card.Title>
+                     <Card.Title
+                      style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
+                      onClick={() => navigate(`/company/${company.id}`)}>
+                      {company.companyName}
+                    </Card.Title>
+
                       <Card.Text>{company.companyBio}</Card.Text>
                       <Card.Text><strong>Location:</strong> {company.companyLocation}</Card.Text>
                       <Card.Text><strong>Website:</strong>{" "}
