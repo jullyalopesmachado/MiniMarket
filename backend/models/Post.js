@@ -10,7 +10,8 @@ const postSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   businessName: { type: String, required: true },
   text: { type: String },
-  imageUrl: [{ type: String }], // ✅ Array of image URLs for multiple images
+  imageUrl: [{ type: String }], // ✅ multiple image URLs
+  expirationDate: { type: Date }, // ✅ used to mark as a deal
   comments: [commentSchema],
   createdAt: { type: Date, default: Date.now },
 });
