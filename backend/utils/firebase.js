@@ -1,38 +1,37 @@
-const admin = require('firebase-admin');
-const { v4: uuidv4 } = require('uuid');
-const serviceAccount = require('../firebase-service-account.json'); // ✅ Your service account key
+const admin = require("firebase-admin");
+const { v4: uuidv4 } = require("uuid");
+const path = require("path");
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  storageBucket: 'minimarket-fl.firebasestorage.app' // ✅ Your correct bucket name!
-});
+// ✅ Automatically load the path from .env or fallback to default
+const serviceAccountPath = process.env.GOOGLE_APPLICATION_CREDENTIALS || path.resolve(__dirname, "../config/firebase-service-account.json");
+
+const serviceAccount = require(serviceAccountPath);
+
+// ✅ Initialize Firebase Admin SDK
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    storageBucket: "minimarket-fl.firebasestorage.app", // 🔁 Replace with your actual bucket name
+  });
+}
 
 const bucket = admin.storage().bucket();
 
-const uploadImageToFirebase = async (fileBuffer, fileName, mimeType) => {
-  return new Promise((resolve, reject) => {
-    const blob = bucket.file(`${Date.now()}_${fileName}`); // ✅ Adds timestamp for uniqueness
-    const blobStream = blob.createWriteStream({
+// ✅ Function to upload image buffer to Firebase Storage
+async function uploadImageToFirebase(buffer, filename, mimetype) {
+  const file = bucket.file(`uploads/${Date.now()}-${filename}`);
+  const uuid = uuidv4();
+
+  await file.save(buffer, {
+    metadata: {
+      contentType: mimetype,
       metadata: {
-        contentType: mimeType,
-        metadata: {
-          firebaseStorageDownloadTokens: uuidv4(),
-        }
+        firebaseStorageDownloadTokens: uuid
       }
-    });
-
-    blobStream.on('error', (error) => {
-      console.error("❌ Firebase upload error:", error);
-      reject(error);
-    });
-
-    blobStream.on('finish', () => {
-      const publicUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(blob.name)}?alt=media&token=${blob.metadata.metadata.firebaseStorageDownloadTokens}`;
-      resolve(publicUrl);
-    });
-
-    blobStream.end(fileBuffer);
+    }
   });
-};
+
+  return `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(file.name)}?alt=media&token=${uuid}`;
+}
 
 module.exports = { uploadImageToFirebase };
