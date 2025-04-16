@@ -5,7 +5,6 @@ import {
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
-
 import logoImage from "../Assets/Logo3.png";
 import backgroundImage from "../Assets/home-banner-background.png";
 import backgroundIv from "../Assets/about-background.png";
@@ -15,30 +14,26 @@ export function PostDealPage() {
   const [deal, setDeal] = useState({
     title: "",
     description: "",
-    expirationDate: "",
-    businessName: ""
+    expirationDate: ""
   });
-
+  const [images, setImages] = useState([]);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [error, setError] = useState(null);
 
   const navigate = useNavigate();
-
-
-    
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setDeal((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleImageChange = (e) => {
+    setImages([...e.target.files]);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
-    
-
-    const businessId = localStorage.getItem("businessId");
-    const businessName = localStorage.getItem("businessName");
 
     if (!deal.title || !deal.description || !deal.expirationDate) {
       setError("All fields are required.");
@@ -46,13 +41,17 @@ export function PostDealPage() {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/api/deals/add", {
+      const formData = new FormData();
+      formData.append("text", `${deal.title}\n\n${deal.description}`);
+      formData.append("expirationDate", deal.expirationDate);
+      images.forEach((img) => formData.append("images", img));
+
+      const response = await fetch("http://localhost:3000/api/posts", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ ...deal, businessId, businessName })
+        body: formData
       });
 
       if (!response.ok) {
@@ -61,10 +60,10 @@ export function PostDealPage() {
       }
 
       setShowSuccessModal(true);
-      setDeal({ title: "", description: "", expirationDate: "", businessName: "" });
-      setError(null); // Clear any previous error
+      setDeal({ title: "", description: "", expirationDate: "" });
+      setImages([]);
+      setError(null);
 
-      // Redirect to the deals page after success
       setTimeout(() => {
         setShowSuccessModal(false);
         navigate("/deals-page");
@@ -128,6 +127,16 @@ export function PostDealPage() {
                     />
                   </Form.Group>
 
+                  <Form.Group className="mb-3">
+                    <Form.Label>Upload Images</Form.Label>
+                    <Form.Control
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleImageChange}
+                    />
+                  </Form.Group>
+
                   {error && <p className="text-danger">{error}</p>}
 
                   <Button type="submit" variant="primary">Post Deal</Button>
@@ -150,6 +159,7 @@ export function PostDealPage() {
         </Modal.Footer>
       </Modal>
 
+      {/* Background */}
       <div style={{ position: 'absolute', top: 0, right: 0, width: '150px', height: '350px', backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat' }} />
       <div style={{ position: 'absolute', top: 500, right: 0, width: '350px', height: '300px', backgroundImage: `url(${backgroundBottom})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat' }} />
       <div style={{ position: 'absolute', top: 10, right: 1350, width: '250px', height: '750px', backgroundImage: `url(${backgroundIv})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat' }} />
