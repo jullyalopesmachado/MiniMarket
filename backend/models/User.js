@@ -9,6 +9,8 @@ const userSchema = new mongoose.Schema({
   bio: { type: String },
   location: { type: String },
   website: { type: String },
+  profileImage: { type: String },
+  role: { type: String, enum: ['admin', 'owner', 'user'], default: 'user' },
   createdAt: { type: Date, default: Date.now },
 },
   {collection: 'Login'});

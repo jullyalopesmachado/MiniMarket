@@ -11,7 +11,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 // ✅ Create a post (deal or normal) with optional images
-router.post("/", authMiddleware, upload.array('images', 5), async (req, res) => {
+router.post("/", authMiddleware(["owner", "admin"]), upload.array('images', 5), async (req, res) => {
   try {
     const { text, expirationDate } = req.body;
     let imageUrls = [];

@@ -8,15 +8,14 @@ const multer = require('multer');
 
 // ✅ Models
 const User = require('./models/User');
-const Deal = require('./models/Deal');
+
 
 // ✅ Routes
 const userRoutes = require('./routes/userRoutes');
 const businessRoutes = require('./routes/businessRoutes');
 const opportunityRoutes = require('./routes/opportunityRoutes');
 const messageRoutes = require('./routes/messageRoutes');
-const dealRoutes = require('./routes/dealRoutes');
-const postRoutes = require('./routes/postRoutes');
+
 
 const apiRoutes = require('./models/api');
 const authMiddleware = require('./middleware/auth');
@@ -80,7 +79,9 @@ app.post('/api/login', async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ _id: user._id, role: user.role }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
     res.json({ message: 'Login successful', token });
   } catch (error) {
     console.error("❌ Login Error:", error);
@@ -98,8 +99,8 @@ app.use('/api/posts', postRoutes);
 app.use('/api/inbox', messageRoutes); // in case it's different from /messages
 app.use('/api', apiRoutes); // keep this last to avoid shadowing more specific routes
 
-// ✅ Protected Profile Route
-app.get('/api/profile', authMiddleware, async (req, res) => {
+// ✅ Protected profile route
+app.get('/api/profile', authMiddleware(["user", "owner", "admin"]), async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select('-password');
     res.json(user);
