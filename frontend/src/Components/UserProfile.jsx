@@ -72,6 +72,7 @@ export function UserProfile() {
         setFirstName(first || "");
         setLastName(last || "");
         setUserId(profile._id);
+        localStorage.setItem("userId", profile._id);
         setUserBio(profile.bio || "");
         setUserLocation(profile.location || "");
         setUserWebsite(profile.website || "");
