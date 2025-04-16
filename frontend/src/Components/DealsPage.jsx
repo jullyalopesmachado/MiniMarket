@@ -22,10 +22,8 @@ export function DealsPage() {
   useEffect(() => {
     const fetchDeals = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/deals/view");
-        if (!response.ok) {
-          throw new Error("Failed to fetch deals");
-        }
+        const response = await fetch("http://localhost:3000/api/posts/deals");
+        if (!response.ok) throw new Error("Failed to fetch deals");
         const data = await response.json();
         setDeals(data);
       } catch (error) {
@@ -34,7 +32,6 @@ export function DealsPage() {
         setLoading(false);
       }
     };
-
     fetchDeals();
   }, []);
 
@@ -87,25 +84,29 @@ export function DealsPage() {
         <Container className="mt-5">
           <h3 className="mb-4">Latest Deals from Small Businesses</h3>
           <Row>
-            {loading ? 
-            ( <p>Loading...</p>) :
-            deals && deals.length > 0 ? (
-            currentItems.map((deal) => (
-              <Col md={6} key={deal._id} className="mb-4">
-                <Card className="text-center shadow-sm">
-                  <Card.Body>
-                    <Card.Title>{deal.title}</Card.Title>
-                    <Card.Subtitle className="mb-2 text-muted">by {deal.businessName}</Card.Subtitle>
-                    <Card.Text>
-                      <strong>Expires:</strong> {new Date(deal.expirationDate).toLocaleDateString()}
-                    </Card.Text>
-                    <Button variant="outline-primary" onClick={() => handleShowModal(deal)}>
-                      View Details
-                    </Button>
-                  </Card.Body>
-                </Card>
-              </Col>
-            ))) : (
+            {loading ? (
+              <p>Loading...</p>
+            ) : deals && deals.length > 0 ? (
+              currentItems.map((deal) => (
+                <Col md={6} key={deal._id} className="mb-4">
+                  <Card className="text-center shadow-sm">
+                    {deal.imageUrl && deal.imageUrl.length > 0 && (
+                      <Card.Img variant="top" src={deal.imageUrl[0]} style={{ maxHeight: "200px", objectFit: "cover" }} />
+                    )}
+                    <Card.Body>
+                      <Card.Title>{deal.text.split("\n")[0]}</Card.Title>
+                      <Card.Subtitle className="mb-2 text-muted">by {deal.businessName}</Card.Subtitle>
+                      <Card.Text>
+                        <strong>Expires:</strong> {new Date(deal.expirationDate).toLocaleDateString()}
+                      </Card.Text>
+                      <Button variant="outline-primary" onClick={() => handleShowModal(deal)}>
+                        View Details
+                      </Button>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              ))
+            ) : (
               <p>No deals found</p>
             )}
           </Row>
@@ -133,12 +134,20 @@ export function DealsPage() {
         {/* Modal for Deal Details */}
         <Modal show={showModal} onHide={handleCloseModal}>
           <Modal.Header closeButton>
-            <Modal.Title>{selectedDeal?.title}</Modal.Title>
+            <Modal.Title>{selectedDeal?.text.split("\n")[0]}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <p><strong>Company:</strong> {selectedDeal?.businessName}</p>
-            <p><strong>Description:</strong> {selectedDeal?.description}</p>
+            <p><strong>Description:</strong> {selectedDeal?.text.split("\n").slice(1).join("\n")}</p>
             <p><strong>Expires on:</strong> {new Date(selectedDeal?.expirationDate).toLocaleDateString()}</p>
+            {selectedDeal?.imageUrl?.length > 0 && (
+              <>
+                <hr />
+                {selectedDeal.imageUrl.map((url, i) => (
+                  <img key={i} src={url} alt="Deal" className="img-fluid mb-2" />
+                ))}
+              </>
+            )}
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={handleCloseModal}>Close</Button>
