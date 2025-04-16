@@ -6,26 +6,31 @@ const dotenv = require('dotenv');
 const bcrypt = require('bcryptjs');
 const multer = require('multer');
 
+// ✅ Models
 const User = require('./models/User');
-const Deal = require('./models/Deal'); // ✅ Added Deal model
+const Deal = require('./models/Deal');
 
-const opportunityRoutes = require('./routes/opportunityRoutes');
+// ✅ Routes
 const userRoutes = require('./routes/userRoutes');
 const businessRoutes = require('./routes/businessRoutes');
+const opportunityRoutes = require('./routes/opportunityRoutes');
 const messageRoutes = require('./routes/messageRoutes');
-const dealRoutes = require('./routes/dealRoutes'); // ✅ Added Deal routes
+const dealRoutes = require('./routes/dealRoutes');
+const postRoutes = require('./routes/postRoutes');
 
 const apiRoutes = require('./models/api');
 const authMiddleware = require('./middleware/auth');
 
 dotenv.config();
 
+// ✅ Ensure Firebase credentials are picked up
+process.env.GOOGLE_APPLICATION_CREDENTIALS = './config/firebase-service-account.json';
+
 const app = express();
 const port = process.env.PORT || 3000;
 
-// ✅ CORS
+// ✅ CORS Configuration
 const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174'];
-
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -38,14 +43,11 @@ app.use(cors({
 
 // ✅ Middleware
 app.use(express.json());
-app.use('/api/deals', dealRoutes);
-app.use('/api/opportunities', opportunityRoutes); // 
-
 
 // ✅ Enable Mongoose debug mode
 mongoose.set('debug', true);
 
-// ✅ Environment variable check
+// ✅ Check required environment variables
 if (!process.env.MONGODB_URI || !process.env.JWT_SECRET) {
   console.error("❌ Missing environment variables. Check your .env file.");
   process.exit(1);
@@ -79,7 +81,6 @@ app.post('/api/login', async (req, res) => {
     }
 
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
     res.json({ message: 'Login successful', token });
   } catch (error) {
     console.error("❌ Login Error:", error);
@@ -87,21 +88,17 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// ✅ Routes
+// ✅ API Routes
 app.use('/api/users', userRoutes);
-
-app.use("/api/business", businessRoutes);
-app.use("/api/inbox", messageRoutes);
-app.use("/api/opportunities", opportunityRoutes); 
-app.use("/api", apiRoutes);
 app.use('/api/business', businessRoutes);
+app.use('/api/opportunities', opportunityRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/deals', dealRoutes);
+app.use('/api/posts', postRoutes);
+app.use('/api/inbox', messageRoutes); // in case it's different from /messages
+app.use('/api', apiRoutes); // keep this last to avoid shadowing more specific routes
 
-app.use('/api/deals', dealRoutes); // ✅ Added Deal API route
-
-app.use('/api', apiRoutes); // ✅ Keeping your custom api.js
-
-// ✅ Protected profile route
+// ✅ Protected Profile Route
 app.get('/api/profile', authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select('-password');
@@ -112,13 +109,13 @@ app.get('/api/profile', authMiddleware, async (req, res) => {
   }
 });
 
-// ✅ Global error handler
+// ✅ Global Error Handler
 app.use((err, req, res, next) => {
   console.error("❌ Server Error:", err.stack);
   res.status(500).send('Something broke!');
 });
 
-// ✅ Start server
+// ✅ Start Server
 app.listen(port, () => {
   console.log(`🚀 Server is running on http://localhost:${port}`);
 });
