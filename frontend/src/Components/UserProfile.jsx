@@ -11,7 +11,6 @@ import backgroundImage from "../Assets/home-banner-background.png";
 import backgroundBottom from "../Assets/nobackground.png";
 
 import { Link } from "react-router-dom";
-// Importing Bootstrap styles for UI components
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./UserProfile.css";
 import { updateData } from "./api";
@@ -20,7 +19,7 @@ export function UserProfile() {
   const navigate = useNavigate();
   const handleLogout = () => {
     localStorage.removeItem("token");
-    navigate("/login-signup"); // or "/"
+    navigate("/login-signup"); 
   };  
   const handleClick = (path) => {
     const pathname = path === "home" ? "/" :
@@ -28,12 +27,12 @@ export function UserProfile() {
                     : path === "profile" ? "/user-profile" :
                     path === "companies" ? "/companies-page" : 
                     path === "deals" ? "/deals-page" : "/";
-    // Check if the path is valid and navigate accordingly
+
     if (!pathname) {
       console.error("Invalid path:", pathname);
       return;
     }
-    navigate(pathname); // Navigate to the specified path
+    navigate(pathname); 
   };
 
   const [isEditing, setIsEditing] = useState(false);
@@ -45,7 +44,10 @@ export function UserProfile() {
   const [userId, setUserId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [userMessages, setUserMessages] = useState([]);
+  const [userMessages, setUserMessages] = useState({ sent: [], received: [] });
+  const [sentMessages, setSentMessages] = useState([]);
+  const [receivedMessages, setReceivedMessages] = useState([]);
+
 
 
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -200,22 +202,33 @@ export function UserProfile() {
     }, []);
     
     const fetchMessages = async () => {
-      const userId = localStorage.getItem("userId");
       const token = localStorage.getItem("token");
-      if (!userId || !token) return;
+      const currentUserId = localStorage.getItem("userId");
+      if (!token || !currentUserId) return;
     
       try {
-        const res = await fetch(`http://localhost:3000/api/messages/user/${userId}`, {
+        const res = await fetch(`http://localhost:3000/api/messages/user/${currentUserId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
+    
         const data = await res.json();
-        setUserMessages(data);
+    
+        //  use sentMessages and receivedMessages from backend response
+        if (!data.sentMessages || !data.receivedMessages) {
+          console.error("Expected sentMessages and receivedMessages, got:", data);
+          return;
+        }
+    
+        setUserMessages({
+          sent: data.sentMessages,
+          received: data.receivedMessages
+        });
       } catch (err) {
         console.error("Failed to fetch messages", err);
       }
     };
     
-
+    
   return (
     <>
       {/* Background Images */}
@@ -279,20 +292,32 @@ export function UserProfile() {
                   </Button>
                 </div>
 
-                <Card className="mt-4 shadow-sm">
-                <Card.Body>
-                  <Card.Title>Messages</Card.Title>
-                  {userMessages.length === 0 ? (
-                    <Card.Text>No messages yet.</Card.Text>
-                  ) : (
-                    userMessages.map((msg, index) => (
-                      <div key={index}>
-                        <strong>{msg.senderId === userId ? "To" : "From"}:</strong> {msg.message}
-                      </div>
-                    ))
-                  )}
-                </Card.Body>
-              </Card>
+            <Card className="mt-4 shadow-sm">
+              <Card.Body>
+                <Card.Title>Messages You Sent</Card.Title>
+                {userMessages.sent.length === 0 ? (
+                  <Card.Text>No messages sent.</Card.Text>
+                ) : (
+                  userMessages.sent.map((msg, idx) => (
+                    <div key={idx}>
+                      <strong>To:</strong> {msg.receiverId || "Unknown"} — {msg.message}
+                    </div>
+                  ))
+                )}
+
+                <Card.Title className="mt-4">Messages You Received</Card.Title>
+                {userMessages.received.length === 0 ? (
+                  <Card.Text>No received messages.</Card.Text>
+                ) : (
+                  userMessages.received.map((msg, idx) => (
+                    <div key={idx}>
+                      <strong>From:</strong> {msg.senderId || "Unknown"} — {msg.message}
+                    </div>
+                  ))
+                )}
+              </Card.Body>
+            </Card>
+
 
               </Card.Body>
             </Card>
