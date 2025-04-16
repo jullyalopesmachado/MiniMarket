@@ -6,6 +6,7 @@ import {
   Button,
   Nav,
   Navbar,
+  Form, // 
 } from "react-bootstrap";
 
 import logoImage from "../Assets/Logo3.png";
@@ -20,6 +21,7 @@ function PublicCompanyProfile() {
   const [company, setCompany] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const isLoggedIn = !!localStorage.getItem("token");
+  const [messagem, setMessagem] = useState("");
 
   useEffect(() => {
     const fetchCompany = async () => {
@@ -37,6 +39,47 @@ function PublicCompanyProfile() {
 
     fetchCompany();
   }, [companyId]);
+
+  const handleSendMessage = async () => {
+    console.log("Sending message...");
+    const token = localStorage.getItem("token");
+    const senderId = localStorage.getItem("userId");
+
+    if (!messagem.trim() || !senderId) {
+      alert("Message or sender is missing.");
+      return;
+    }
+
+    try {
+      const res = await fetch(`http://localhost:3000/api/messages/${companyId}/message`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          senderId,
+          receiverId: companyId,
+          message: messagem,
+          companyId,
+        }),
+      });
+
+      console.log("Response status:", res.status);
+
+      if (res.ok) {
+        alert("Message sent successfully!");
+        setMessagem(""); // Clear input
+      } else {
+        const errorData = await res.json();
+        console.error("Failed to send message:", errorData);
+        alert("Failed to send message.");
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+      alert("Error sending message.");
+    }
+  };
 
   return (
     <>
@@ -93,9 +136,17 @@ function PublicCompanyProfile() {
               </Card.Text>
 
               {isLoggedIn && (
-                <Button variant="primary" onClick={() => alert("Messaging functionality coming soon!")}>
-                  Message Company
-                </Button>
+                <Form.Group className="mt-3">
+                  <Form.Label>Message</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={2}
+                    value={messagem}
+                    onChange={(e) => setMessagem(e.target.value)}
+                    placeholder="Type your message..."
+                  />
+                  <Button className="mt-2" onClick={handleSendMessage}>Send Message</Button>
+                </Form.Group>
               )}
             </Card.Body>
           </Card>

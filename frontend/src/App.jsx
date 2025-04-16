@@ -65,8 +65,9 @@ function App() {
       const userData = await response.json();
       console.log("User data fetched:", userData); // Log fetched user data
       // Update the user state with the fetched data
-
+      localStorage.setItem("userId", userData._id); 
       setUser(userData);
+      
     } catch (error) {
       console.error("Error fetching user profile:", error);
     }

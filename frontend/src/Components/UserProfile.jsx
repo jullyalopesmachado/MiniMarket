@@ -45,6 +45,8 @@ export function UserProfile() {
   const [userId, setUserId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [userMessages, setUserMessages] = useState([]);
+
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newCompany, setNewCompany] = useState({
@@ -192,7 +194,27 @@ export function UserProfile() {
         console.error("Error navigating to posts:", err.message);
       }
     };
-  
+    useEffect(() => {
+      fetchProfile();
+      fetchMessages();
+    }, []);
+    
+    const fetchMessages = async () => {
+      const userId = localStorage.getItem("userId");
+      const token = localStorage.getItem("token");
+      if (!userId || !token) return;
+    
+      try {
+        const res = await fetch(`http://localhost:3000/api/messages/user/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        setUserMessages(data);
+      } catch (err) {
+        console.error("Failed to fetch messages", err);
+      }
+    };
+    
 
   return (
     <>
@@ -256,6 +278,22 @@ export function UserProfile() {
                     See My Posts
                   </Button>
                 </div>
+
+                <Card className="mt-4 shadow-sm">
+                <Card.Body>
+                  <Card.Title>Messages</Card.Title>
+                  {userMessages.length === 0 ? (
+                    <Card.Text>No messages yet.</Card.Text>
+                  ) : (
+                    userMessages.map((msg, index) => (
+                      <div key={index}>
+                        <strong>{msg.senderId === userId ? "To" : "From"}:</strong> {msg.message}
+                      </div>
+                    ))
+                  )}
+                </Card.Body>
+              </Card>
+
               </Card.Body>
             </Card>
           )}

@@ -130,22 +130,26 @@ export function CompanyList({ user }) {
   };
 
   const handleSendMessage = async () => {
-    if (!messagem.trim()) {
-      alert("Please enter a message.");
-      return;
-    }
-
+    const token = localStorage.getItem("token");
+    const senderId = localStorage.getItem("userId"); // Make sure you save this on login
+    if (!messagem.trim() || !senderId) return;
+  
     try {
-      const response = await fetch(`/api/companies/${selectedCompany.id}/message`, {
+      const res = await fetch(`http://localhost:3000/api/messages/${selectedCompany.id}/message`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ message: messagem }),
+        body: JSON.stringify({
+          senderId,
+          receiverId: selectedCompany.id,
+          message: messagem,
+          companyId: selectedCompany.id,
+        }),
       });
-
-      if (response.ok) {
+  
+      if (res.ok) {
         alert("Message sent successfully!");
         handleCloseModal();
       } else {
@@ -155,11 +159,11 @@ export function CompanyList({ user }) {
       console.error("Error sending message:", error);
     }
   };
-
+  
   return (
     <div className="min-vh-100 w-100 position-relative">
 
-      {/* ✅ Navbar with conditional links */}
+      {/* Navbar with conditional links */}
       <Navbar bg="light" expand="lg" className="shadow-sm">
         <Container>
           <Navbar.Brand onClick={() => navigate("/")} style={{ cursor: 'pointer' }}>
