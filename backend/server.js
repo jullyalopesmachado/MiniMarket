@@ -9,13 +9,12 @@ const multer = require('multer');
 // ✅ Models
 const User = require('./models/User');
 
-
 // ✅ Routes
 const userRoutes = require('./routes/userRoutes');
 const businessRoutes = require('./routes/businessRoutes');
 const opportunityRoutes = require('./routes/opportunityRoutes');
 const messageRoutes = require('./routes/messageRoutes');
-
+const postRoutes = require('./routes/postRoutes');
 
 const apiRoutes = require('./models/api');
 const authMiddleware = require('./middleware/auth');
@@ -94,10 +93,9 @@ app.use('/api/users', userRoutes);
 app.use('/api/business', businessRoutes);
 app.use('/api/opportunities', opportunityRoutes);
 app.use('/api/messages', messageRoutes);
-app.use('/api/deals', dealRoutes);
 app.use('/api/posts', postRoutes);
-app.use('/api/inbox', messageRoutes); // in case it's different from /messages
-app.use('/api', apiRoutes); // keep this last to avoid shadowing more specific routes
+app.use('/api/inbox', messageRoutes); // if different route path than /messages
+app.use('/api', apiRoutes); // keep last
 
 // ✅ Protected profile route
 app.get('/api/profile', authMiddleware(["user", "owner", "admin"]), async (req, res) => {
