@@ -13,7 +13,7 @@ router.get('/user/:userId', authMiddleware, async (req, res) => {
   return messageController.getMessagesForUser(req, res);
 });
 
-router.post('/:companyId/message', messageController.sendMessage);
+router.post('/:companyId/message', authMiddleware, messageController.sendMessage);
 
 router.get('/:companyId/message-history', messageController.getMessageHistory);
 

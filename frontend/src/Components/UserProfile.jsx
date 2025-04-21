@@ -72,6 +72,7 @@ export function UserProfile() {
         setFirstName(first || "");
         setLastName(last || "");
         setUserId(profile._id);
+        localStorage.setItem("userId", profile._id);
         setUserBio(profile.bio || "");
         setUserLocation(profile.location || "");
         setUserWebsite(profile.website || "");
@@ -300,7 +301,7 @@ export function UserProfile() {
                 ) : (
                   userMessages.sent.map((msg, idx) => (
                     <div key={idx}>
-                      <strong>To:</strong> {msg.receiverId || "Unknown"} — {msg.message}
+                      <strong>To:</strong> {msg.receiverName || msg.receiverId} — {msg.message}
                     </div>
                   ))
                 )}
@@ -311,10 +312,11 @@ export function UserProfile() {
                 ) : (
                   userMessages.received.map((msg, idx) => (
                     <div key={idx}>
-                      <strong>From:</strong> {msg.senderId || "Unknown"} — {msg.message}
+                      <strong>From:</strong> {msg.senderName ||  msg.senderId} — {msg.message}
                     </div>
                   ))
                 )}
+
               </Card.Body>
             </Card>
 

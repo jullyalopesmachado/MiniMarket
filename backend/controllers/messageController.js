@@ -3,12 +3,13 @@ const Login = require('../models/User');
 
 class MessageController {
   async sendMessage(req, res) {
-    const { senderId, receiverId, message, companyId } = req.body;
-
+    const { receiverId, message, companyId } = req.body;
+    const senderId = req.user._id; // ✅ use the logged-in user
+  
     if (!senderId || !receiverId || !message || !companyId) {
       return res.status(400).json({ success: false, message: "Missing fields." });
     }
-
+  
     try {
       const newMessage = await Message.create({
         senderId,
@@ -17,13 +18,24 @@ class MessageController {
         companyId,
         timestamp: new Date(),
       });
-
-      res.status(201).json({ success: true, message: newMessage });
+  
+      // Get sender's name
+      const senderUser = await Login.findById(senderId).select("name");
+      const senderName = senderUser?.name || "Unknown";
+  
+      res.status(201).json({
+        success: true,
+        message: {
+          ...newMessage._doc,
+          senderName
+        }
+      });
     } catch (error) {
       console.error("Error sending message:", error);
       res.status(500).json({ success: false, message: "Failed to send message." });
     }
   }
+  
 
   async getMessagesForUser(req, res) {
     const { userId } = req.params;
