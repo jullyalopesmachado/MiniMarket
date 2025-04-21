@@ -3,7 +3,7 @@ const router = express.Router();
 const messageController = require('../controllers/messageController');
 const authMiddleware = require('../middleware/auth');
 
-router.get('/user/:userId', authMiddleware, async (req, res) => {
+router.get('/user/:userId', authMiddleware(["owner"]), async (req, res) => {
   const { userId } = req.params;
 
   if (req.user._id.toString() !== userId) {
@@ -13,8 +13,8 @@ router.get('/user/:userId', authMiddleware, async (req, res) => {
   return messageController.getMessagesForUser(req, res);
 });
 
-router.post('/:companyId/message', authMiddleware, messageController.sendMessage);
+router.post('/:companyId/message', authMiddleware(["owner", "admin"]), messageController.sendMessage);
 
-router.get('/:companyId/message-history', messageController.getMessageHistory);
+router.get('/:companyId/message-history', authMiddleware(["owner", "admin"]), messageController.getMessageHistory);
 
 module.exports = router;
