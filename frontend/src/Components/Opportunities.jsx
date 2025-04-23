@@ -20,7 +20,8 @@ function OppListPage() {
     description: "",
     type: "",
     location: "",
-    posted_by: ""
+    is_paid: false,
+    amount: 0
   });
   const [businessName, setBusinessName] = useState("");
   const [filteredOpportunities, setFilteredOpportunities] = useState([]);
@@ -33,35 +34,41 @@ function OppListPage() {
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setNewOpportunity((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setNewOpportunity((prev) => ({
+       ...prev,
+        [name]: type === "checkbox" ? checked : value
+     }));
   };
 
   useEffect(() => {
-    const fetchUserBusinessName = async () => {
+    const fetchOpportunities = async () => {
       try {
-      const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:3000/api/profile", {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      
-      if (!response.ok) {
+        const response = await fetch("http://localhost:3000/api/opportunities/view");
+        if (!response.ok) {
+          throw new Error("Failed to fetch opportunities");
+        }
         const data = await response.json();
-        throw new Error(data.message || "Failed to fetch user business name.");
+        console.log("Fetched opportunities:", data);
+        setOpportunities(data.opportunities); // 👈 API returns an `opportunities` array
+      } catch (error) {
+        console.error("Error fetching opportunities:", error);
+      } finally {
+        setLoading(false);
       }
-
-      const data = await response.json();
-      setNewOpportunity((prev) => ({ ...prev, posted_by: data.businessName || "Unknown", }));
-      localStorage.setItem("businessName", data.businessName || "Unknown");
-      console.log("Business name set in local storage:", data.businessName || "Unknown");
-  } catch (error) {
-      console.error("Error fetching user business name:", err.message);
-  }
     };
-
-    fetchUserBusinessName();
+  
+    fetchOpportunities();
   }, []);
+
+   // Update filtered opportunities whenever opportunities or filterType changes
+useEffect(() => {
+  const opps = filterType === "All"
+    ? opportunities
+    : opportunities.filter(opp => opp.type === filterType);
+
+  setFilteredOpportunities(opps || []);
+}, [opportunities, filterType]);
 
 
   const handleSubmit = async (e) => {
@@ -83,7 +90,6 @@ function OppListPage() {
     const opportunityToSubmit = {
       ...newOpportunity,
       businessId,
-      businessName,
       posted_by: businessName
     };
   
@@ -103,48 +109,19 @@ function OppListPage() {
       }
   
       setShowSuccessModal(true);
-      setNewOpportunity({ title: "", description: "", type: "", location: "", posted_by: "" });
+      setNewOpportunity({ title: "", description: "", type: "", location: "", is_paid: false, amount: 0 });
       setError(null);
   
       setTimeout(() => {
         setShowModal(false);
         navigate("/opportunities-page");
-        fetchOpportunities(); // fetch new data
       }, 2000);
     } catch (err) {
       setError(err.message);
     }
   };
   
-  useEffect(() => {
-    const fetchOpportunities = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/api/opportunities/view");
-        if (!response.ok) {
-          throw new Error("Failed to fetch opportunities");
-        }
-        const data = await response.json();
-        console.log("Fetched opportunities:", data);
-        setOpportunities(data.opportunities); // 👈 API returns an `opportunities` array
-      } catch (error) {
-        console.error("Error fetching opportunities:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
   
-    fetchOpportunities();
-  }, []);
-  
-
- // Update filtered opportunities whenever opportunities or filterType changes
-useEffect(() => {
-  const opps = filterType === "All"
-    ? opportunities
-    : opportunities.filter(opp => opp.type === filterType);
-
-  setFilteredOpportunities(opps || []);
-}, [opportunities, filterType]);
 
     
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -300,6 +277,31 @@ useEffect(() => {
                               onChange={handleChange}
                             />
                           </Form.Group>
+
+                          <Form.Group className="mb-3">
+                            <Form.Label>Is Paid?</Form.Label>
+                            <Form.Check>
+                              type="checkbox"
+                              name="is_paid"
+                              label="Is this opportunity paid?"
+                              checked={newOpportunity.is_paid}
+                              onChange={handleChange}
+                        
+                            </Form.Check>
+                          </Form.Group>
+
+                          {newOpportunity.is_paid && (
+  <Form.Group className="mb-3">
+    <Form.Label>Amount</Form.Label>
+    <Form.Control
+      type="number"
+      name="amount"
+      value={newOpportunity.amount}
+      onChange={handleChange}
+      placeholder="Enter payment amount"
+    />
+  </Form.Group>
+)}
         
                           {error && <p className="text-danger">{error}</p>}
         

@@ -75,11 +75,11 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/owned", authMiddleware, async (req, res) => {
+router.get("/owned", authMiddleware(["owner", "admin"]), async (req, res) => {
   try {
     // Find the business associated with the authenticated user
     const business = await Business.findOne({ owner: req.user._id });
-
+    
     if (!business) {
       return res.status(404).json({ message: "No business found for this user" });
     }

@@ -1,17 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const Post = require("../models/Post");
 const User = require("../models/User"); // ✅ Needed to fetch business name
 const authMiddleware = require("../middleware/auth");
 const multer = require('multer');
 const { uploadImageToFirebase } = require('../utils/firebase');
+const Post = require("../models/Post"); // ✅ Import the Post model
 
 // ✅ Setup multer for image uploads
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 // ✅ Create a post (deal or normal) with optional images
-router.post("/", authMiddleware(["owner", "admin"]), upload.array('images', 5), async (req, res) => {
+router.post("/new", authMiddleware(["owner", "admin"]), upload.array('images', 5), async (req, res) => {
   try {
     const { text, expirationDate } = req.body;
     let imageUrls = [];
@@ -73,7 +73,7 @@ router.get("/deals", async (req, res) => {
 });
 
 // ✅ Add comment to a post
-router.post("/:postId/comments", authMiddleware, async (req, res) => {
+router.post("/:postId/comments", authMiddleware(["owner", "admin"]), async (req, res) => {
   try {
     const { text } = req.body;
     const post = await Post.findById(req.params.postId);

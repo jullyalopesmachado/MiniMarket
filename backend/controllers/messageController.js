@@ -18,12 +18,23 @@ class MessageController {
         timestamp: new Date(),
       });
 
-      res.status(201).json({ success: true, message: newMessage });
-    } catch (error) {
-      console.error("Error sending message:", error);
-      res.status(500).json({ success: false, message: "Failed to send message." });
-    }
+    // Get sender's name
+    const senderUser = await Login.findById(senderId).select("name");
+    const senderName = senderUser?.name || "Unknown";
+
+    res.status(201).json({
+      success: true,
+      message: {
+        ...newMessage._doc,
+        senderName
+      }
+    });
+  } catch (error) {
+    console.error("Error sending message:", error);
+    res.status(500).json({ success: false, message: "Failed to send message." });
   }
+}
+
 
   async getMessagesForUser(req, res) {
     const { userId } = req.params;

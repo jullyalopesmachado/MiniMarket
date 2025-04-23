@@ -46,7 +46,7 @@ export function PostDealPage() {
       formData.append("expirationDate", deal.expirationDate);
       images.forEach((img) => formData.append("images", img));
 
-      const response = await fetch("http://localhost:3000/api/posts", {
+      const response = await fetch("http://localhost:3000/api/posts/new", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`

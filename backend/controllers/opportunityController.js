@@ -1,5 +1,6 @@
 const Opportunity = require('../models/Opportunities');
 const mongoose = require('mongoose');
+const Business = require('../models/Business'); // Assuming you have a Business model
 
 class OpportunityController {
 
@@ -42,6 +43,7 @@ class OpportunityController {
       res.status(500).json({ success: false, message: 'Failed to fetch opportunities' });
     }
   }
+  
 
   // POST create a new opportunity
   async createOpportunity(req, res) {
@@ -50,34 +52,42 @@ class OpportunityController {
       description,
       type,
       location = 'Not specified',
-      businessId,
-      businessName,
-      is_paid = false,
-      amount = 0
+  
     } = req.body;
-
-    if (!title || !description || !type || !businessId || !businessName) {
-      return res.status(400).json({
+  
+    // Ensure the user is authenticated and has a business
+    const userId = req.user?._id; // Assuming `authMiddleware` attaches `user` to `req`
+    if (!userId) {
+      return res.status(401).json({
         success: false,
-        message: 'Title, description, type, businessId, and businessName are required.'
+        message: 'Unauthorized. User must be logged in to create an opportunity.'
       });
     }
-
+  
     try {
+      // Find the business associated with the authenticated user
+      const business = await Business.findOne({ owner: userId });
+      if (!business) {
+        return res.status(404).json({
+          success: false,
+          message: 'No business found for the authenticated user.'
+        });
+      }
+  
+      // Create the new opportunity
       const newOpportunity = new Opportunity({
         title,
         description,
         type,
         location,
-        businessId,
-        businessName,
-        posted_by: businessName,
-        is_paid,
-        amount: is_paid ? amount : 0
+        businessId: business._id, // Use the business ID from the authenticated user
+        posted_by: business.name, // Optional: duplicate for clarity
+
       });
-
+  
       await newOpportunity.save();
-
+      console.log('New opportunity created:', newOpportunity);
+  
       res.status(201).json({ success: true, opportunity: newOpportunity });
     } catch (error) {
       console.error('Error creating opportunity:', error);

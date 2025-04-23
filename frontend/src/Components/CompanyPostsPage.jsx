@@ -32,34 +32,102 @@ const CompanyPostsPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    
+
     const fetchCompany = async () => {
-      const res = await fetch(`http://localhost:3000/api/business/${companyId}`);
+try {
+      const res = await fetch(`http://localhost:3000/api/business/owned`, {
+        method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // Include the token
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to fetch company: ${res.statusText}`);
+    }
+
       const data = await res.json();
+      console.log("Company Data:", data);
       setCompany(data);
-    };
+      
+  } catch (error) {
+      console.error("Error fetching company data:", error);
+    }
+  };
+
+  fetchCompany();
+}, []);
+
+  useEffect(() => {
+    if (!company) return; // Ensure companyId is available
+    let filtered = [];
+
+    const token = localStorage.getItem("token");
 
     const fetchDeals = async () => {
-      const res = await fetch("http://localhost:3000/api/deals/view");
+      const res = await fetch("http://localhost:3000/api/posts", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Include the token
+        },
+      });
       const data = await res.json();
-      const filtered = data.filter(deal =>
-        String(deal.businessId?._id || deal.businessId) === String(companyId)
+      console.log("Deals Data:", data);
+
+      if (!company || !company.owner) {
+        console.error("Company or owner ID is not available.");
+        return;
+      }
+      
+      
+      filtered = data.filter(deal =>
+        deal.user && String(deal.user._id || deal.user) === String(company.owner)
       );
+      console.log("Filtered Deals:", filtered);
       setDeals(filtered);
     };
 
     const fetchOpportunities = async () => {
-      const res = await fetch("http://localhost:3000/api/opportunities/view");
+      const res = await fetch("http://localhost:3000/api/opportunities", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Include the token
+        },
+      });
       const data = await res.json();
-      const filtered = (data.opportunities || []).filter(opp =>
-        String(opp.businessId?._id || opp.businessId) === String(companyId)
-      );
+      console.log("Opportunities Data:", data);
+
+      if (!company || !company._id) {
+        console.error("Company or owner ID is not available.");
+        return;
+      }
+      
+// Log each opportunity to verify the structure
+data.forEach((opp) => console.log("Opportunity Object:", opp));
+
+// Handle cases where data is not an array or is undefined
+if (!Array.isArray(data)) {
+  console.error("Invalid opportunities data format.");
+  return;
+}
+
+// Filter opportunities by businessId matching company._id
+const filtered = data.filter(opp =>
+  opp.businessId && String(opp.businessId._id || opp.businessId) === String(company._id)
+);
+      console.log("Filtered Opportunities:", filtered);
       setOpportunities(filtered);
     };
 
-    fetchCompany();
-    fetchDeals();
-    fetchOpportunities();
-  }, [companyId]);
+
+      fetchDeals();
+      fetchOpportunities();
+  }, [company]);
 
   const handleShowModal = (post) => {
     setSelectedPost(post);
@@ -69,7 +137,7 @@ const CompanyPostsPage = () => {
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedPost(null);
-  };
+  }; 
 
   const indexOfLastDeal = currentDealsPage * itemsPerPage;
   const indexOfFirstDeal = indexOfLastDeal - itemsPerPage;
