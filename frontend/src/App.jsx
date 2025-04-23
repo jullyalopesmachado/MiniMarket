@@ -1,6 +1,7 @@
 import "./App.css"; 
 import React, { useState, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
+import MessagesGroupedPage from "./Components/MessagesGroupedPage";
 
 import { SearchBar } from "./Components/SearchBar";
 import { SearchResultList } from "./Components/SearchResultList";
@@ -101,6 +102,10 @@ function App() {
         <Route path="/company-post-page" element={<PostDeal />} />
         <Route path="/deals-page" element={<SeeDeals />} />
         <Route path="/company/:companyId" element={<PublicCompanyProfile />} />
+
+
+        <Route path="/messages-grouped" element={<MessagesGroupedPage />} />
+
 
         {/* <Route path="/companies-page" element={<CompanyList  />} /> */}  {/* This route is without admin priviledges */}
         {/* <Route path="/companies-page" element={<CompanyList isAdmin={isAdmin} />} />  {/* The 'isAdmin' prop is */}

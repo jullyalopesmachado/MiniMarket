@@ -285,40 +285,17 @@ export function UserProfile() {
                   <Button variant="outline-primary" onClick={() => navigate('/deals-page')}>
                     Latest Deals
                   </Button>
-                  <Button variant="primary" onClick={() => navigate('/user-company-page')}>
+                  <Button variant="outline-primary" onClick={() => navigate('/user-company-page')}>
                     View Company 
                   </Button>
-                  <Button variant="outline-secondary" onClick={handleSeeMyPosts}>
+                  <Button variant="outline-primary" onClick={handleSeeMyPosts}>
                     See My Posts
                   </Button>
+                  <Button variant="outline-primary" onClick={() => navigate('/messages-grouped')}>
+                   Conversations
+                </Button>
                 </div>
 
-            <Card className="mt-4 shadow-sm">
-              <Card.Body>
-                <Card.Title>Messages You Sent</Card.Title>
-                {userMessages.sent.length === 0 ? (
-                  <Card.Text>No messages sent.</Card.Text>
-                ) : (
-                  userMessages.sent.map((msg, idx) => (
-                    <div key={idx}>
-                      <strong>To:</strong> {msg.receiverName || msg.receiverId} — {msg.message}
-                    </div>
-                  ))
-                )}
-
-                <Card.Title className="mt-4">Messages You Received</Card.Title>
-                {userMessages.received.length === 0 ? (
-                  <Card.Text>No received messages.</Card.Text>
-                ) : (
-                  userMessages.received.map((msg, idx) => (
-                    <div key={idx}>
-                      <strong>From:</strong> {msg.senderName ||  msg.senderId} — {msg.message}
-                    </div>
-                  ))
-                )}
-
-              </Card.Body>
-            </Card>
 
 
               </Card.Body>
