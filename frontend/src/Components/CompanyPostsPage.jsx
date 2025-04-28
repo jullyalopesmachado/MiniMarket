@@ -184,7 +184,7 @@ const filtered = data.filter(opp =>
               <Col md={6} key={deal._id} className="mb-4">
                 <Card className="text-center shadow-sm">
                   <Card.Body>
-                    <Card.Title>{deal.title}</Card.Title>
+                  <Card.Title>{deal.text?.split("\n")[0] || "No Title"}</Card.Title>
                     <Card.Subtitle className="mb-2 text-muted">Expires on {new Date(deal.expirationDate).toLocaleDateString()}</Card.Subtitle>
                     <Button variant="outline-primary" onClick={() => handleShowModal(deal)}>
                       View Details
@@ -246,7 +246,7 @@ const filtered = data.filter(opp =>
         {/* Modal for Details */}
         <Modal show={showModal} onHide={handleCloseModal}>
           <Modal.Header closeButton>
-            <Modal.Title>{selectedPost?.title}</Modal.Title>
+          <Modal.Title>{selectedPost?.text?.split("\n")[0]}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             {selectedPost?.description && (
