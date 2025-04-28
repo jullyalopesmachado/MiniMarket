@@ -278,35 +278,65 @@ export function UserProfile() {
 
       {/* Create Company Modal */}
       <Modal show={showCreateModal} onHide={() => setShowCreateModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Create New Company</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {creationSuccess && <Alert variant="success">Company created successfully!</Alert>}
-          <Form>
-            <Form.Group className="mb-2">
-              <Form.Label>Location</Form.Label>
-              <Form.Control value={newCompany.location} onChange={(e) => setNewCompany({ ...newCompany, location: e.target.value })} />
-            </Form.Group>
-            <Form.Group className="mb-2">
-              <Form.Label>Email</Form.Label>
-              <Form.Control type="email" value={newCompany.email} onChange={(e) => setNewCompany({ ...newCompany, email: e.target.value })} />
-            </Form.Group>
-            <Form.Group className="mb-2">
-              <Form.Label>Website</Form.Label>
-              <Form.Control value={newCompany.website} onChange={(e) => setNewCompany({ ...newCompany, website: e.target.value })} />
-            </Form.Group>
-            <Form.Group className="mb-2">
-              <Form.Label>Description</Form.Label>
-              <Form.Control as="textarea" rows={3} value={newCompany.description} onChange={(e) => setNewCompany({ ...newCompany, description: e.target.value })} />
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowCreateModal(false)}>Cancel</Button>
-          <Button variant="primary" onClick={createCompany}>Create Company</Button>
-        </Modal.Footer>
-      </Modal>
+  <Modal.Header closeButton>
+    <Modal.Title>Create New Company</Modal.Title>
+  </Modal.Header>
+  <Modal.Body>
+    {creationSuccess && <Alert variant="success">Company created successfully!</Alert>}
+    <Form>
+      <Form.Group className="mb-2">
+        <Form.Label>Location</Form.Label>
+        <Form.Control
+          value={newCompany.location}
+          onChange={(e) => setNewCompany({ ...newCompany, location: e.target.value })}
+        />
+      </Form.Group>
+      <Form.Group className="mb-2">
+        <Form.Label>Email</Form.Label>
+        <Form.Control
+          type="email"
+          value={newCompany.email}
+          onChange={(e) => setNewCompany({ ...newCompany, email: e.target.value })}
+        />
+      </Form.Group>
+      <Form.Group className="mb-2">
+        <Form.Label>Phone</Form.Label>
+        <Form.Control
+          type="text"
+          value={newCompany.phone || ""}
+          onChange={(e) => setNewCompany({ ...newCompany, phone: e.target.value })}
+        />
+      </Form.Group>
+      <Form.Group className="mb-2">
+        <Form.Label>Website</Form.Label>
+        <Form.Control
+          value={newCompany.website}
+          onChange={(e) => setNewCompany({ ...newCompany, website: e.target.value })}
+        />
+      </Form.Group>
+      <Form.Group className="mb-2">
+        <Form.Label>Description</Form.Label>
+        <Form.Control
+          as="textarea"
+          rows={3}
+          value={newCompany.description}
+          onChange={(e) => setNewCompany({ ...newCompany, description: e.target.value })}
+        />
+      </Form.Group>
+    </Form>
+  </Modal.Body>
+  <Modal.Footer>
+    <Button variant="secondary" onClick={() => setShowCreateModal(false)}>
+      Cancel
+    </Button>
+    <Button variant="primary" onClick={createCompany}>
+      Create Company
+    </Button>
+  </Modal.Footer>
+</Modal>
+<div className="text-center mt-4 mb-2">
+  <p>© 2025 MiniMarket. All rights reserved.</p>
+</div>
     </>
   );
 }
