@@ -74,24 +74,39 @@ useEffect(() => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
     const businessId = localStorage.getItem("businessId");
     const businessName = localStorage.getItem("businessName");
+    console.log("User ID:", userId);
+    console.log("Business ID:", businessId);
+    console.log("Business Name:", businessName);
+
   
     if (!newOpportunity.title || !newOpportunity.description || !newOpportunity.type || !newOpportunity.location) {
       setError("All fields are required.");
       return;
     }
   
-    if (!businessId || !businessName) {
+    if (!userId || !businessId || !businessName) {
       setError("Missing business ID or name. Please make sure your business is registered.");
+      return;
+    }
+
+    if (newOpportunity.is_paid && newOpportunity.amount <= 0) {
+      setError("Amount must be greater than 0 for paid opportunities.");
       return;
     }
   
     const opportunityToSubmit = {
+      userId,
       ...newOpportunity,
       businessId,
-      posted_by: businessName
+      posted_by: businessName,
+      is_paid: newOpportunity.is_paid,
+      amount: newOpportunity.is_paid ? newOpportunity.amount : 0
     };
+
+    console.log("Opportunity to submit:", opportunityToSubmit);
   
     try {
       const response = await fetch("http://localhost:3000/api/opportunities/new", {
@@ -102,14 +117,21 @@ useEffect(() => {
         },
         body: JSON.stringify(opportunityToSubmit)
       });
+
+      console.log("Response from server:", response);
   
       if (!response.ok) {
+        if (response.status === 204) {
+    
+          throw new Error("No content returned from the server.");
+        }
         const data = await response.json();
+        console.error("Error response data:", data);
         throw new Error(data.message || "Failed to post opportunity.");
       }
   
       setShowSuccessModal(true);
-      setNewOpportunity({ title: "", description: "", type: "", location: "", is_paid: false, amount: 0 });
+      setNewOpportunity({ title: "", description: "", type: "", location: "", is_paid: false, amount: 1 });
       setError(null);
   
       setTimeout(() => {
@@ -279,15 +301,14 @@ useEffect(() => {
                           </Form.Group>
 
                           <Form.Group className="mb-3">
-                            <Form.Label>Is Paid?</Form.Label>
-                            <Form.Check>
+                            <Form.Label>Is This Opportunity Paid?</Form.Label>
+                            <Form.Check
                               type="checkbox"
                               name="is_paid"
-                              label="Is this opportunity paid?"
                               checked={newOpportunity.is_paid}
                               onChange={handleChange}
                         
-                            </Form.Check>
+                            />
                           </Form.Group>
 
                           {newOpportunity.is_paid && (
@@ -319,7 +340,7 @@ useEffect(() => {
                 </Modal.Header>
                 <Modal.Body>Your Opportunity posted successfully!</Modal.Body>
                 <Modal.Footer>
-                  <Button variant="success" onClick={() => navigate("/opportunities-page")}>
+                  <Button variant="success" onClick={() => {setShowSuccessModal(false), navigate("/opportunities-page")}}>
                     OK
                   </Button>
                 </Modal.Footer>

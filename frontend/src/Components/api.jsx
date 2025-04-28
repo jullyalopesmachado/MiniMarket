@@ -95,3 +95,35 @@ export const fetchData = async ({ value, action }) => {
     throw error;
   }
   };
+
+  export const fetchCompany = async (company, loading) => {
+
+    const token = localStorage.getItem("token");
+    if (!token) return null;
+
+    try {
+      const response = await fetch("http://localhost:3000/api/business/owned", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) throw new Error("Error fetching company");
+
+      const userCompany = await response.json();
+    
+
+      if (userCompany) {
+        localStorage.setItem("businessId", userCompany._id);
+        localStorage.setItem("businessName", userCompany.name); // optional for display
+        return userCompany;
+      }        
+
+      return null; // No company found
+    } catch (err) {
+      console.error("Failed to fetch company:", err);
+      return null; // Handle error gracefully
+    } 
+  };

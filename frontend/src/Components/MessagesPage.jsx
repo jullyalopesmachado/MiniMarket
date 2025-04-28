@@ -44,6 +44,7 @@ const MessagesPage = () => {
         Authorization: `Bearer ${localStorage.getItem("token")}`
       },
       body: JSON.stringify({
+        senderId: localStorage.getItem("businessId"),
         receiverId: companyId,
         message: newMessage,
         companyId

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   Container, Row, Col, Button, Alert, Card, Form, Nav, Navbar, Spinner, Modal
 } from 'react-bootstrap';
+import { fetchCompany } from "./api";
 
 import avatarImage from "../Assets/userBlue.png";
 import logoImage from "../Assets/Logo3.png";
@@ -86,6 +87,7 @@ export function UserProfile() {
 
   useEffect(() => {
     fetchProfile();
+    fetchCompany(); 
   }, []);
 
   const handleSave = async () => {
@@ -127,7 +129,7 @@ export function UserProfile() {
       });
 
       if (!response.ok) {
-        if (response.status === 404) {
+        if (response.status === 403) {
           // No business found, show the create modal
           setShowCreateModal(true);
         } else {
@@ -145,6 +147,7 @@ export function UserProfile() {
 
   const createCompany = async () => {
     const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
     if (!token || !userId) return;
 
     const payload = {
@@ -169,6 +172,8 @@ export function UserProfile() {
       setCreationSuccess(true);
       setNewCompany({ name: "", location: "", email: "", website: "", description: "" });
 
+      fetchCompany();
+
       setTimeout(() => {
         setCreationSuccess(false);
         setShowCreateModal(false);
@@ -177,6 +182,8 @@ export function UserProfile() {
       alert(`Failed to create company: ${err.message}`);
     }
   };
+
+  
     const handleSeeMyPosts = async () => {
       const token = localStorage.getItem("token");
       console.log("Token in use:", token);
@@ -199,35 +206,10 @@ export function UserProfile() {
     };
     useEffect(() => {
       fetchProfile();
-      fetchMessages();
+      
     }, []);
     
-    const fetchMessages = async () => {
-      const token = localStorage.getItem("token");
-      const currentUserId = localStorage.getItem("userId");
-      if (!token || !currentUserId) return;
-    
-      try {
-        const res = await fetch(`http://localhost:3000/api/messages/user/${currentUserId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-    
-        const data = await res.json();
-    
-        //  use sentMessages and receivedMessages from backend response
-        if (!data.sentMessages || !data.receivedMessages) {
-          console.error("Expected sentMessages and receivedMessages, got:", data);
-          return;
-        }
-    
-        setUserMessages({
-          sent: data.sentMessages,
-          received: data.receivedMessages
-        });
-      } catch (err) {
-        console.error("Failed to fetch messages", err);
-      }
-    };
+  
     
     
   return (
@@ -285,39 +267,17 @@ export function UserProfile() {
                   <Button variant="outline-primary" onClick={() => navigate('/deals-page')}>
                     Latest Deals
                   </Button>
-                  <Button variant="primary" onClick={() => navigate('/user-company-page')}>
+                  <Button variant="outline-primary" onClick={() => handleMyCompanyClick()}>
                     View Company 
                   </Button>
-                  <Button variant="outline-secondary" onClick={handleSeeMyPosts}>
+                  <Button variant="outline-primary" onClick={handleSeeMyPosts}>
                     See My Posts
                   </Button>
+                  <Button variant="outline-primary" onClick={() => navigate('/messages-grouped')}>
+                   Conversations
+                </Button>
                 </div>
 
-            <Card className="mt-4 shadow-sm">
-              <Card.Body>
-                <Card.Title>Messages You Sent</Card.Title>
-                {userMessages.sent.length === 0 ? (
-                  <Card.Text>No messages sent.</Card.Text>
-                ) : (
-                  userMessages.sent.map((msg, idx) => (
-                    <div key={idx}>
-                      <strong>To:</strong> {msg.receiverId || "Unknown"} — {msg.message}
-                    </div>
-                  ))
-                )}
-
-                <Card.Title className="mt-4">Messages You Received</Card.Title>
-                {userMessages.received.length === 0 ? (
-                  <Card.Text>No received messages.</Card.Text>
-                ) : (
-                  userMessages.received.map((msg, idx) => (
-                    <div key={idx}>
-                      <strong>From:</strong> {msg.senderId || "Unknown"} — {msg.message}
-                    </div>
-                  ))
-                )}
-              </Card.Body>
-            </Card>
 
 
               </Card.Body>
@@ -365,10 +325,7 @@ export function UserProfile() {
           <Modal.Body>
             {creationSuccess && <Alert variant="success">Company created successfully!</Alert>}
             <Form>
-              <Form.Group className="mb-2">
-                <Form.Label>Name</Form.Label>
-                <Form.Control value={newCompany.name} onChange={(e) => setNewCompany({ ...newCompany, name: e.target.value })} />
-              </Form.Group>
+              
               <Form.Group className="mb-2">
                 <Form.Label>Location</Form.Label>
                 <Form.Control value={newCompany.location} onChange={(e) => setNewCompany({ ...newCompany, location: e.target.value })} />
@@ -389,7 +346,7 @@ export function UserProfile() {
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={() => setShowCreateModal(false)}>Cancel</Button>
-            <Button variant="primary" onClick={createCompany}>Create Company</Button>
+            <Button variant="primary" onClick={() => createCompany()}>Create Company</Button>
           </Modal.Footer>
         </Modal>
       </div>

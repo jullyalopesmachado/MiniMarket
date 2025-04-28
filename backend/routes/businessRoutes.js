@@ -5,10 +5,12 @@ const router = express.Router();
 const authMiddleware = require("../middleware/auth");
 
 // Add a new business (Protected Route)
-router.post('/add', authMiddleware, async (req, res) => {
+router.post('/add', authMiddleware(["user"]), async (req, res) => {
   try {
-    const {description, location, website } = req.body;
+    const {email, description, location, website } = req.body;
     
+    console.log("📦 Incoming body:", req.body);
+
 
     const user = await User.findById(req.user._id);
             if (!user) {
@@ -16,7 +18,7 @@ router.post('/add', authMiddleware, async (req, res) => {
             }
 
 
-            if (!user.businessName || !user.email) {
+            if (!user.businessName) {
               return res.status(400).json({ message: "User is missing required fields (businessName or email)" });
             }
         
@@ -27,20 +29,27 @@ router.post('/add', authMiddleware, async (req, res) => {
           
     console.log("👤 Owner from token:", user);
     console.log("📦 Incoming body:", req.body);
-    console.log("📦 User email and business:", user.email); // Debugging log
 
     const newBusiness = new Business({
       owner: user._id,
       name: user.businessName,
       description,
       location,
-      email: user.email,
+      email,
       website
     });
 
     console.log("New Business:", newBusiness); // Debugging log
 
     await newBusiness.save();
+
+    const result = await User.updateOne(
+      { _id : req.user._id }, // Use the user ID from the token
+      { $set: { role: 'owner' } }    // Set the default role to 'user'
+    );
+
+    console.log("User role updated:", result); // Debugging log
+
     console.log("✅ Business saved:", newBusiness);
     res.status(201).json({ message: "Business created successfully", newBusiness });
 

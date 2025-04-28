@@ -24,3 +24,4 @@ config
 *.sln
 *.sw?
 backend\config\firebase-service-account.json
+backend/updateUsers.js

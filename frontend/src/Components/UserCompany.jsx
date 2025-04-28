@@ -8,6 +8,7 @@ import {
   Alert,
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { fetchCompany } from "./api";
 
 import logoImage from "../Assets/Logo3.png";
 import avatarImage from "../Assets/compphoto1.png";
@@ -22,37 +23,21 @@ export function UserCompany() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchCompany = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-  
-      try {
-        const response = await fetch("http://localhost:3000/api/business/owned", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-  
-        if (!response.ok) throw new Error("Error fetching company");
-  
-        const userCompany = await response.json();
-      
-  
-        if (userCompany) {
-          setCompany(userCompany);
-          localStorage.setItem("businessId", userCompany._id);
-          localStorage.setItem("businessName", userCompany.name); // optional for display
-        }        
-      } catch (err) {
-        console.error("Failed to fetch company:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+const loadCompany = async () => {
+    const data = await fetchCompany();
+    if (data) {
+      setCompany(data);
+      setUserId(localStorage.getItem("userId"));
+      localStorage.setItem("businessId", data._id);
+      localStorage.setItem("businessName", data.name);
+    } else {
+      console.error("No data found for the company.");
+    }
+    setIsLoading(false)
+  };
 
-    fetchCompany();
+    loadCompany();
+
     
   }, []);
 

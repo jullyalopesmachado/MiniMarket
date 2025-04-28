@@ -1,6 +1,8 @@
 const Opportunity = require('../models/Opportunities');
 const mongoose = require('mongoose');
 const Business = require('../models/Business'); // Assuming you have a Business model
+const express = require('express');
+const router = express.Router();
 
 class OpportunityController {
 
@@ -45,55 +47,7 @@ class OpportunityController {
   }
   
 
-  // POST create a new opportunity
-  async createOpportunity(req, res) {
-    const {
-      title,
-      description,
-      type,
-      location = 'Not specified',
-  
-    } = req.body;
-  
-    // Ensure the user is authenticated and has a business
-    const userId = req.user?._id; // Assuming `authMiddleware` attaches `user` to `req`
-    if (!userId) {
-      return res.status(401).json({
-        success: false,
-        message: 'Unauthorized. User must be logged in to create an opportunity.'
-      });
-    }
-  
-    try {
-      // Find the business associated with the authenticated user
-      const business = await Business.findOne({ owner: userId });
-      if (!business) {
-        return res.status(404).json({
-          success: false,
-          message: 'No business found for the authenticated user.'
-        });
-      }
-  
-      // Create the new opportunity
-      const newOpportunity = new Opportunity({
-        title,
-        description,
-        type,
-        location,
-        businessId: business._id, // Use the business ID from the authenticated user
-        posted_by: business.name, // Optional: duplicate for clarity
 
-      });
-  
-      await newOpportunity.save();
-      console.log('New opportunity created:', newOpportunity);
-  
-      res.status(201).json({ success: true, opportunity: newOpportunity });
-    } catch (error) {
-      console.error('Error creating opportunity:', error);
-      res.status(500).json({ success: false, message: 'Failed to create opportunity' });
-    }
-  }
 
   // GET opportunity by ID
   async getOpportunityById(req, res) {

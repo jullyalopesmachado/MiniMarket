@@ -43,7 +43,7 @@ function PublicCompanyProfile() {
   const handleSendMessage = async () => {
     console.log("Sending message...");
     const token = localStorage.getItem("token");
-    const senderId = localStorage.getItem("userId");
+    const senderId = localStorage.getItem("businessId");
 
     if (!messagem.trim() || !senderId) {
       alert("Message or sender is missing.");
