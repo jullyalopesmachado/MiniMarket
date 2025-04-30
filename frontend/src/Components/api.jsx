@@ -96,9 +96,10 @@ export const fetchData = async ({ value, action }) => {
   }
   };
 
-  export const fetchCompany = async (company, loading) => {
+  export const fetchCompany = async () => {
 
     const token = localStorage.getItem("token");
+    console.log("Token:", token); // Check if token is available
     if (!token) return null;
 
     try {

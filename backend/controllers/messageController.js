@@ -173,13 +173,8 @@ businesses.forEach(business => {
 
       const businessIds = Array.from(new Set(messages.flatMap(msg => [msg.senderId, msg.receiverId])));
      
-     console.log("User IDs:", businessIds);
-      const users = await Login.find({ _id: { $in: businessIds } }, { _id: 1, name: 1 });
-      const userMap = {};
-      users.forEach(user => userMap[user._id.toString()] = user.name);
 
 
-      console.log("User Map:", userMap);
       // Fetch all businesses involved in the messages
 const businesses = await Business.find({ _id: { $in: businessIds } }, { _id: 1, name: 1 });
       console.log("Businesses:", businesses);
@@ -195,15 +190,11 @@ businesses.forEach(business => {
       console.log("Message:", msg);
       console.log("Sender ID:", msg.senderId);
       console.log("Receiver ID:", msg.receiverId);
-      console.log("User ID:", userId);
-      console.log("fromMe:", msg.senderId === userId);
     
       
 
-      const myUser = userId;
       const otherUser = msg.receiverId === businessId ? msg.senderId : msg.receiverId;
 
-      console.log("My User ID:", myUser);
       console.log("Other User ID:", otherUser);
 
       const otherUserId = msg.senderId.equals(businessId) ? msg.receiverId : msg.senderId;

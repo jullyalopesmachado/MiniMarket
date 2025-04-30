@@ -13,10 +13,11 @@ router.get('/user/:userId/business/:businessId', authMiddleware(["owner","admin"
   return messageController.getMessagesForUser(req, res);
 });
 
-router.get('/business/:businessId/private/:companyId', authMiddleware(["owner","admin"]), async (req, res) => {
+router.get('/business/:businessId/company/:companyId', authMiddleware(["owner","admin"]), async (req, res) => {
   const { businessId, companyId } = req.params;
+  console.log("Request body:", req.params);
 
-  if (req.user._id.toString() !== userId) {
+  if (!companyId || !businessId) {
     return res.status(403).json({ error: "Access denied." });
   }
 

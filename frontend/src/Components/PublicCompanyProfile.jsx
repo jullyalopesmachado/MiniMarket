@@ -7,6 +7,8 @@ import {
   Nav,
   Navbar,
   Form, // 
+  Row,
+  Col,
 } from "react-bootstrap";
 
 import logoImage from "../Assets/Logo3.png";
@@ -15,15 +17,21 @@ import backgroundImage from "../Assets/home-banner-background.png";
 import backgroundBottom from "../Assets/nobackground.png";
 import backgroundIv from "../Assets/about-background.png";
 
+const businessId = localStorage.getItem("businessId");
+
+
 function PublicCompanyProfile() {
   const { companyId } = useParams();
   const navigate = useNavigate();
   const [company, setCompany] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const isLoggedIn = !!localStorage.getItem("token");
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
   const [messagem, setMessagem] = useState("");
+  const [messages, setMessages] = useState([]); 
 
+  
   useEffect(() => {
+
     const fetchCompany = async () => {
       try {
         const response = await fetch(`http://localhost:3000/api/business/${companyId}`);
@@ -37,8 +45,50 @@ function PublicCompanyProfile() {
       }
     };
 
+    const fetchMessages = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const businessId = localStorage.getItem("businessId");
+
+       
+
+        const response = await fetch(`http://localhost:3000/api/messages/business/${businessId}/company/${companyId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) throw new Error("Failed to fetch messages");
+
+        const data = await response.json();
+        console.log("Fetched messages:", data);
+        
+        // Extract messages from the response
+    const groupedMessages = data.sortedGroupedMessages || {};
+    const companyMessages = groupedMessages[companyId].messages || [];
+
+    console.log("Company messages:", companyMessages); // Log the messages for debugging
+    setMessages(companyMessages); // Update state with the extracted messages
+  
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      }
+    };
+
     fetchCompany();
+    fetchMessages();
   }, [companyId]);
+
+  useEffect(() => {
+  const handleStorageChange = () => {
+    setIsLoggedIn(!!localStorage.getItem("token"));
+  };
+
+  window.addEventListener("storage", handleStorageChange);
+  return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
 
   const handleSendMessage = async () => {
     console.log("Sending message...");
@@ -58,7 +108,7 @@ function PublicCompanyProfile() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          senderId,
+          senderId: senderId,
           receiverId: companyId,
           message: messagem,
           companyId,
@@ -68,16 +118,21 @@ function PublicCompanyProfile() {
       console.log("Response status:", res.status);
 
       if (res.ok) {
-        alert("Message sent successfully!");
+        const newMessage = await res.json();
+        setMessages((prevMessages) => [...prevMessages, 
+          {
+            ...newMessage.text,
+            fromMe: true, // Ensure the message is marked as sent by the user
+          },
+        ]);
+
+        console.log("Message sent successfully!");
         setMessagem(""); // Clear input
       } else {
-        const errorData = await res.json();
-        console.error("Failed to send message:", errorData);
-        alert("Failed to send message.");
+        console.error("Failed to send message.");
       }
     } catch (error) {
       console.error("Error sending message:", error);
-      alert("Error sending message.");
     }
   };
 
@@ -109,13 +164,16 @@ function PublicCompanyProfile() {
 
         {/* Company Profile Card */}
         <Container className="d-flex flex-column justify-content-center align-items-center mt-5">
-          <Card style={{ width: '28rem' }} className="text-center shadow">
-            <Card.Img
-              variant="top"
-              src={companyPhoto}
-              className="rounded-circle mx-auto mt-4"
-              style={{ width: "40%", height: "auto" }}
-            />
+          <Row>
+            {/* Company Info Section */}
+            <Col md={8}>
+              <Card style={{ width: '100%' }} className="text-center shadow">
+              <Card.Img
+  variant="top"
+  src={company?.photo || companyPhoto}
+  className="rounded-circle mx-auto mt-4"
+  style={{ width: "40%", height: "auto" }}
+/>
             <Card.Body>
               <Card.Title>
                 {isLoading ? "Loading company..." : company?.name || "Company Name"}
@@ -150,6 +208,32 @@ function PublicCompanyProfile() {
               )}
             </Card.Body>
           </Card>
+          </Col>
+
+          {/* Messages Section */}
+          <Col md={4} className="mb-4">
+            <Card className="shadow-sm">
+              <Card.Body style={{ maxHeight: "calc(100vh - 200px)", overflowY: "auto" }}>
+                <h5>Messages</h5>
+                {messages.length === 0 ? (
+    <p>No messages yet.</p>
+  ) : (
+    messages.map((msg, idx) => (
+      <div
+        key={idx}
+        className={`mb-2 ${msg.fromMe ? "text-end" : "text-start"}`}
+      >
+        <strong>{msg.fromMe ? "You" : company?.name || "Company"}:</strong> {msg.text}
+        <br />
+        <small className="text-muted">{msg.timestamp}</small>
+        <hr />
+      </div>
+    ))
+  )}
+              </Card.Body>
+            </Card>
+          </Col>
+          </Row>
         </Container>
       </div>
     </>

@@ -10,8 +10,6 @@ const { uploadImageToFirebase, deleteImageFromFirebase } = require("../utils/fir
 // Multer config for in-memory storage
 const upload = multer({ storage: multer.memoryStorage() });
 
-// Auth middleware to verify JWT
-const verifyToken = authMiddleware(["user", "owner", "admin"]);
 
 // 🚀 New Register Route
 router.post("/register", async (req, res) => {
@@ -44,8 +42,48 @@ router.post("/register", async (req, res) => {
   }
 });
 
+// ✅ Get All Users or Search Users
+router.get("/", async (req, res) => {
+  try {
+      const { search } = req.query;
+      let users;
+
+      if (search) {
+          // 🔹 Search by name or email (case insensitive)
+          users = await User.find({
+              $or: [
+                  { name: { $regex: search, $options: "i" } }, 
+                  { email: { $regex: search, $options: "i" } }
+              ]
+          }).select("-password"); // Exclude passwords
+      } else {
+          // 🔹 Return all users
+          users = await User.find().select("-password"); // Exclude passwords
+      }
+
+      res.json(users);
+  } catch (error) {
+      res.status(500).json({ message: error.message });
+  }
+});
+
+// ✅ Get a Specific User by ID
+router.get("/:id", async (req, res) => {
+  try {
+      const user = await User.findById(req.params.id).select("-password"); // Exclude password
+
+      if (!user) {
+          return res.status(404).json({ message: "User not found" });
+      }
+
+      res.json(user);
+  } catch (error) {
+      res.status(500).json({ message: error.message });
+  }
+});
+
 // ✅ Update User (includes optional profile picture and image replacement)
-router.put("/:id", verifyToken, upload.single("profilePicture"), async (req, res) => {
+router.put("/:id", authMiddleware(["user", "admin", "owner"]), upload.single("profilePicture"), async (req, res) => {
   try {
     const allowedFields = ["name", "bio", "location", "website"];
     const updates = {};
@@ -79,7 +117,7 @@ router.put("/:id", verifyToken, upload.single("profilePicture"), async (req, res
 });
 
 // ✅ Get Profile Info (used on frontend)
-router.get("/profile", verifyToken, async (req, res) => {
+router.get("/profile", authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select("-password");
     if (!user) return res.status(404).json({ message: "User not found" });

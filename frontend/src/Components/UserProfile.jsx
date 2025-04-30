@@ -14,22 +14,23 @@ import backgroundBottom from "../Assets/nobackground.png";
 import { Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./UserProfile.css";
+import { updateData } from "./api";
 
 export function UserProfile() {
   const navigate = useNavigate();
-
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    localStorage.clear();
     navigate("/login-signup"); 
   };  
-
   const handleClick = (path) => {
     const pathname = path === "home" ? "/" :
                      path === "opportunities" ? "/opportunities-page" :
                      path === "profile" ? "/user-profile" :
-                     path === "companies" ? "/companies-page" : 
-                     path === "deals" ? "/deals-page" : "/";
-    navigate(pathname);
+                    path === "companies" ? "/companies-page" : 
+                    path === "deals" ? "/deals-page" : "/";
+
+   
+    navigate(pathname); 
   };
 
   const [user, setUser] = useState({});
@@ -46,14 +47,19 @@ export function UserProfile() {
   });
   const [creationSuccess, setCreationSuccess] = useState(false);
 
-  const token = localStorage.getItem("token");
-
   const fetchProfile = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      handleLogout();
+      return;
+    }
+
     try {
       const response = await fetch("http://localhost:3000/api/profile", {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       });
+
       if (response.ok) {
         const data = await response.json();
         setUser(data);
@@ -68,10 +74,11 @@ export function UserProfile() {
 
   useEffect(() => {
     fetchProfile();
-    fetchCompany();
+    fetchCompany(); 
   }, []);
 
   const handleSave = async () => {
+    const token = localStorage.getItem("token");
     const userId = localStorage.getItem("userId");
     if (!userId) {
       setError("User not found");
@@ -97,7 +104,7 @@ export function UserProfile() {
       if (response.ok) {
         const updated = await response.json();
         setUser(updated.updatedUser || updated); 
-        setIsEditing(false);
+      setIsEditing(false);
         setProfilePicture(null);
       } else {
         const errorData = await response.json();
@@ -112,6 +119,7 @@ export function UserProfile() {
   };
 
   const handleMyCompanyClick = async () => {
+    const token = localStorage.getItem("token");
     try {
       const response = await fetch("http://localhost:3000/api/business/owned", {
         method: "GET",
@@ -120,14 +128,17 @@ export function UserProfile() {
           Authorization: `Bearer ${token}`,
         },
       });
+
       if (!response.ok) {
         if (response.status === 403) {
+          // No business found, show the create modal
           setShowCreateModal(true);
         } else {
           throw new Error("Error fetching user's business");
         }
       } else {
         const business = await response.json();
+        // Navigate to the user's company page with the business data
         navigate("/user-company-page", { state: { business } });
       }
     } catch (err) {
@@ -136,6 +147,7 @@ export function UserProfile() {
   };
 
   const createCompany = async () => {
+    const token = localStorage.getItem("token");
     const userId = localStorage.getItem("userId");
     if (!token || !userId) return;
 
@@ -157,6 +169,7 @@ export function UserProfile() {
       setCreationSuccess(true);
       setNewCompany({ description: "", location: "", website: "", email: "" });
       fetchCompany();
+
       setTimeout(() => {
         setCreationSuccess(false);
         setShowCreateModal(false);
@@ -166,119 +179,130 @@ export function UserProfile() {
     }
   };
 
-  const handleSeeMyPosts = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/api/business/owned", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!response.ok) throw new Error("Failed to get company");
-      const company = await response.json();
-      if (company && company._id) {
-        navigate(`/company-posts/${company._id}`);
-      } else {
-        alert("You don't own a company yet.");
+  
+    const handleSeeMyPosts = async () => {
+      const token = localStorage.getItem("token");
+      console.log("Token in use:", token);
+
+      try {
+        const response = await fetch("http://localhost:3000/api/business/owned", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error("Failed to get company");
+    
+        const company = await response.json();
+        if (company && company._id) {
+          navigate(`/company-posts/${company._id}`);
+        } else {
+          alert("You don't own a company yet.");
+        }
+      } catch (err) {
+        console.error("Error navigating to posts:", err.message);
       }
-    } catch (err) {
-      console.error("Error navigating to posts:", err.message);
-    }
-  };
+    };
 
-  const handleChange = (e) => {
-    setUser({ ...user, [e.target.name]: e.target.value });
-  };
-
+    const handleChange = (e) => {
+      setUser({ ...user, [e.target.name]: e.target.value });
+    };
+    
+  
+    
+    
   return (
     <>
-      {/* Backgrounds */}
-      <div style={{ position: 'fixed', top: 0, right: 0, width: '200px', height: '300px', backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', zIndex: 999 }} />
-      <div style={{ position: 'fixed', top: 500, right: -50, width: '500px', height: '310px', backgroundImage: `url(${backgroundBottom})`, backgroundSize: 'cover', zIndex: 999 }} />
-      <div style={{ position: 'fixed', top: 400, left: 0, width: '150px', height: '400px', backgroundImage: `url(${backgroundIv})`, backgroundSize: 'cover', zIndex: 999 }} />
+      {/* Background Images */}
+      <div style={{ position: 'fixed', top: 0, right: 0, width: '200px', height: '300px', backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', zIndex: 999 }} />
+      <div style={{ position: 'fixed', top: 500, right: -50, width: '500px', height: '310px', backgroundImage: `url(${backgroundBottom})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', zIndex: 999 }} />
+      <div style={{ position: 'fixed', top: 400, left: 0, width: '150px', height: '400px', backgroundImage: `url(${backgroundIv})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', zIndex: 999 }} />
 
-      {/* Navbar */}
-      <Navbar bg="light" expand="lg" className="shadow-sm">
-        <Container>
-          <Navbar.Brand onClick={() => navigate("/")} style={{ cursor: 'pointer' }}>
-            <img src={logoImage} alt="Logo" style={{ width: '80px' }} />
-          </Navbar.Brand>
-          <Navbar.Toggle aria-controls="navbar-nav" />
-          <Navbar.Collapse id="navbar-nav">
-            <Nav className="ms-auto">
-              <Nav.Link onClick={() => handleClick("home")}>Home</Nav.Link>
-              <Nav.Link onClick={() => handleClick("companies")}>Companies</Nav.Link>
-              <Nav.Link onClick={() => handleClick("opportunities")}>See Opportunities</Nav.Link>
-              <Nav.Link onClick={() => handleClick("deals")}>See Deals</Nav.Link>
-              <Nav.Link onClick={handleMyCompanyClick}>My Company</Nav.Link>
+        {/* Navbar */}
+        <Navbar bg="light" expand="lg" className="shadow-sm">
+          <Container>
+            <Navbar.Brand onClick={() => navigate("/")} style={{ cursor: 'pointer' }}>
+              <img src={logoImage} alt="Logo" style={{ width: '80px' }} />
+            </Navbar.Brand>
+            <Navbar.Toggle aria-controls="navbar-nav" />
+            <Navbar.Collapse id="navbar-nav">
+                <Nav className="ms-auto">
+                <Nav.Link onClick={() => handleClick("home")}>Home</Nav.Link>
+                <Nav.Link onClick={() => handleClick("companies")}>Companies</Nav.Link>
+                <Nav.Link onClick={() => handleClick("opportunities")}>See Opportunities</Nav.Link>
+                <Nav.Link onClick={() => handleClick("deals")}>See Deals</Nav.Link>
+                <Nav.Link onClick={handleMyCompanyClick}>My Company</Nav.Link>
               <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
             </Nav>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
+            </Navbar.Collapse>
+          </Container>
+        </Navbar>
 
-      {/* Profile */}
-      <Container className="d-flex flex-column justify-content-center align-items-center mt-5">
-        {isLoading ? (
-          <Spinner animation="border" />
-        ) : (
-          <Card style={{ width: '28rem' }} className="text-center shadow">
-            <Card.Img
-              variant="top"
+        {/* Profile Section */}
+        <Container className="d-flex flex-column justify-content-center align-items-center mt-5">
+          {isLoading ? (
+            <Spinner animation="border" />
+          ) : (
+            <Card style={{ width: '28rem' }} className="text-center shadow">
+              <Card.Img
+                variant="top"
               src={user.profileImage || avatarImage}
-              className="rounded-circle mx-auto mt-4"
+                className="rounded-circle mx-auto mt-4"
               style={{ width: "150px", height: "150px", objectFit: "cover" }}
-            />
-            <Card.Body>
+              />
+              <Card.Body>
               <Card.Title>{user.name}</Card.Title>
               <Card.Text>{user.bio || "No bio provided"}</Card.Text>
               <Card.Text><strong>Location:</strong> {user.location || "Not specified"}</Card.Text>
               <Card.Text><strong>Website:</strong> {user.website || "No website"}</Card.Text>
-              <div className="d-flex justify-content-center mt-4 gap-3 flex-wrap">
+                <div className="d-flex justify-content-center mt-4 gap-3 flex-wrap">
                 <Button variant="outline-primary" onClick={() => setIsEditing(true)}>Edit Profile</Button>
                 <Button variant="outline-primary" onClick={() => navigate('/company-post-page')}>Post a Deal</Button>
                 <Button variant="outline-primary" onClick={() => navigate('/deals-page')}>Latest Deals</Button>
                 <Button variant="outline-primary" onClick={handleMyCompanyClick}>View Company</Button>
                 <Button variant="outline-primary" onClick={handleSeeMyPosts}>See My Posts</Button>
                 <Button variant="outline-primary" onClick={() => navigate('/messages-grouped')}>Conversations</Button>
-              </div>
-            </Card.Body>
-          </Card>
-        )}
+                </div>
 
-        {/* Edit Form */}
-        {isEditing && (
-          <Card className="mt-5 p-4 shadow-sm" style={{ width: '100%', maxWidth: '700px' }}>
-            <Form>
-              <Form.Group className="mb-3">
+
+
+              </Card.Body>
+            </Card>
+          )}
+
+          {/* Edit Profile Form */}
+          {isEditing && (
+            <Card className="mt-5 p-4 shadow-sm" style={{ width: '100%', maxWidth: '700px' }}>
+              <Form>
+                <Form.Group className="mb-3">
                 <Form.Label>Name</Form.Label>
                 <Form.Control name="name" value={user.name || ""} onChange={handleChange} />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Bio</Form.Label>
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Bio</Form.Label>
                 <Form.Control name="bio" as="textarea" value={user.bio || ""} onChange={handleChange} />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Location</Form.Label>
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Location</Form.Label>
                 <Form.Control name="location" value={user.location || ""} onChange={handleChange} />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Website</Form.Label>
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Website</Form.Label>
                 <Form.Control name="website" value={user.website || ""} onChange={handleChange} />
               </Form.Group>
               <Form.Group className="mb-3">
                 <Form.Label>Upload New Profile Picture (optional)</Form.Label>
                 <Form.Control type="file" onChange={(e) => setProfilePicture(e.target.files[0])} />
-              </Form.Group>
-              <Button variant="primary" onClick={handleSave} disabled={isLoading}>
-                {isLoading ? "Saving..." : "Save Changes"}
-              </Button>
-              {error && <Alert variant="danger" className="mt-3">{error}</Alert>}
-            </Form>
-          </Card>
-        )}
-      </Container>
+                </Form.Group>
+                <Button variant="primary" onClick={handleSave} disabled={isLoading}>
+                  {isLoading ? "Saving..." : "Save Changes"}
+                </Button>
+                {error && <Alert variant="danger" className="mt-3">{error}</Alert>}
+              </Form>
+            </Card>
+          )}
+        </Container>
 
-      {/* Create Company Modal */}
-      <Modal show={showCreateModal} onHide={() => setShowCreateModal(false)}>
-  <Modal.Header closeButton>
+        {/* Create Company Modal */}
+        <Modal show={showCreateModal} onHide={() => setShowCreateModal(false)}>
+        <Modal.Header closeButton>
     <Modal.Title>Create New Company</Modal.Title>
   </Modal.Header>
   <Modal.Body>
